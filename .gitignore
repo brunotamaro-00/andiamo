@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# uploads at runtime
+/data
+
+# do NOT commit the local npmrc (no auth tokens)
+# .npmrc is tracked since it sets registry=npmjs.org

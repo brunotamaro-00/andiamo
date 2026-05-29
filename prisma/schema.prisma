@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Stop {
+  id            String     @id @default(cuid())
+  order         Int        @unique
+  country       String
+  countryFlag   String
+  name          String
+  slug          String     @unique
+  category      String
+  priceLevel    String
+  arrivalDate   DateTime?
+  departureDate DateTime?
+  nights        Int        @default(0)
+  datesFixed    Boolean    @default(false)
+  latitude      Float
+  longitude     Float
+  timezone      String?
+  currencyCode  String
+  tempRange     String?
+  isTransit     Boolean    @default(false)
+  isCandidate   Boolean    @default(false)
+  isFlexMargin  Boolean    @default(false)
+  pois          Poi[]
+  notes         Note[]
+  documents     Document[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Poi {
+  id                  String   @id @default(cuid())
+  stopId              String
+  stop                Stop     @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  name                String
+  type                PoiType  @default(otro)
+  latitude            Float
+  longitude           Float
+  address             String?
+  url                 String?
+  notes               String?
+  reservationRequired Boolean  @default(false)
+  done                Boolean  @default(false)
+  sortOrder           Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+enum PoiType {
+  hostel
+  museo
+  actividad
+  comida
+  mirador
+  transporte
+  otro
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  stopId    String?
+  stop      Stop?    @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  title     String
+  body      String   @default("")
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id          String       @id @default(cuid())
+  stopId      String?
+  stop        Stop?        @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  label       String
+  kind        DocumentKind @default(other)
+  source      String
+  fileName    String?
+  mimeType    String?
+  sizeBytes   Int?
+  storagePath String?
+  externalUrl String?
+  createdAt   DateTime     @default(now())
+}
+
+enum DocumentKind {
+  checkin
+  voucher
+  ticket
+  carRental
+  insurance
+  flight
+  other
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
