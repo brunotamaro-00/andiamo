@@ -2,6 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { getCurrencySymbol, CURRENCY_NAMES } from "@/lib/currency-map";
+import { Card, SectionHeader } from "@/components/ui/Card";
+
+const NO_SPACE_SYMBOLS = new Set(["$", "€", "£", "₺"]);
+
+function fmtNum(value: number, decimals: number): string {
+  return value.toLocaleString("de-DE", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+function fmt(symbol: string, amount: string): string {
+  return NO_SPACE_SYMBOLS.has(symbol) ? `${symbol}${amount}` : `${symbol} ${amount}`;
+}
 
 interface RatesData {
   rates: Record<string, number>;
@@ -11,7 +25,8 @@ interface RatesData {
 
 export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
   const [data, setData] = useState<RatesData | null>(null);
-  const [amount, setAmount] = useState("100");
+  const [usdInput, setUsdInput] = useState("100");
+  const [localInput, setLocalInput] = useState("100");
 
   useEffect(() => {
     fetch("/api/rates")
@@ -24,65 +39,86 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
   const symbol = getCurrencySymbol(currencyCode);
   const currencyName = CURRENCY_NAMES[currencyCode] ?? currencyCode;
 
-  // How many local units = 1 USD
-  const localAmount = rate && amount ? (parseFloat(amount) * rate).toFixed(2) : null;
-  // How many USD = 1 local unit
-  const usdAmount = rate && amount ? (parseFloat(amount) / rate).toFixed(2) : null;
+  const decimals = currencyCode === "HUF" ? 0 : 2;
+
+  const localFromUsd =
+    rate && usdInput
+      ? fmtNum(parseFloat(usdInput) * rate, decimals)
+      : null;
+
+  const usdFromLocal =
+    rate && localInput
+      ? fmtNum(parseFloat(localInput) / rate, 2)
+      : null;
+
+  const offlineAction = data?.source === "cached" ? (
+    <span className="text-[11px] text-warning/70">(sin conexión)</span>
+  ) : undefined;
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4">
-      <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-        Moneda
-        {data?.source === "cached" && (
-          <span className="ml-2 text-amber-500/70">(sin conexión)</span>
-        )}
-      </h2>
+    <Card>
+      <SectionHeader title="Moneda" action={offlineAction} />
 
-      <div className="flex items-center gap-2 mb-4">
-        <div className="bg-slate-800 rounded-xl px-3 py-2 flex-1">
-          <p className="text-lg font-bold text-slate-100">{symbol} {currencyCode}</p>
-          <p className="text-xs text-slate-400">{currencyName}</p>
+      {/* Currency info */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="bg-sand-850 rounded-xl px-3 py-2 flex-1 border border-sand-800">
+          <p className="text-base font-semibold text-sand-100">
+            {symbol} {currencyCode}
+          </p>
+          <p className="text-xs text-sand-500">{currencyName}</p>
         </div>
         {rate && (
           <div className="text-right">
-            <p className="text-sm font-semibold text-slate-200">
-              1 USD = {symbol}{rate.toFixed(currencyCode === "HUF" ? 0 : currencyCode === "CZK" ? 1 : 2)}
+            <p className="text-sm font-medium text-sand-200">
+              1 USD = {fmt(symbol, fmtNum(rate, decimals))}
             </p>
-            <p className="text-xs text-slate-500">{data?.date ?? ""}</p>
+            <p className="text-xs text-sand-600">{data?.date ?? ""}</p>
           </div>
         )}
       </div>
 
       {/* Converter */}
       {rate && (
-        <div className="bg-slate-800/50 rounded-xl p-3 space-y-2">
-          <p className="text-xs text-slate-500 mb-2">Convertidor rápido</p>
+        <div className="bg-sand-850/50 rounded-xl p-3 border border-sand-800/50 space-y-3">
+          <p className="text-xs font-medium text-sand-500 uppercase tracking-wider">
+            Convertidor
+          </p>
+
+          {/* USD → local */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400 w-8">USD</span>
+            <span className="text-xs text-sand-500 w-12 shrink-0">USD</span>
             <input
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={usdInput}
+              onChange={(e) => setUsdInput(e.target.value)}
+              className="flex-1 bg-sand-900 border border-sand-700 rounded-xl px-3 py-1.5 text-sm text-sand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-850"
               min="0"
               step="any"
+              aria-label="Monto en USD"
             />
-            <span className="text-sm text-slate-400">→ {symbol}{localAmount ?? "–"}</span>
+            <span className="text-sm text-sand-300 shrink-0 min-w-[5rem] text-right">
+              {localFromUsd != null ? fmt(symbol, localFromUsd) : "–"}
+            </span>
           </div>
+
+          {/* local → USD */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400 w-8">{currencyCode}</span>
+            <span className="text-xs text-sand-500 w-12 shrink-0">{currencyCode}</span>
             <input
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={localInput}
+              onChange={(e) => setLocalInput(e.target.value)}
+              className="flex-1 bg-sand-900 border border-sand-700 rounded-xl px-3 py-1.5 text-sm text-sand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-850"
               min="0"
               step="any"
+              aria-label={`Monto en ${currencyCode}`}
             />
-            <span className="text-sm text-slate-400">→ ${usdAmount ?? "–"}</span>
+            <span className="text-sm text-sand-300 shrink-0 min-w-[5rem] text-right">
+              {usdFromLocal != null ? fmt("$", usdFromLocal) : "–"}
+            </span>
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

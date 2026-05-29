@@ -8,6 +8,10 @@ import { StopMap } from "@/components/StopMap";
 import { PoiPanel } from "@/components/PoiPanel";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
+import { EditStopPanel } from "@/components/EditStopPanel";
+import { Badge } from "@/components/ui/Badge";
+import type { Metadata } from "next";
+import { ArrowLeft, ArrowRight, Thermometer } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +19,15 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const stop = await db.stop.findUnique({ where: { slug }, select: { name: true, countryFlag: true } });
-  return { title: stop ? `${stop.countryFlag} ${stop.name} — Europa 2026` : "Europa 2026" };
+  const stop = await db.stop.findUnique({
+    where: { slug },
+    select: { name: true, countryFlag: true },
+  });
+  return {
+    title: stop ? `${stop.countryFlag} ${stop.name} — Europa 2026` : "Europa 2026",
+  };
 }
 
 export default async function StopPage({ params }: Props) {
@@ -28,7 +37,9 @@ export default async function StopPage({ params }: Props) {
     db.stop.findUnique({
       where: { slug },
       include: {
-        pois: { orderBy: [{ done: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }] },
+        pois: {
+          orderBy: [{ done: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+        },
         notes: { orderBy: [{ pinned: "desc" }, { createdAt: "desc" }] },
         documents: { orderBy: { createdAt: "asc" } },
       },
@@ -38,16 +49,23 @@ export default async function StopPage({ params }: Props) {
 
   if (!stop) notFound();
 
-  // Nearby stops for navigation
-  const adjacentStops = await db.stop.findMany({
-    where: {
-      order: { gte: stop.order - 2, lte: stop.order + 2 },
-      isFlexMargin: false,
-      NOT: { id: stop.id },
-    },
-    orderBy: { order: "asc" },
-    select: { slug: true, name: true, order: true, countryFlag: true },
-  });
+  /* Nearby stops for navigation */
+  const [adjacentStops, allStops] = await Promise.all([
+    db.stop.findMany({
+      where: {
+        order: { gte: stop.order - 2, lte: stop.order + 2 },
+        isFlexMargin: false,
+        NOT: { id: stop.id },
+      },
+      orderBy: { order: "asc" },
+      select: { slug: true, name: true, order: true, countryFlag: true },
+    }),
+    db.stop.findMany({
+      where: { isFlexMargin: false, NOT: { id: stop.id } },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, order: true, countryFlag: true },
+    }),
+  ]);
 
   const prevStop = adjacentStops.filter((s) => s.order < stop.order).at(-1);
   const nextStop = adjacentStops.find((s) => s.order > stop.order);
@@ -55,9 +73,14 @@ export default async function StopPage({ params }: Props) {
   const isActive = slug === currentSlug;
 
   const today = new Date();
-  const tripStart = new Date("2026-08-05");
   const daysLeft = stop.departureDate
-    ? Math.max(0, Math.ceil((new Date(stop.departureDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(
+        0,
+        Math.ceil(
+          (new Date(stop.departureDate).getTime() - today.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      )
     : null;
 
   const poiMarkers = stop.pois.map((p) => ({
@@ -72,67 +95,97 @@ export default async function StopPage({ params }: Props) {
   const path = `/stops/${slug}`;
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-sand-950">
       {/* Top nav */}
-      <header className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex items-center gap-3">
-        <Link href="/stops" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">
-          ← Itinerario
+      <header className="sticky top-0 z-[1000] bg-sand-950/90 backdrop-blur border-b border-sand-800 px-4 py-3 flex items-center gap-3">
+        <Link
+          href="/stops"
+          className="text-sand-400 hover:text-sand-200 text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 rounded-lg px-1 py-0.5"
+        >
+          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
+          Itinerario
         </Link>
         <div className="flex-1 min-w-0 text-center">
-          <h1 className="text-sm font-semibold text-slate-100 truncate">
-            {stop.countryFlag} {stop.name}
+          <h1 className="text-sm font-medium text-sand-300 truncate">
+            <span aria-hidden="true">{stop.countryFlag}</span>{" "}
+            {stop.name}
           </h1>
         </div>
-        <div className="w-16" /> {/* spacer */}
+        <div className="w-20" /> {/* spacer to balance left link */}
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-4">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         {/* City header card */}
-        <div className={`rounded-2xl p-4 border ${isActive ? "bg-sky-900/20 border-sky-700/40" : "bg-slate-900 border-slate-800"}`}>
+        <div
+          className={`rounded-2xl p-4 border ${
+            isActive
+              ? "bg-gold-900 border-gold-700/50"
+              : "bg-sand-900 border-sand-800"
+          }`}
+        >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-3xl">{stop.countryFlag}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-4xl" aria-hidden="true">
+                  {stop.countryFlag}
+                </span>
                 <div>
-                  <h2 className="text-xl font-bold text-slate-100">{stop.name}</h2>
-                  <p className="text-sm text-slate-400">{stop.country}</p>
+                  <h2 className="text-2xl font-semibold font-display text-sand-100 leading-tight">
+                    {stop.name}
+                  </h2>
+                  <p className="text-sm text-sand-400 mt-0.5">{stop.country}</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-3">
                 {stop.arrivalDate && (
-                  <Badge>{formatDate(stop.arrivalDate)} → {stop.departureDate ? formatDate(stop.departureDate) : "?"}</Badge>
+                  <DateBadge>
+                    {formatDate(stop.arrivalDate)} –{" "}
+                    {stop.departureDate ? formatDate(stop.departureDate) : "?"}
+                  </DateBadge>
                 )}
-                {stop.nights > 0 && <Badge>{stop.nights} noches</Badge>}
-                <Badge>{stop.category}</Badge>
-                <Badge>{stop.priceLevel}</Badge>
-                {stop.tempRange && <Badge>🌡️ {stop.tempRange}</Badge>}
+                {stop.tempRange && (
+                  <DateBadge>
+                    <Thermometer
+                      size={11}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="inline mr-1"
+                    />
+                    {stop.tempRange}
+                  </DateBadge>
+                )}
               </div>
             </div>
 
-            <div className="text-right shrink-0">
-              {isActive && (
-                <span className="inline-block bg-sky-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                  Aquí ahora
-                </span>
-              )}
+            <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
+              {isActive && <Badge variant="active">Aquí ahora</Badge>}
               {!stop.datesFixed && (
-                <span className="block text-[10px] text-amber-400 mt-1">fechas tentativas</span>
+                <Badge variant="warning">fechas tentativas</Badge>
               )}
-              {stop.isTransit && (
-                <span className="block text-[10px] text-slate-500 mt-1">tránsito</span>
-              )}
-              {stop.isCandidate && (
-                <span className="block text-[10px] text-purple-400 mt-1">candidata</span>
-              )}
+              {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
+              {stop.isCandidate && <Badge variant="special">candidata</Badge>}
+              <EditStopPanel
+                stopId={stop.id}
+                slug={stop.slug}
+                name={stop.name}
+                arrivalDate={stop.arrivalDate}
+                nights={stop.nights}
+                datesFixed={stop.datesFixed}
+                isCandidate={stop.isCandidate}
+                currentOrder={stop.order}
+                allStops={allStops}
+              />
             </div>
           </div>
 
           {stop.arrivalDate && (
-            <div className="mt-3 pt-3 border-t border-slate-800/50 flex flex-wrap gap-3 text-xs text-slate-500">
+            <div className="mt-3 pt-3 border-t border-sand-800/50 flex flex-wrap gap-3 text-xs text-sand-500">
               <span>Día {getTripDay(stop.arrivalDate)} del viaje</span>
               {isActive && daysLeft !== null && (
-                <span className="text-sky-400">{daysLeft} días restantes aquí</span>
+                <span className="text-gold-400">
+                  {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
+                </span>
               )}
             </div>
           )}
@@ -141,15 +194,43 @@ export default async function StopPage({ params }: Props) {
         {/* Prev / Next navigation */}
         <div className="flex gap-2">
           {prevStop ? (
-            <Link href={`/stops/${prevStop.slug}`} className="flex-1 flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:border-slate-600 transition-colors">
-              ← {prevStop.countryFlag} {prevStop.name}
+            <Link
+              href={`/stops/${prevStop.slug}`}
+              className={[
+                "flex-1 flex items-center gap-1.5 bg-sand-900 border border-sand-800",
+                "rounded-xl px-3 py-2.5 text-sm text-sand-400 hover:border-sand-700 hover:text-sand-200 transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
+              <span aria-hidden="true">{prevStop.countryFlag}</span>{" "}
+              {prevStop.name}
             </Link>
-          ) : <div className="flex-1" />}
+          ) : (
+            <div className="flex-1" />
+          )}
           {nextStop ? (
-            <Link href={`/stops/${nextStop.slug}`} className="flex-1 flex items-center justify-end gap-1.5 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:border-slate-600 transition-colors text-right">
-              {nextStop.countryFlag} {nextStop.name} →
+            <Link
+              href={`/stops/${nextStop.slug}`}
+              className={[
+                "flex-1 flex items-center justify-end gap-1.5 bg-sand-900 border border-sand-800",
+                "rounded-xl px-3 py-2.5 text-sm text-sand-400 hover:border-sand-700 hover:text-sand-200 transition-colors text-right",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <span aria-hidden="true">{nextStop.countryFlag}</span>{" "}
+              {nextStop.name}
+              <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
             </Link>
-          ) : <div className="flex-1" />}
+          ) : (
+            <div className="flex-1" />
+          )}
         </div>
 
         {/* Weather */}
@@ -158,7 +239,7 @@ export default async function StopPage({ params }: Props) {
         {/* Currency */}
         <CurrencyCard currencyCode={stop.currencyCode} />
 
-        {/* Map — key changes when POIs change, forcing re-mount to show new markers */}
+        {/* Map */}
         <StopMap
           key={`map-${stop.pois.map((p) => p.id + p.done).join("-")}`}
           centerLat={stop.latitude}
@@ -186,7 +267,9 @@ export default async function StopPage({ params }: Props) {
         <DocumentsPanel
           stopId={stop.id}
           slug={stop.slug}
-          documents={stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]}
+          documents={
+            stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
+          }
           path={path}
         />
       </main>
@@ -194,20 +277,29 @@ export default async function StopPage({ params }: Props) {
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+/** Small inline badge for dates/temp ranges */
+function DateBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-xs bg-slate-800 text-slate-400 rounded-lg px-2 py-0.5 border border-slate-700">
+    <span className="inline-flex items-center text-xs bg-sand-850 text-sand-400 rounded-lg px-2 py-0.5 border border-sand-800">
       {children}
     </span>
   );
 }
 
 function formatDate(d: Date | string): string {
-  return new Date(d).toLocaleDateString("es-AR", { day: "numeric", month: "short", timeZone: "UTC" });
+  return new Date(d).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
 }
 
 function getTripDay(arrival: Date | string): number {
   const start = new Date("2026-08-05");
   const arrDate = new Date(arrival);
-  return Math.floor((arrDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return (
+    Math.floor(
+      (arrDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+    ) + 1
+  );
 }

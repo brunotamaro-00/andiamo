@@ -45,5 +45,12 @@ next-env.d.ts
 # uploads at runtime
 /data
 
+# Claude Code local config
+.claude/
+
+# misc logs
+databricks_mcp.log
+prisma/split-highlands.ts
+
 # do NOT commit the local npmrc (no auth tokens)
 # .npmrc is tracked since it sets registry=npmjs.org

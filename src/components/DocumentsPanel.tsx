@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import {
+  BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
+  ArrowUpRight, Trash2, Plus, Upload,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
+import { Card, SectionHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { Field, SelectField } from "@/components/ui/Field";
 
 interface Document {
   id: string;
@@ -18,9 +27,14 @@ const KIND_LABEL: Record<string, string> = {
   carRental: "Auto", insurance: "Seguro", flight: "Vuelo", other: "Otro",
 };
 
-const KIND_EMOJI: Record<string, string> = {
-  checkin: "🏨", voucher: "🎟️", ticket: "🎫",
-  carRental: "🚗", insurance: "🛡️", flight: "✈️", other: "📄",
+const KIND_ICON: Record<string, LucideIcon> = {
+  checkin:   BedDouble,
+  voucher:   Ticket,
+  ticket:    Ticket,
+  carRental: Car,
+  insurance: ShieldCheck,
+  flight:    Plane,
+  other:     FileText,
 };
 
 const DOCUMENT_KINDS = Object.keys(KIND_LABEL) as (keyof typeof KIND_LABEL)[];
@@ -37,65 +51,97 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   const [, startTransition] = useTransition();
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-          Documentos {documents.length > 0 && <span className="text-slate-600 normal-case">({documents.length})</span>}
-        </h2>
-        <div className="flex gap-2">
-          <button onClick={() => setMode("link")} className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
-            + Link
-          </button>
-          <button onClick={() => setMode("upload")} className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
-            + Subir
-          </button>
-        </div>
-      </div>
+    <Card>
+      <SectionHeader
+        title="Documentos"
+        count={documents.length > 0 ? documents.length : undefined}
+        action={
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setMode("link")}>
+              <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
+              Link
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setMode("upload")}>
+              <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
+              Subir
+            </Button>
+          </>
+        }
+      />
 
       {documents.length === 0 && (
-        <p className="text-slate-600 text-sm">Sin documentos. Agregá links o sube PDFs e imágenes.</p>
+        <p className="text-sand-600 text-sm">
+          Sin documentos. Agregá links o subí PDFs e imágenes.
+        </p>
       )}
 
       <div className="space-y-2">
-        {documents.map((doc) => (
-          <div key={doc.id} className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
-            <span className="text-lg shrink-0">{KIND_EMOJI[doc.kind] ?? "📄"}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-200 truncate">{doc.label}</p>
-              <p className="text-xs text-slate-500">{KIND_LABEL[doc.kind] ?? doc.kind}</p>
+        {documents.map((doc) => {
+          const Icon = KIND_ICON[doc.kind] ?? FileText;
+          return (
+            <div
+              key={doc.id}
+              className="flex items-center gap-3 p-2.5 rounded-xl bg-sand-850/40 border border-sand-800"
+            >
+              <Icon
+                size={18}
+                strokeWidth={1.5}
+                aria-hidden="true"
+                className="text-sand-500 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-sand-200 truncate">
+                  {doc.label}
+                </p>
+                <p className="text-xs text-sand-600">
+                  {KIND_LABEL[doc.kind] ?? doc.kind}
+                </p>
+              </div>
+              <a
+                href={`/api/documents/${doc.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gold-400 hover:text-gold-300 shrink-0 transition-colors inline-flex items-center gap-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold-400 rounded"
+                aria-label={`Abrir ${doc.label} en nueva pestaña`}
+              >
+                Ver
+                <ArrowUpRight size={12} strokeWidth={1.5} aria-hidden="true" />
+              </a>
+              <button
+                onClick={() => startTransition(() => deleteDocument(doc.id, path))}
+                aria-label={`Borrar documento "${doc.label}"`}
+                className="p-1.5 rounded-lg text-sand-700 hover:text-danger hover:bg-danger-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+              >
+                <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
+              </button>
             </div>
-            <a
-              href={`/api/documents/${doc.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-sky-400 hover:text-sky-300 shrink-0 transition-colors"
-            >
-              Ver ↗
-            </a>
-            <button
-              onClick={() => startTransition(() => deleteDocument(doc.id, path))}
-              className="text-slate-700 hover:text-red-400 text-xs shrink-0 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {mode === "link" && (
-        <AddLinkModal stopId={stopId} slug={slug} path={path} onClose={() => setMode(null)} />
+        <AddLinkModal
+          stopId={stopId}
+          slug={slug}
+          onClose={() => setMode(null)}
+        />
       )}
       {mode === "upload" && (
-        <UploadModal stopId={stopId} path={path} onClose={() => setMode(null)} />
+        <UploadModal
+          stopId={stopId}
+          onClose={() => setMode(null)}
+        />
       )}
-    </div>
+    </Card>
   );
 }
 
 function AddLinkModal({
-  stopId, slug, path, onClose,
+  stopId, slug, onClose,
 }: {
-  stopId: string | null; slug: string | null; path: string; onClose: () => void;
+  stopId: string | null;
+  slug: string | null;
+  onClose: () => void;
 }) {
   const [, startTransition] = useTransition();
 
@@ -107,25 +153,42 @@ function AddLinkModal({
     });
   }
 
-  return <Modal title="Agregar link" onClose={onClose}>
-    <form action={handleSubmit} className="space-y-3">
-      <div>
-        <label className="text-xs text-slate-400">Etiqueta</label>
-        <input type="text" name="label" required placeholder="Ej: Check-in Generator Hostel"
-          className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-      </div>
-      <KindSelect />
-      <div>
-        <label className="text-xs text-slate-400">URL</label>
-        <input type="url" name="url" required placeholder="https://..."
-          className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-      </div>
-      <ModalButtons onClose={onClose} />
-    </form>
-  </Modal>;
+  return (
+    <Modal title="Agregar link" onClose={onClose}>
+      <form action={handleSubmit} className="space-y-3">
+        <Field
+          label="Etiqueta"
+          name="label"
+          required
+          placeholder="Ej: Check-in Generator Hostel"
+          autoFocus
+        />
+        <SelectField label="Tipo" name="kind">
+          {DOCUMENT_KINDS.map((k) => (
+            <option key={k} value={k}>
+              {KIND_LABEL[k]}
+            </option>
+          ))}
+        </SelectField>
+        <Field label="URL" name="url" type="url" required placeholder="https://..." />
+        <div className="flex gap-2 pt-1">
+          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary" className="flex-1">
+            Guardar
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
 }
 
-function UploadModal({ stopId, path, onClose }: { stopId: string | null; path: string; onClose: () => void }) {
+function UploadModal({
+  stopId, onClose,
+}: {
+  stopId: string | null; onClose: () => void;
+}) {
   const [uploading, setUploading] = useState(false);
   const [label, setLabel] = useState("");
   const [kind, setKind] = useState("other");
@@ -142,76 +205,55 @@ function UploadModal({ stopId, path, onClose }: { stopId: string | null; path: s
     if (stopId) fd.set("stopId", stopId);
     await fetch("/api/documents/upload", { method: "POST", body: fd });
     setUploading(false);
-    // Trigger revalidation by navigating
     window.location.reload();
   }
 
-  return <Modal title="Subir documento" onClose={onClose}>
-    <div className="space-y-3">
-      <div>
-        <label className="text-xs text-slate-400">Etiqueta</label>
-        <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ej: Voucher hostel Londres"
-          className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-      </div>
-      <div>
-        <label className="text-xs text-slate-400">Tipo</label>
-        <select value={kind} onChange={(e) => setKind(e.target.value)}
-          className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
-          {DOCUMENT_KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
-        </select>
-      </div>
-      <div>
-        <label className="text-xs text-slate-400">Archivo</label>
-        <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp"
-          className="mt-1 w-full text-sm text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600 cursor-pointer" />
-      </div>
-      <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className="flex-1 py-2 rounded-lg border border-slate-700 text-slate-400 text-sm hover:border-slate-500 transition-colors">
-          Cancelar
-        </button>
-        <button onClick={handleUpload} disabled={uploading || !label}
-          className="flex-1 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white text-sm font-medium transition-colors">
-          {uploading ? "Subiendo..." : "Subir"}
-        </button>
-      </div>
-    </div>
-  </Modal>;
-}
-
-function KindSelect() {
   return (
-    <div>
-      <label className="text-xs text-slate-400">Tipo</label>
-      <select name="kind" className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
-        {DOCUMENT_KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
-      </select>
-    </div>
-  );
-}
-
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-sm bg-slate-900 rounded-2xl p-5 space-y-4 shadow-2xl">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-slate-100">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">✕</button>
+    <Modal title="Subir documento" onClose={onClose}>
+      <div className="space-y-3">
+        <Field
+          label="Etiqueta"
+          name="label"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder="Ej: Voucher hostel Londres"
+          autoFocus
+        />
+        <SelectField
+          label="Tipo"
+          name="kind"
+          value={kind}
+          onChange={(e) => setKind(e.target.value)}
+        >
+          {DOCUMENT_KINDS.map((k) => (
+            <option key={k} value={k}>
+              {KIND_LABEL[k]}
+            </option>
+          ))}
+        </SelectField>
+        <div>
+          <label className="text-xs font-medium text-sand-400">Archivo</label>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            className="mt-1 w-full text-sm text-sand-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-sand-800 file:text-sand-200 hover:file:bg-sand-700 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 rounded-xl"
+          />
         </div>
-        {children}
+        <div className="flex gap-2 pt-1">
+          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            className="flex-1"
+            onClick={handleUpload}
+            disabled={uploading || !label}
+          >
+            {uploading ? "Subiendo..." : "Subir"}
+          </Button>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function ModalButtons({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="flex gap-2 pt-1">
-      <button type="button" onClick={onClose} className="flex-1 py-2 rounded-lg border border-slate-700 text-slate-400 text-sm hover:border-slate-500 transition-colors">
-        Cancelar
-      </button>
-      <button type="submit" className="flex-1 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium transition-colors">
-        Guardar
-      </button>
-    </div>
+    </Modal>
   );
 }
