@@ -6,6 +6,14 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   PLN: "zł",
   HUF: "Ft",
   USD: "$",
+  SEK: "kr",
+  DKK: "kr",
+  NOK: "kr",
+  RON: "lei",
+  BGN: "лв",
+  ISK: "kr",
+  TRY: "₺",
+  RSD: "din",
 };
 
 export const CURRENCY_NAMES: Record<string, string> = {
@@ -15,6 +23,14 @@ export const CURRENCY_NAMES: Record<string, string> = {
   CZK: "Corona checa",
   PLN: "Esloti polaco",
   HUF: "Forinto húngaro",
+  SEK: "Corona sueca",
+  DKK: "Corona danesa",
+  NOK: "Corona noruega",
+  RON: "Leu rumano",
+  BGN: "Lev búlgaro",
+  ISK: "Corona islandesa",
+  TRY: "Lira turca",
+  RSD: "Dinar serbio",
 };
 
 export function getCurrencySymbol(code: string): string {

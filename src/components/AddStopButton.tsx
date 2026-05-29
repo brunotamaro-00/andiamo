@@ -1,0 +1,219 @@
+"use client";
+
+import { useState, useTransition, useRef } from "react";
+import { Plus, X } from "lucide-react";
+import { createStop } from "@/app/actions/stops";
+import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { Field, SelectField } from "@/components/ui/Field";
+
+interface GeoResult {
+  name: string;
+  admin1: string | null;
+  country: string;
+  countryCode: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+}
+
+interface StopOption {
+  id: string;
+  order: number;
+  name: string;
+  countryFlag: string;
+}
+
+interface Props {
+  stops: StopOption[];
+}
+
+export function AddStopButton({ stops }: Props) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className={[
+          "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl",
+          "border border-dashed border-sand-700 bg-sand-900/50 text-sm text-sand-500",
+          "hover:border-gold-600/50 hover:bg-sand-900 hover:text-sand-200 transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
+          "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
+        Agregar ciudad
+      </button>
+      {open && <AddStopModal stops={stops} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function AddStopModal({
+  stops, onClose,
+}: {
+  stops: StopOption[]; onClose: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<GeoResult[]>([]);
+  const [selected, setSelected] = useState<GeoResult | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleQueryChange(val: string) {
+    setQuery(val);
+    setSelected(null);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (val.length < 2) {
+      setResults([]);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
+        const data = await res.json();
+        setResults(data.results ?? []);
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 400);
+  }
+
+  function handleSubmit(formData: FormData) {
+    if (!selected) return;
+    formData.set("name", selected.name);
+    formData.set("country", selected.country);
+    formData.set("countryCode", selected.countryCode);
+    formData.set("latitude", selected.latitude.toString());
+    formData.set("longitude", selected.longitude.toString());
+    formData.set("timezone", selected.timezone);
+    startTransition(() => {
+      createStop(formData);
+    });
+  }
+
+  const maxOrder = stops.reduce((m, s) => Math.max(m, s.order), 0);
+
+  return (
+    <Modal title="Agregar ciudad" onClose={onClose}>
+      {/* City search */}
+      <div>
+        <label className="text-xs font-medium text-sand-400">Buscar ciudad</label>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleQueryChange(e.target.value)}
+          placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
+          autoFocus
+          aria-label="Buscar ciudad"
+          className="mt-1 w-full bg-sand-850 border border-sand-700 rounded-xl px-3 py-2.5 text-sm text-sand-100 placeholder:text-sand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950 transition-colors"
+        />
+        {searching && (
+          <p className="text-xs text-sand-500 mt-1">Buscando...</p>
+        )}
+      </div>
+
+      {/* Search results */}
+      {!selected && results.length > 0 && (
+        <div className="space-y-1">
+          {results.map((r, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => {
+                setSelected(r);
+                setResults([]);
+                setQuery(r.name);
+              }}
+              className="w-full text-left px-3 py-2.5 rounded-xl bg-sand-850 hover:bg-sand-800 transition-colors border border-sand-800 hover:border-sand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+            >
+              <p className="text-sm font-medium text-sand-100">
+                {r.name}{r.admin1 ? `, ${r.admin1}` : ""}
+              </p>
+              <p className="text-xs text-sand-500">
+                {r.country} · {r.latitude.toFixed(2)}, {r.longitude.toFixed(2)}
+              </p>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Selected city chip */}
+      {selected && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-gold-900 border border-gold-700/40 rounded-xl">
+          <span className="text-sm font-medium text-gold-200 flex-1">
+            {selected.name}
+          </span>
+          <span className="text-xs text-sand-400">{selected.country}</span>
+          <button
+            onClick={() => {
+              setSelected(null);
+              setQuery("");
+            }}
+            aria-label="Quitar ciudad seleccionada"
+            className="p-1 rounded-lg text-sand-500 hover:text-sand-200 hover:bg-sand-850 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+          >
+            <X size={14} strokeWidth={1.5} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      {/* Form — only visible when a city is selected */}
+      {selected && (
+        <form action={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Llegada" name="arrivalDate" type="date" />
+            <Field
+              label="Noches"
+              name="nights"
+              type="number"
+              defaultValue={3}
+              min={0}
+              required
+            />
+          </div>
+
+          <SelectField
+            label="Insertar después de"
+            name="insertAfterOrder"
+            defaultValue={String(maxOrder)}
+          >
+            <option value="0">Al principio</option>
+            {stops.map((s) => (
+              <option key={s.id} value={s.order}>
+                Después de {s.countryFlag} {s.name}
+              </option>
+            ))}
+          </SelectField>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="flex-1"
+              onClick={onClose}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              className="flex-1"
+              disabled={isPending}
+            >
+              {isPending ? "Agregando..." : "Agregar"}
+            </Button>
+          </div>
+        </form>
+      )}
+    </Modal>
+  );
+}

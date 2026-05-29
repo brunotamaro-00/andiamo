@@ -2,12 +2,10 @@ import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-const CURRENCIES = ["GBP", "EUR", "CHF", "CZK", "PLN", "HUF"];
-
 export async function GET() {
   try {
     const res = await fetch(
-      `https://api.frankfurter.app/latest?from=USD&to=${CURRENCIES.join(",")}`,
+      "https://api.frankfurter.app/latest?from=USD",
       { next: { revalidate: 43200 } } // 12h cache
     );
 

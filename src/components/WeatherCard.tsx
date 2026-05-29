@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Sun, CloudSun, Cloud, CloudFog, CloudRain, Snowflake,
+  CloudDrizzle, CloudLightning, Thermometer, Sunrise, Sunset,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Card, SectionHeader } from "@/components/ui/Card";
 
 interface WeatherData {
   current: { temperature_2m: number; weather_code: number };
@@ -14,24 +20,42 @@ interface WeatherData {
   };
 }
 
-function weatherEmoji(code: number): string {
-  if (code === 0) return "☀️";
-  if (code <= 2) return "🌤️";
-  if (code <= 3) return "☁️";
-  if (code <= 49) return "🌫️";
-  if (code <= 69) return "🌧️";
-  if (code <= 79) return "❄️";
-  if (code <= 84) return "🌦️";
-  if (code <= 99) return "⛈️";
-  return "🌡️";
+interface WeatherIconDef {
+  icon: LucideIcon;
+  className: string;
+}
+
+function getWeatherIconDef(code: number): WeatherIconDef {
+  if (code === 0) return { icon: Sun, className: "text-gold-400" };
+  if (code <= 2) return { icon: CloudSun, className: "text-gold-400/80" };
+  if (code <= 3) return { icon: Cloud, className: "text-sand-400" };
+  if (code <= 49) return { icon: CloudFog, className: "text-sand-300" };
+  if (code <= 69) return { icon: CloudRain, className: "text-sand-300" };
+  if (code <= 79) return { icon: Snowflake, className: "text-sand-200" };
+  if (code <= 84) return { icon: CloudDrizzle, className: "text-sand-300" };
+  if (code <= 99) return { icon: CloudLightning, className: "text-warning" };
+  return { icon: Thermometer, className: "text-sand-400" };
+}
+
+function WeatherIcon({ code, size = 32 }: { code: number; size?: number }) {
+  const { icon: Icon, className } = getWeatherIconDef(code);
+  return <Icon size={size} strokeWidth={1.5} aria-hidden="true" className={className} />;
 }
 
 function formatTime(iso: string): string {
   try {
-    return new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
+    return new Date(iso).toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
   } catch {
     return iso;
   }
+}
+
+function formatDay(iso: string): string {
+  return new Date(iso).toLocaleDateString("es-AR", { weekday: "short" });
 }
 
 export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
@@ -40,71 +64,89 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
 
   useEffect(() => {
     fetch(`/api/weather?lat=${lat}&lng=${lng}`)
-      .then((r) => r.json())
-      .then(setData)
+      .then((r) => {
+        if (!r.ok) throw new Error("weather error");
+        return r.json();
+      })
+      .then((json) => {
+        if (!json?.daily) throw new Error("no daily data");
+        setData(json);
+      })
       .catch(() => setError(true));
   }, [lat, lng]);
 
   if (error) {
     return (
-      <Card title="Clima">
-        <p className="text-slate-500 text-sm">Sin conexión</p>
+      <Card>
+        <SectionHeader title="Clima" />
+        <p className="text-sand-500 text-sm">Sin conexión</p>
       </Card>
     );
   }
 
   if (!data) {
     return (
-      <Card title="Clima">
-        <div className="animate-pulse h-16 bg-slate-800 rounded-lg" />
+      <Card>
+        <SectionHeader title="Clima" />
+        <div className="animate-pulse h-16 bg-sand-850 rounded-xl" />
       </Card>
     );
   }
 
-  const today = data.daily;
-  const emoji = weatherEmoji(data.current.weather_code);
-  const sunrise = today.sunrise?.[0] ? formatTime(today.sunrise[0]) : "–";
-  const sunset = today.sunset?.[0] ? formatTime(today.sunset[0]) : "–";
+  const daily = data.daily;
+  const sunrise = daily.sunrise?.[0] ? formatTime(daily.sunrise[0]) : "–";
+  const sunset = daily.sunset?.[0] ? formatTime(daily.sunset[0]) : "–";
 
   return (
-    <Card title="Clima">
-      <div className="flex items-center gap-3 mb-3">
-        <span className="text-4xl">{emoji}</span>
+    <Card>
+      <SectionHeader title="Clima" />
+
+      {/* Current conditions */}
+      <div className="flex items-center gap-3 mb-4">
+        <WeatherIcon code={data.current.weather_code} size={40} />
         <div>
-          <p className="text-2xl font-bold text-slate-100">{Math.round(data.current.temperature_2m)}°C</p>
-          <p className="text-xs text-slate-400">
-            ↑ {Math.round(today.temperature_2m_max[0])}° · ↓ {Math.round(today.temperature_2m_min[0])}°
+          <p className="text-2xl font-semibold font-display text-sand-100">
+            {Math.round(data.current.temperature_2m)}°C
+          </p>
+          <p className="text-xs text-sand-400">
+            ↑ {Math.round(daily.temperature_2m_max[0])}° · ↓{" "}
+            {Math.round(daily.temperature_2m_min[0])}°
           </p>
         </div>
-        <div className="ml-auto text-right">
-          <p className="text-xs text-slate-400">🌅 {sunrise}</p>
-          <p className="text-xs text-slate-400">🌇 {sunset}</p>
+        <div className="ml-auto text-right space-y-1">
+          <p className="text-xs text-sand-400 flex items-center justify-end gap-1.5">
+            <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-gold-400" />
+            {sunrise}
+          </p>
+          <p className="text-xs text-sand-400 flex items-center justify-end gap-1.5">
+            <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="text-sand-500" />
+            {sunset}
+          </p>
         </div>
       </div>
 
       {/* 3-day forecast */}
-      <div className="grid grid-cols-3 gap-2 mt-2">
-        {today.time.slice(0, 3).map((date, i) => (
-          <div key={date} className={`text-center rounded-lg py-2 px-1 ${i === 0 ? "bg-slate-700/50" : "bg-slate-800/50"}`}>
-            <p className="text-xs text-slate-400">{i === 0 ? "Hoy" : formatDay(date)}</p>
-            <p className="text-lg my-1">{weatherEmoji(today.weather_code[i])}</p>
-            <p className="text-xs text-slate-200">{Math.round(today.temperature_2m_max[i])}° / {Math.round(today.temperature_2m_min[i])}°</p>
+      <div className="grid grid-cols-3 gap-2">
+        {daily.time.slice(0, 3).map((date, i) => (
+          <div
+            key={date}
+            className={`text-center rounded-xl py-2.5 px-1 ${
+              i === 0 ? "bg-sand-850" : "bg-sand-850/50"
+            }`}
+          >
+            <p className="text-xs text-sand-500">
+              {i === 0 ? "Hoy" : formatDay(date)}
+            </p>
+            <div className="flex justify-center my-1.5">
+              <WeatherIcon code={daily.weather_code[i]} size={20} />
+            </div>
+            <p className="text-xs text-sand-200">
+              {Math.round(daily.temperature_2m_max[i])}° /{" "}
+              {Math.round(daily.temperature_2m_min[i])}°
+            </p>
           </div>
         ))}
       </div>
     </Card>
-  );
-}
-
-function formatDay(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-AR", { weekday: "short" });
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4">
-      <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">{title}</h2>
-      {children}
-    </div>
   );
 }

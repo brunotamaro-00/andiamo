@@ -1,11 +1,53 @@
 @import "tailwindcss";
 
+@theme {
+  /* ── Font families ─────────────────────────────────── */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-montserrat), system-ui, sans-serif;
+
+  /* ── Warm dark neutrals (sand) ─────────────────────── */
+  --color-sand-950: #14110E;   /* canvas */
+  --color-sand-900: #1C1813;   /* surface */
+  --color-sand-850: #241F18;   /* raised / input bg */
+  --color-sand-800: #322B22;   /* border subtle */
+  --color-sand-700: #463C30;   /* border strong */
+  --color-sand-600: #6B5D4F;   /* disabled / placeholder */
+  --color-sand-500: #8A7E71;   /* text subtle (large only) */
+  --color-sand-400: #A89F94;   /* text muted */
+  --color-sand-300: #C8BFB5;   /* text secondary */
+  --color-sand-200: #DDD6CC;   /* text secondary strong */
+  --color-sand-100: #EDE6DB;   /* text primary */
+
+  /* ── Gold accent ───────────────────────────────────── */
+  --color-gold-300: #EAB571;   /* hover */
+  --color-gold-400: #E0A458;   /* base */
+  --color-gold-500: #C98E42;   /* press */
+  --color-gold-700: #503908;   /* border accent */
+  --color-gold-800: #3D2A0A;   /* bg accent */
+  --color-gold-900: #2C1D07;   /* bg accent subtle */
+
+  /* ── Semantic ──────────────────────────────────────── */
+  --color-success: #6FB07F;
+  --color-success-bg: #0D2B18;
+  --color-warning: #D9A441;
+  --color-warning-bg: #2B1D07;
+  --color-danger: #D9685A;
+  --color-danger-bg: #2B0D0A;
+  --color-special: #B89BD1;
+  --color-special-bg: #1A0F2B;
+}
+
 :root {
   color-scheme: dark;
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-optical-sizing: auto;
+}
+
+/* Optical sizing for display headings */
+.font-display {
+  font-optical-sizing: auto;
 }
 
 /* Leaflet needs explicit height on map containers */
