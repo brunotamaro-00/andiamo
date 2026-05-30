@@ -88,9 +88,11 @@ function renderMarkers(
       .addTo(group);
   });
 
-  if (pois.length > 0) {
+  if (pois.length > 1) {
     const bounds = L.latLngBounds(pois.map((p) => [p.latitude, p.longitude]));
-    map.fitBounds(bounds, { padding: [32, 32], maxZoom: 16 });
+    map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 });
+  } else if (pois.length === 1) {
+    map.setView([pois[0].latitude, pois[0].longitude], 14);
   }
 }
 
