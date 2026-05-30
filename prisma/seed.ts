@@ -267,26 +267,118 @@ async function main() {
     console.log(`  ✓ ${stop.countryFlag} ${stop.name}`);
   }
 
+  const POIS: Array<{
+    stopSlug: string;
+    name: string;
+    type: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    url: string;
+    notes: string;
+    reservationRequired: boolean;
+    sortOrder: number;
+  }> = [
+    {
+      stopSlug: "londres", name: "Smart Russell Square Hostel", type: "hospedaje",
+      address: "71-72 Guilford Street, WC1N 1DF, London",
+      latitude: 51.522922, longitude: -0.12285,
+      url: "https://www.smarthostels.com/smart-russell-square",
+      notes: "", reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "york", name: "Victoria Villa (Airbnb)", type: "hospedaje",
+      address: "Victoria Villa, 72 Heslington Road, York, YO10 5AU",
+      latitude: 53.9524406, longitude: -1.0688265,
+      url: "https://www.airbnb.com.ar/trips/v1/reservation-details/ro/RESERVATION2_CHECKIN/HMYH8EWDHM",
+      notes: "Reserva HMYH8EWDHM · check-in 13 ago, check-out 15 ago",
+      reservationRequired: true, sortOrder: 0,
+    },
+    {
+      stopSlug: "edimburgo", name: "Safestay Edinburgh Cowgate", type: "hospedaje",
+      address: "116 Cowgate, EH1 1JN, Edinburgh",
+      latitude: 55.9425, longitude: -3.1863,
+      url: "https://www.safestay.com/venue/safestay-edinburgh-cowgate/",
+      notes: "", reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "fort-william", name: "Glen Nevis Youth Hostel", type: "hospedaje",
+      address: "Glen Nevis, PH33 6SY, Fort William",
+      latitude: 56.7992, longitude: -5.0677,
+      url: "https://www.hostellingscotland.org.uk/hostels/glen-nevis/",
+      notes: "Reservado por Hostelworld. Pendientes 135 GBP a pagar allá.",
+      reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "portree", name: "Portree Independent Hostel", type: "hospedaje",
+      address: "The Old Post Office, The Green, Portree IV51 9BT",
+      latitude: 57.41268, longitude: -6.1964,
+      url: "https://www.hostelskye.co.uk/",
+      notes: "70 GBP a pagar en cash al ingresar.",
+      reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "inverness", name: "Inverness Youth Hostel", type: "hospedaje",
+      address: "Victoria Drive, Inverness IV2 3QB",
+      latitude: 57.480537, longitude: -4.211528,
+      url: "https://www.hostellingscotland.org.uk/hostels/inverness/",
+      notes: "Reservado Hostelworld. Pendientes 123 GBP a pagar allá.",
+      reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "amsterdam", name: "ClinkMAMA", type: "hospedaje",
+      address: "Valkenburgerstraat 124, 1011 NA Amsterdam",
+      latitude: 52.37, longitude: 4.9,
+      url: "https://www.clinkhostels.com/clinkmama/",
+      notes: "403 euros. Se debitan antes de ingresar.",
+      reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "paris", name: "The People Paris Belleville", type: "hospedaje",
+      address: "59 Boulevard de Belleville, 75011 Paris",
+      latitude: 48.870053, longitude: 2.378934,
+      url: "https://www.thepeoplehostel.com/en/destinations/paris-belleville/",
+      notes: "", reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "lisboa", name: "Lisbon Destination Hostel", type: "hospedaje",
+      address: "Largo Duque do Cadaval, 17, 2º andar (Estação Rossio), 1200-160 Lisboa",
+      latitude: 38.714, longitude: -9.1405,
+      url: "https://www.destinationhostels.com/accomodation/lisbon-destination-hostel/",
+      notes: "", reservationRequired: false, sortOrder: 0,
+    },
+    {
+      stopSlug: "porto", name: "Onefam Ribeira", type: "hospedaje",
+      address: "Rua Chã 89, 4000-052 Porto",
+      latitude: 41.1441, longitude: -8.6107,
+      url: "https://onefamhostels.com/ribeira-onefam-hostel-porto/",
+      notes: "", reservationRequired: false, sortOrder: 0,
+    },
+  ];
+
   console.log("\nSeeding POIs...");
-  const yorkStop = await prisma.stop.findUnique({ where: { slug: "york" } });
-  if (yorkStop) {
-    const existing = await prisma.poi.findFirst({ where: { stopId: yorkStop.id, name: "Victoria Villa (Airbnb)" } });
+  for (const poi of POIS) {
+    const stop = await prisma.stop.findUnique({ where: { slug: poi.stopSlug } });
+    if (!stop) { console.log(`  ⚠ Stop not found: ${poi.stopSlug}`); continue; }
+    const existing = await prisma.poi.findFirst({ where: { stopId: stop.id, name: poi.name } });
     if (!existing) {
       await prisma.poi.create({
         data: {
-          stopId: yorkStop.id,
-          name: "Victoria Villa (Airbnb)",
-          type: "hospedaje",
-          address: "72 Heslington Road, York, YO10 5AU, Reino Unido",
-          latitude: 53.9490,
-          longitude: -1.0641,
-          url: "https://www.airbnb.com.ar/trips/v1/reservation-details/ro/RESERVATION2_CHECKIN/HMYH8EWDHM",
-          notes: "Reserva HMYH8EWDHM · check-in 13 ago, check-out 15 ago",
-          reservationRequired: true,
-          sortOrder: 0,
+          stopId: stop.id,
+          name: poi.name,
+          type: poi.type,
+          address: poi.address,
+          latitude: poi.latitude,
+          longitude: poi.longitude,
+          url: poi.url,
+          notes: poi.notes,
+          reservationRequired: poi.reservationRequired,
+          sortOrder: poi.sortOrder,
         },
       });
-      console.log("  ✓ York — Victoria Villa (Airbnb)");
+      console.log(`  ✓ ${poi.stopSlug} — ${poi.name}`);
+    } else {
+      console.log(`  · ${poi.stopSlug} — ${poi.name} (ya existe)`);
     }
   }
 
