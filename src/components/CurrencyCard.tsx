@@ -126,7 +126,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
               type="number"
               value={usdInput}
               onChange={(e) => setUsdInput(e.target.value)}
-              className="flex-1 bg-surface border border-border-strong rounded-xl px-3 py-1.5 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2"
+              className="flex-1 min-w-0 bg-surface border border-border-strong rounded-xl px-3 py-1.5 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2"
               min="0"
               step="any"
               aria-label="Monto en USD"
