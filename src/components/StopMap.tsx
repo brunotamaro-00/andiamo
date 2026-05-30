@@ -91,9 +91,8 @@ function renderMarkers(
   if (pois.length > 1) {
     const bounds = L.latLngBounds(pois.map((p) => [p.latitude, p.longitude]));
     map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 });
-  } else if (pois.length === 1) {
-    map.setView([pois[0].latitude, pois[0].longitude], 14);
   }
+  // 0 or 1 POI: keep the initial city-center view (zoom 13)
 }
 
 export function StopMap({ centerLat, centerLng, pois, stopName }: StopMapProps) {
