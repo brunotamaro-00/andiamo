@@ -115,21 +115,21 @@ function EditModal({
         </SelectField>
 
         <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-sm text-sand-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
             <input
               type="checkbox"
               checked={fixedChecked}
               onChange={(e) => setFixedChecked(e.target.checked)}
-              className="rounded border-sand-600 accent-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
             />
             Fechas confirmadas
           </label>
-          <label className="flex items-center gap-2 text-sm text-sand-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
             <input
               type="checkbox"
               checked={candidateChecked}
               onChange={(e) => setCandidateChecked(e.target.checked)}
-              className="rounded border-sand-600 accent-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
             />
             Candidata (sin decidir)
           </label>
@@ -156,7 +156,7 @@ function EditModal({
       </form>
 
       {/* Danger zone */}
-      <div className="border-t border-sand-800 pt-3">
+      <div className="border-t border-border pt-3">
         {confirmDelete ? (
           <div className="space-y-2">
             <p className="text-sm text-danger">

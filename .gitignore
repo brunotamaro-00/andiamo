@@ -52,5 +52,6 @@ next-env.d.ts
 databricks_mcp.log
 prisma/split-highlands.ts
 
+.playwright-mcp/
 # do NOT commit the local npmrc (no auth tokens)
 # .npmrc is tracked since it sets registry=npmjs.org

@@ -2,22 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, MapPin, FileText } from "lucide-react";
+import { Map, MapPin, FileText, Search } from "lucide-react";
 
 const TABS = [
   {
     href: "/stops",
     label: "Itinerario",
     icon: Map,
-    /** Active on /stops (list only) */
     match: (p: string) => p === "/stops",
   },
   {
     href: "/",
     label: "Hoy",
     icon: MapPin,
-    /** Active on any stop detail page */
     match: (p: string) => p.startsWith("/stops/"),
+  },
+  {
+    href: "/search",
+    label: "Buscar",
+    icon: Search,
+    match: (p: string) => p.startsWith("/search"),
   },
   {
     href: "/general",
@@ -30,15 +34,14 @@ const TABS = [
 export function TabBar() {
   const pathname = usePathname();
 
-  /* Hide on login page */
   if (pathname === "/login") return null;
 
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed bottom-0 inset-x-0 z-[1000] bg-sand-900/95 backdrop-blur border-t border-sand-800"
+      className="fixed bottom-0 inset-x-0 z-[1000] bg-surface/95 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="flex items-center justify-around px-2 h-16">
+      <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
           const active = match(pathname);
           return (
@@ -47,22 +50,32 @@ export function TabBar() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={[
-                  "flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-                  "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-900",
-                  active
-                    ? "text-gold-400"
-                    : "text-sand-500 hover:text-sand-300",
+                  "flex flex-col items-center justify-center gap-1 h-full min-h-[44px] rounded-xl transition-colors duration-150",
+                  "active:scale-[0.96] motion-reduce:active:scale-100",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
                 ]
                   .filter(Boolean)
                   .join(" ")}
               >
-                <Icon
-                  size={20}
-                  strokeWidth={active ? 2 : 1.5}
-                  aria-hidden="true"
-                />
-                <span className={`text-[11px] font-medium ${active ? "text-gold-400" : ""}`}>
+                {/* Icon with active pill bg */}
+                <span
+                  className={[
+                    "flex items-center justify-center w-10 h-6 rounded-full transition-colors duration-150",
+                    active ? "bg-coral-bg" : "",
+                  ].join(" ")}
+                >
+                  <Icon
+                    size={18}
+                    strokeWidth={active ? 2 : 1.5}
+                    aria-hidden="true"
+                    className={active ? "text-coral" : "text-ink-2"}
+                  />
+                </span>
+                <span
+                  className={`text-[10px] font-semibold tracking-wide transition-colors duration-150 ${
+                    active ? "text-coral" : "text-ink-3"
+                  }`}
+                >
                   {label}
                 </span>
               </Link>

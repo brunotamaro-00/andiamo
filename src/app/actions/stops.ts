@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
 import { fetchTempRange } from "@/lib/temp-range";
 
@@ -27,6 +28,7 @@ async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
 }
 
 export async function createStop(formData: FormData) {
+  await requireAuth();
   const name = (formData.get("name") as string).trim();
   const country = (formData.get("country") as string).trim();
   const countryCode = (formData.get("countryCode") as string).trim().toUpperCase();
@@ -98,6 +100,7 @@ export async function createStop(formData: FormData) {
 }
 
 export async function updateStop(id: string, formData: FormData) {
+  await requireAuth();
   const name = (formData.get("name") as string).trim();
   const nights = parseInt(formData.get("nights") as string) || 0;
   const arrivalRaw = formData.get("arrivalDate") as string | null;
@@ -131,6 +134,7 @@ export async function updateStop(id: string, formData: FormData) {
 }
 
 export async function moveStop(id: string, afterOrder: number) {
+  await requireAuth();
   await db.$transaction(async (tx) => {
     const stop = await tx.stop.findUnique({ where: { id }, select: { order: true } });
     if (!stop) return;
@@ -167,6 +171,7 @@ export async function moveStop(id: string, afterOrder: number) {
 }
 
 export async function deleteStop(id: string) {
+  await requireAuth();
   const stop = await db.stop.findUnique({ where: { id }, select: { order: true } });
   if (!stop) return;
 

@@ -2,11 +2,9 @@ import type { ButtonHTMLAttributes } from "react";
 import type { LucideIcon } from "lucide-react";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visible label for screen readers — required */
   label: string;
   icon: LucideIcon;
   iconSize?: number;
-  /** Danger styling for destructive actions */
   danger?: boolean;
 }
 
@@ -23,12 +21,12 @@ export function IconButton({
       aria-label={label}
       {...props}
       className={[
-        "inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors",
+        "inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150",
         danger
-          ? "text-sand-500 hover:text-danger hover:bg-danger-bg"
-          : "text-sand-500 hover:text-sand-200 hover:bg-sand-850",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-        "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+          ? "text-ink-3 hover:text-danger hover:bg-danger-bg"
+          : "text-ink-3 hover:text-ink hover:bg-surface-2",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
+        "focus-visible:ring-offset-1 focus-visible:ring-offset-surface",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         className,
       ]

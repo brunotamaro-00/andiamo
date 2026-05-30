@@ -20,30 +20,38 @@ export function Modal({ title, onClose, children }: ModalProps) {
   /* Restore focus to the element that opened the modal */
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
-    return () => {
-      opener?.focus();
-    };
+    return () => { opener?.focus(); };
   }, []);
 
-  /* Focus first focusable element + scroll-lock */
+  /* Focus first focusable element + iOS-safe scroll-lock */
   useEffect(() => {
     const panel = panelRef.current;
-    if (!panel) return;
-    const first = panel.querySelector<HTMLElement>(FOCUSABLE);
-    first?.focus();
-    document.body.style.overflow = "hidden";
+    if (panel) {
+      const first = panel.querySelector<HTMLElement>(FOCUSABLE);
+      first?.focus();
+    }
+    // position:fixed is the only reliable way to stop background scroll on iOS Safari
+    const scrollY = window.scrollY;
+    const body = document.body;
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
     return () => {
-      document.body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, []);
 
   /* Escape to close + focus trap */
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
+      if (e.key === "Escape") { onClose(); return; }
       if (e.key !== "Tab") return;
       const panel = panelRef.current;
       if (!panel) return;
@@ -52,15 +60,9 @@ export function Modal({ title, onClose, children }: ModalProps) {
       const first = elements[0];
       const last = elements[elements.length - 1];
       if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
       } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
     }
     document.addEventListener("keydown", handleKeyDown);
@@ -68,30 +70,27 @@ export function Modal({ title, onClose, children }: ModalProps) {
   }, [onClose]);
 
   return (
-    /* Backdrop — click outside closes */
     <div
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 animate-fade-in"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm bg-sand-900 rounded-2xl border border-sand-800 shadow-2xl max-h-[90vh] flex flex-col"
+        className="w-full max-w-sm bg-surface rounded-2xl border border-border card-shadow-lg max-h-[90vh] flex flex-col animate-slide-up"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Fixed header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-0 shrink-0">
-          <h3 id={titleId} className="font-semibold text-sand-100">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-border shrink-0">
+          <h3 id={titleId} className="font-semibold text-sm text-ink-2 uppercase tracking-widest">
             {title}
           </h3>
           <IconButton label="Cerrar" icon={X} onClick={onClose} />
         </div>
         {/* Scrollable body */}
-        <div className="px-5 py-4 overflow-y-auto space-y-3 flex-1">
+        <div className="px-5 py-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
           {children}
         </div>
       </div>
