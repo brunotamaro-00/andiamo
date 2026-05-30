@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient, PoiType } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
@@ -270,7 +270,7 @@ async function main() {
   const POIS: Array<{
     stopSlug: string;
     name: string;
-    type: string;
+    type: PoiType;
     address: string;
     latitude: number;
     longitude: number;
