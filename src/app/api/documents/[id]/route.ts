@@ -2,10 +2,15 @@ import { NextRequest } from "next/server";
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { db } from "@/lib/db";
+import { isAuthenticated } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await isAuthenticated())) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const doc = await db.document.findUnique({ where: { id } });
 

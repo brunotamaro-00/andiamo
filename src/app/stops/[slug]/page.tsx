@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
+import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
 import { StopMap } from "@/components/StopMap";
@@ -12,6 +13,7 @@ import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, Thermometer } from "lucide-react";
+import { HashScroller } from "@/components/HashScroller";
 
 export const dynamic = "force-dynamic";
 
@@ -26,11 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { name: true, countryFlag: true },
   });
   return {
-    title: stop ? `${stop.countryFlag} ${stop.name} — Europa 2026` : "Europa 2026",
+    title: stop ? `${stop.countryFlag} ${stop.name} · Andiamo` : "Andiamo",
   };
 }
 
 export default async function StopPage({ params }: Props) {
+  await requireAuth();
   const { slug } = await params;
 
   const [stop, currentSlug] = await Promise.all([
@@ -49,26 +52,16 @@ export default async function StopPage({ params }: Props) {
 
   if (!stop) notFound();
 
-  /* Nearby stops for navigation */
-  const [adjacentStops, allStops] = await Promise.all([
-    db.stop.findMany({
-      where: {
-        order: { gte: stop.order - 2, lte: stop.order + 2 },
-        isFlexMargin: false,
-        NOT: { id: stop.id },
-      },
-      orderBy: { order: "asc" },
-      select: { slug: true, name: true, order: true, countryFlag: true },
-    }),
-    db.stop.findMany({
-      where: { isFlexMargin: false, NOT: { id: stop.id } },
-      orderBy: { order: "asc" },
-      select: { id: true, name: true, order: true, countryFlag: true },
-    }),
-  ]);
+  /* Other stops — one query powers both prev/next nav and the reorder picker */
+  const otherStops = await db.stop.findMany({
+    where: { isFlexMargin: false, NOT: { id: stop.id } },
+    orderBy: { order: "asc" },
+    select: { id: true, slug: true, name: true, order: true, countryFlag: true },
+  });
 
-  const prevStop = adjacentStops.filter((s) => s.order < stop.order).at(-1);
-  const nextStop = adjacentStops.find((s) => s.order > stop.order);
+  const prevStop = otherStops.filter((s) => s.order < stop.order).at(-1);
+  const nextStop = otherStops.find((s) => s.order > stop.order);
+  const allStops = otherStops;
 
   const isActive = slug === currentSlug;
 
@@ -83,44 +76,47 @@ export default async function StopPage({ params }: Props) {
       )
     : null;
 
-  const poiMarkers = stop.pois.map((p) => ({
-    id: p.id,
-    name: p.name,
-    type: p.type as string,
-    latitude: p.latitude,
-    longitude: p.longitude,
-    done: p.done,
-  }));
+  const poiMarkers = stop.pois
+    .filter((p) => p.latitude != null && p.longitude != null)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      type: p.type as string,
+      latitude: p.latitude as number,
+      longitude: p.longitude as number,
+      done: p.done,
+    }));
 
   const path = `/stops/${slug}`;
 
   return (
-    <div className="min-h-screen bg-sand-950">
+    <div className="min-h-screen bg-canvas">
       {/* Top nav */}
-      <header className="sticky top-0 z-[1000] bg-sand-950/90 backdrop-blur border-b border-sand-800 px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 z-[1000] bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
         <Link
           href="/stops"
-          className="text-sand-400 hover:text-sand-200 text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 rounded-lg px-1 py-0.5"
+          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral rounded-lg px-1 py-0.5"
         >
           <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
           Itinerario
         </Link>
         <div className="flex-1 min-w-0 text-center">
-          <h1 className="text-sm font-medium text-sand-300 truncate">
+          <p className="text-sm font-medium text-ink-2 truncate">
             <span aria-hidden="true">{stop.countryFlag}</span>{" "}
             {stop.name}
-          </h1>
+          </p>
         </div>
         <div className="w-20" /> {/* spacer to balance left link */}
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+        <HashScroller />
         {/* City header card */}
         <div
-          className={`rounded-2xl p-4 border ${
+          className={`rounded-2xl p-4 border card-shadow ${
             isActive
-              ? "bg-gold-900 border-gold-700/50"
-              : "bg-sand-900 border-sand-800"
+              ? "bg-surface border-border border-t-2 border-t-coral"
+              : "bg-surface border-border"
           }`}
         >
           <div className="flex items-start justify-between gap-3">
@@ -130,10 +126,10 @@ export default async function StopPage({ params }: Props) {
                   {stop.countryFlag}
                 </span>
                 <div>
-                  <h2 className="text-2xl font-semibold font-display text-sand-100 leading-tight">
+                  <h1 className="text-2xl font-semibold font-display text-ink leading-tight">
                     {stop.name}
-                  </h2>
-                  <p className="text-sm text-sand-400 mt-0.5">{stop.country}</p>
+                  </h1>
+                  <p className="text-sm text-ink-2 mt-0.5">{stop.country}</p>
                 </div>
               </div>
 
@@ -146,12 +142,7 @@ export default async function StopPage({ params }: Props) {
                 )}
                 {stop.tempRange && (
                   <DateBadge>
-                    <Thermometer
-                      size={11}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                      className="inline mr-1"
-                    />
+                    <Thermometer size={11} strokeWidth={1.5} aria-hidden="true" className="inline mr-1" />
                     {stop.tempRange}
                   </DateBadge>
                 )}
@@ -180,10 +171,10 @@ export default async function StopPage({ params }: Props) {
           </div>
 
           {stop.arrivalDate && (
-            <div className="mt-3 pt-3 border-t border-sand-800/50 flex flex-wrap gap-3 text-xs text-sand-500">
+            <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap gap-3 text-xs text-ink-3">
               <span>Día {getTripDay(stop.arrivalDate)} del viaje</span>
               {isActive && daysLeft !== null && (
-                <span className="text-gold-400">
+                <span className="text-coral">
                   {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
                 </span>
               )}
@@ -197,10 +188,10 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${prevStop.slug}`}
               className={[
-                "flex-1 flex items-center gap-1.5 bg-sand-900 border border-sand-800",
-                "rounded-xl px-3 py-2.5 text-sm text-sand-400 hover:border-sand-700 hover:text-sand-200 transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-                "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+                "flex-1 flex items-center gap-1.5 bg-surface border border-border",
+                "rounded-xl px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -216,10 +207,10 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${nextStop.slug}`}
               className={[
-                "flex-1 flex items-center justify-end gap-1.5 bg-sand-900 border border-sand-800",
-                "rounded-xl px-3 py-2.5 text-sm text-sand-400 hover:border-sand-700 hover:text-sand-200 transition-colors text-right",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-                "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+                "flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border",
+                "rounded-xl px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -241,7 +232,6 @@ export default async function StopPage({ params }: Props) {
 
         {/* Map */}
         <StopMap
-          key={`map-${stop.pois.map((p) => p.id + p.done).join("-")}`}
           centerLat={stop.latitude}
           centerLng={stop.longitude}
           pois={poiMarkers}
@@ -249,19 +239,25 @@ export default async function StopPage({ params }: Props) {
         />
 
         {/* POIs */}
-        <PoiPanel
-          stopId={stop.id}
-          slug={stop.slug}
-          pois={stop.pois as Parameters<typeof PoiPanel>[0]["pois"]}
-        />
+        <div id="pois" className="scroll-mt-20">
+          <PoiPanel
+            stopId={stop.id}
+            slug={stop.slug}
+            stopLat={stop.latitude}
+            stopLng={stop.longitude}
+            pois={stop.pois as Parameters<typeof PoiPanel>[0]["pois"]}
+          />
+        </div>
 
         {/* Notes */}
-        <NotesPanel
-          stopId={stop.id}
-          slug={stop.slug}
-          notes={stop.notes.map((n) => ({ ...n, createdAt: n.createdAt }))}
-          path={path}
-        />
+        <div id="notas" className="scroll-mt-20">
+          <NotesPanel
+            stopId={stop.id}
+            slug={stop.slug}
+            notes={stop.notes.map((n) => ({ ...n, createdAt: n.createdAt }))}
+            path={path}
+          />
+        </div>
 
         {/* Documents */}
         <DocumentsPanel
@@ -280,7 +276,7 @@ export default async function StopPage({ params }: Props) {
 /** Small inline badge for dates/temp ranges */
 function DateBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center text-xs bg-sand-850 text-sand-400 rounded-lg px-2 py-0.5 border border-sand-800">
+    <span className="inline-flex items-center gap-0.5 text-xs bg-surface-2 text-ink-2 rounded-full px-2.5 py-1 border border-border font-medium">
       {children}
     </span>
   );

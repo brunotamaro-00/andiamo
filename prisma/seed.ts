@@ -267,6 +267,29 @@ async function main() {
     console.log(`  ✓ ${stop.countryFlag} ${stop.name}`);
   }
 
+  console.log("\nSeeding POIs...");
+  const yorkStop = await prisma.stop.findUnique({ where: { slug: "york" } });
+  if (yorkStop) {
+    const existing = await prisma.poi.findFirst({ where: { stopId: yorkStop.id, name: "Victoria Villa (Airbnb)" } });
+    if (!existing) {
+      await prisma.poi.create({
+        data: {
+          stopId: yorkStop.id,
+          name: "Victoria Villa (Airbnb)",
+          type: "hospedaje",
+          address: "72 Heslington Road, York, YO10 5AU, Reino Unido",
+          latitude: 53.9490,
+          longitude: -1.0641,
+          url: "https://www.airbnb.com.ar/trips/v1/reservation-details/ro/RESERVATION2_CHECKIN/HMYH8EWDHM",
+          notes: "Reserva HMYH8EWDHM · check-in 13 ago, check-out 15 ago",
+          reservationRequired: true,
+          sortOrder: 0,
+        },
+      });
+      console.log("  ✓ York — Victoria Villa (Airbnb)");
+    }
+  }
+
   const globalNotes = [
     { title: "UK ETA", body: "Ambos necesitan UK ETA (~£16 pp). Solo irlandeses están exentos. Solicitar antes del 5 ago.", pinned: true },
     { title: "Schengen — Persona 2", body: "89 días en Schengen (límite: 90). Ámsterdam → fin del viaje incluyendo Portugal.", pinned: true },

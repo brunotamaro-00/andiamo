@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
+import { requireAuth } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
 import { Badge } from "@/components/ui/Badge";
-import { ChevronRight, Plane, FileText } from "lucide-react";
+import { Wordmark } from "@/components/Wordmark";
+import { ChevronRight, Plane, FileText, Search } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Itinerario — Europa 2026" };
+export const metadata: Metadata = { title: "Itinerario · Andiamo" };
 
 export default async function StopsPage() {
+  await requireAuth();
   const [stops, currentSlug] = await Promise.all([
     db.stop.findMany({ orderBy: { order: "asc" } }),
     getCurrentStopSlug(),
@@ -24,43 +27,50 @@ export default async function StopsPage() {
   const tripStarted = today >= tripStart;
 
   return (
-    <div className="min-h-screen bg-sand-950">
+    <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-sand-950/90 backdrop-blur border-b border-sand-800 px-4 py-3">
+      <header className="sticky top-0 z-10 bg-canvas/95 backdrop-blur-md border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold font-display text-sand-100">
-              Europa 2026
-            </h1>
+            <Wordmark size="sm" />
             {!tripStarted && daysUntilTrip > 0 && (
-              <p className="text-xs text-gold-400 flex items-center gap-1 mt-0.5">
-                <Plane size={11} strokeWidth={1.5} aria-hidden="true" />
-                Faltan {daysUntilTrip} días
+              <p className="text-[11px] font-semibold text-coral-ink flex items-center gap-1 mt-0.5 tracking-wide">
+                <Plane size={10} strokeWidth={2} aria-hidden="true" />
+                {daysUntilTrip} días para el viaje
               </p>
             )}
             {tripStarted && (
-              <p className="text-xs text-gold-400 mt-0.5">¡El viaje ya empezó!</p>
+              <p className="text-[11px] font-semibold text-coral-ink mt-0.5 tracking-wide">
+                ¡El viaje ya empezó!
+              </p>
             )}
           </div>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="text-xs text-sand-500 hover:text-sand-300 transition-colors px-2 py-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950"
+          <div className="flex items-center gap-1">
+            <Link
+              href="/search"
+              aria-label="Buscar en el viaje"
+              className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
             >
-              Salir
-            </button>
-          </form>
+              <Search size={17} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
+              >
+                Salir
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      <main className="px-4 py-6 max-w-lg mx-auto pb-24">
+      <main className="px-4 py-5 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-5 animate-fade-in">
           <Stat
             label="Paradas"
-            value={stops
-              .filter((s) => !s.isFlexMargin && !s.isCandidate)
-              .length.toString()}
+            value={stops.filter((s) => !s.isFlexMargin && !s.isCandidate).length.toString()}
           />
           <Stat
             label="Noches"
@@ -74,142 +84,121 @@ export default async function StopsPage() {
 
         {/* Timeline */}
         <div className="space-y-2">
-          {stops.map((stop, idx) => {
-            const isActive = stop.slug === currentSlug;
-            const isPast =
-              stop.departureDate && today > new Date(stop.departureDate);
-            const isCandidate = stop.isCandidate;
+          {stops
+            .filter((s) => !s.isFlexMargin)
+            .map((stop, idx) => {
+              const isActive = stop.slug === currentSlug;
+              const isPast = stop.departureDate && today > new Date(stop.departureDate);
+              const isCandidate = stop.isCandidate;
+              const stagger = idx < 6 ? `stagger-${(idx % 6) + 1}` : "";
 
-            if (stop.isFlexMargin) return null;
-
-            return (
-              <Link
-                key={stop.id}
-                href={`/stops/${stop.slug}`}
-                className={[
-                  "flex items-center gap-3 px-4 py-3 rounded-xl border transition-all",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-                  "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
-                  isActive
-                    ? "bg-gold-900 border-gold-700/60"
-                    : isCandidate
-                    ? "bg-sand-900/50 border-dashed border-sand-800/50 opacity-60"
-                    : isPast
-                    ? "bg-sand-900/30 border-sand-800/50 opacity-50"
-                    : "bg-sand-900 border-sand-800 hover:border-sand-700 active:bg-sand-850",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                {/* Order indicator */}
-                <div
+              return (
+                <Link
+                  key={stop.id}
+                  href={`/stops/${stop.slug}`}
                   className={[
-                    "w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0",
+                    "flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 animate-fade-in",
+                    stagger,
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
+                    "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-gold-800 border border-gold-600/60 text-gold-300"
+                      ? "bg-surface border-border border-l-2 border-l-coral card-shadow"
+                      : isCandidate
+                      ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
-                      ? "bg-sand-850 text-sand-600"
-                      : "bg-sand-850 text-sand-400",
+                      ? "bg-surface/40 border-border/40 opacity-45"
+                      : "bg-surface border-border hover:border-border-strong card-shadow",
                   ]
                     .filter(Boolean)
                     .join(" ")}
                 >
-                  {idx + 1}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-base" aria-hidden="true">
-                      {stop.countryFlag}
-                    </span>
-                    <span
-                      className={`font-medium text-sm ${
-                        isActive ? "text-gold-200" : "text-sand-100"
-                      }`}
-                    >
-                      {stop.name}
-                    </span>
-                    {!stop.datesFixed && (
-                      <Badge variant="warning">tentativa</Badge>
-                    )}
-                    {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
-                    {isCandidate && (
-                      <Badge variant="special">candidata</Badge>
-                    )}
+                  {/* Order indicator */}
+                  <div
+                    className={[
+                      "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0",
+                      isActive
+                        ? "border border-coral text-coral-ink"
+                        : isPast
+                        ? "bg-surface-2 text-ink-faint"
+                        : "bg-surface-2 text-ink-2",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {idx + 1}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span
-                      className={`text-xs ${
-                        isActive ? "text-gold-400/70" : "text-sand-500"
-                      }`}
-                    >
-                      {stop.country}
-                    </span>
-                    {stop.nights > 0 && (
-                      <>
-                        <span className="text-xs text-sand-700">·</span>
-                        <span
-                          className={`text-xs ${
-                            isActive ? "text-gold-400/70" : "text-sand-500"
-                          }`}
-                        >
-                          {stop.nights} noches
-                        </span>
-                      </>
-                    )}
-                    {stop.arrivalDate && (
-                      <>
-                        <span className="text-xs text-sand-700">·</span>
-                        <span
-                          className={`text-xs ${
-                            isActive ? "text-gold-400/70" : "text-sand-500"
-                          }`}
-                        >
-                          {formatShortDate(new Date(stop.arrivalDate))}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
 
-                <ChevronRight
-                  size={16}
-                  strokeWidth={1.5}
-                  className={isActive ? "text-gold-500" : "text-sand-700"}
-                  aria-hidden="true"
-                />
-              </Link>
-            );
-          })}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-base leading-none" aria-hidden="true">
+                        {stop.countryFlag}
+                      </span>
+                      <span
+                        className={`font-semibold text-sm ${
+                          isActive ? "text-coral-ink" : "text-ink"
+                        }`}
+                      >
+                        {stop.name}
+                      </span>
+                      {!stop.datesFixed && <Badge variant="warning">tentativa</Badge>}
+                      {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
+                      {isCandidate && <Badge variant="special">candidata</Badge>}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-ink-3 font-medium">
+                      <span>{stop.country}</span>
+                      {stop.nights > 0 && (
+                        <>
+                          <span className="text-border-strong">·</span>
+                          <span>{stop.nights} noches</span>
+                        </>
+                      )}
+                      {stop.arrivalDate && (
+                        <>
+                          <span className="text-border-strong">·</span>
+                          <span>{formatShortDate(new Date(stop.arrivalDate))}</span>
+                        </>
+                      )}
+                      {stop.tempRange && (
+                        <>
+                          <span className="text-border-strong">·</span>
+                          <span>{stop.tempRange}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <ChevronRight
+                    size={15}
+                    strokeWidth={2}
+                    className={isActive ? "text-coral" : "text-border-strong"}
+                    aria-hidden="true"
+                  />
+                </Link>
+              );
+            })}
         </div>
 
         {/* Add stop */}
         <AddStopButton
           stops={stops
             .filter((s) => !s.isFlexMargin)
-            .map((s) => ({
-              id: s.id,
-              order: s.order,
-              name: s.name,
-              countryFlag: s.countryFlag,
-            }))}
+            .map((s) => ({ id: s.id, order: s.order, name: s.name, countryFlag: s.countryFlag }))}
+          lastDepartureDate={
+            stops
+              .filter((s) => !s.isFlexMargin && s.departureDate != null)
+              .at(-1)
+              ?.departureDate?.toISOString().slice(0, 10) ?? undefined
+          }
         />
 
         {/* Global docs link */}
         <Link
           href="/general"
-          className={[
-            "mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-sand-800",
-            "bg-sand-900 hover:border-sand-700 transition-colors text-sm text-sand-400 hover:text-sand-200",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-            "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
         >
-          <FileText size={14} strokeWidth={1.5} aria-hidden="true" />
-          Documentos y notas generales del viaje
+          <FileText size={13} strokeWidth={1.5} aria-hidden="true" />
+          Documentos generales
         </Link>
       </main>
     </div>
@@ -218,17 +207,13 @@ export default async function StopsPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-sand-900 rounded-xl px-3 py-2.5 text-center border border-sand-800">
-      <p className="text-xl font-semibold font-display text-sand-100">{value}</p>
-      <p className="text-xs text-sand-500">{label}</p>
+    <div className="bg-surface rounded-xl px-3 py-3 text-center border border-border card-shadow">
+      <p className="text-2xl font-bold font-display text-ink font-tabular">{value}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-ink-3 mt-0.5">{label}</p>
     </div>
   );
 }
 
 function formatShortDate(d: Date): string {
-  return d.toLocaleDateString("es-AR", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
+  return d.toLocaleDateString("es-AR", { day: "numeric", month: "short", timeZone: "UTC" });
 }

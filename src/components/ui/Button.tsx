@@ -5,18 +5,18 @@ type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-gold-400 text-sand-950 hover:bg-gold-300 active:bg-gold-500 font-semibold border border-transparent",
+    "bg-coral text-white hover:bg-coral-hover active:bg-coral-press font-semibold border border-transparent",
   secondary:
-    "border border-sand-700 text-sand-400 hover:border-sand-600 hover:text-sand-200 bg-transparent",
+    "border border-border text-ink-2 hover:border-border-strong hover:text-ink bg-surface",
   ghost:
-    "text-sand-400 hover:text-sand-200 hover:bg-sand-850 border border-transparent",
+    "text-ink-2 hover:text-ink hover:bg-surface-2 border border-transparent",
   danger:
     "border border-danger/40 text-danger hover:bg-danger-bg bg-transparent",
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "py-1.5 px-3 text-xs",
-  md: "py-2.5 px-4 text-sm",
+  sm: "py-1.5 px-3.5 text-xs",
+  md: "py-2 px-5 text-sm",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,10 +35,10 @@ export function Button({
     <button
       {...props}
       className={[
-        "inline-flex items-center justify-center gap-1.5 rounded-xl font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-        "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-1.5 rounded-full font-medium transition-colors duration-150",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50",
+        "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
+        "disabled:opacity-40 disabled:cursor-not-allowed",
         variantClasses[variant],
         sizeClasses[size],
         className,

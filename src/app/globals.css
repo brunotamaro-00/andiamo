@@ -5,52 +5,124 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-montserrat), system-ui, sans-serif;
 
-  /* ── Warm dark neutrals (sand) ─────────────────────── */
-  --color-sand-950: #14110E;   /* canvas */
-  --color-sand-900: #1C1813;   /* surface */
-  --color-sand-850: #241F18;   /* raised / input bg */
-  --color-sand-800: #322B22;   /* border subtle */
-  --color-sand-700: #463C30;   /* border strong */
-  --color-sand-600: #6B5D4F;   /* disabled / placeholder */
-  --color-sand-500: #8A7E71;   /* text subtle (large only) */
-  --color-sand-400: #A89F94;   /* text muted */
-  --color-sand-300: #C8BFB5;   /* text secondary */
-  --color-sand-200: #DDD6CC;   /* text secondary strong */
-  --color-sand-100: #EDE6DB;   /* text primary */
+  /* ── Neutrals — Botardo OKLCH warm harmony ─────────── */
+  --color-canvas:       oklch(0.963 0.022 88);   /* warm cream page bg */
+  --color-surface:      oklch(0.990 0.012 88);   /* near-white cards */
+  --color-surface-2:    oklch(0.938 0.016 88);   /* inputs / nested / muted */
+  --color-border:       oklch(0.868 0.022 88);   /* default border */
+  --color-border-strong:oklch(0.800 0.030 88);   /* hover / strong border */
+  --color-ink:          oklch(0.200 0.010 80);   /* warm near-black text */
+  --color-ink-2:        oklch(0.480 0.018 80);   /* secondary text */
+  --color-ink-3:        oklch(0.640 0.014 80);   /* muted / subtle */
+  --color-ink-faint:    oklch(0.780 0.010 80);   /* placeholder / disabled */
 
-  /* ── Gold accent ───────────────────────────────────── */
-  --color-gold-300: #EAB571;   /* hover */
-  --color-gold-400: #E0A458;   /* base */
-  --color-gold-500: #C98E42;   /* press */
-  --color-gold-700: #503908;   /* border accent */
-  --color-gold-800: #3D2A0A;   /* bg accent */
-  --color-gold-900: #2C1D07;   /* bg accent subtle */
+  /* ── Coral accent ───────────────────────────────────── */
+  --color-coral:        #FF385C;
+  --color-coral-hover:  #E31C5F;
+  --color-coral-press:  #C9134E;
+  --color-coral-ink:    #C9134E;
+  --color-coral-border: #FBCAD4;
+  --color-coral-bg:     #FFF0F3;
 
-  /* ── Semantic ──────────────────────────────────────── */
-  --color-success: #6FB07F;
-  --color-success-bg: #0D2B18;
-  --color-warning: #D9A441;
-  --color-warning-bg: #2B1D07;
-  --color-danger: #D9685A;
-  --color-danger-bg: #2B0D0A;
-  --color-special: #B89BD1;
-  --color-special-bg: #1A0F2B;
+  /* ── Semantic (light) ───────────────────────────────── */
+  --color-success:      #1A7F4B;
+  --color-success-bg:   #E8F5EE;
+  --color-warning:      #B7791F;
+  --color-warning-bg:   #FBF3E2;
+  --color-danger:       #C13515;
+  --color-danger-bg:    #FDEDE9;
+  --color-special:      #7C3AED;
+  --color-special-bg:   #F2ECFD;
+
+  /* ── Animations ─────────────────────────────────────── */
+  --animate-fade-in:    fadeIn 400ms ease-out both;
+  --animate-slide-up:   slideUp 400ms ease-out both;
+  --animate-pulse-skeleton: pulseGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  from { opacity: 0.4; }
+  to   { opacity: 0.8; }
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: oklch(0.430 0.135 27 / 0.15);
+    color: oklch(0.200 0.010 80);
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: oklch(0.938 0.016 88); }
+  ::-webkit-scrollbar-thumb { background: oklch(0.868 0.022 88); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: oklch(0.800 0.030 88); }
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-body {
-  font-optical-sizing: auto;
+/* ── Elevation utilities (Botardo bottom-heavy style) ── */
+@utility card-shadow {
+  box-shadow:
+    0 12px 28px -24px rgb(0 0 0 / 0.18),
+    0 1px 0 0 rgb(0 0 0 / 0.04);
 }
 
-/* Optical sizing for display headings */
-.font-display {
-  font-optical-sizing: auto;
+@utility card-shadow-lg {
+  box-shadow:
+    0 20px 40px -20px rgb(0 0 0 / 0.22),
+    0 2px 0 0 rgb(0 0 0 / 0.06);
 }
 
-/* Leaflet needs explicit height on map containers */
+/* Keep compat aliases */
+@utility shadow-soft    { box-shadow: 0 12px 28px -24px rgb(0 0 0 / 0.18), 0 1px 0 0 rgb(0 0 0 / 0.04); }
+@utility shadow-soft-lg { box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.22), 0 2px 0 0 rgb(0 0 0 / 0.06); }
+
+/* ── Animation utilities ─────────────────────────────── */
+@utility animate-fade-in    { animation: fadeIn  400ms ease-out both; }
+@utility animate-slide-up   { animation: slideUp 400ms ease-out both; }
+@utility animate-pulse-skeleton { animation: pulseGlow 1.5s ease-in-out infinite alternate; }
+
+@utility stagger-1 { animation-delay: 60ms; }
+@utility stagger-2 { animation-delay: 120ms; }
+@utility stagger-3 { animation-delay: 180ms; }
+@utility stagger-4 { animation-delay: 240ms; }
+@utility stagger-5 { animation-delay: 300ms; }
+@utility stagger-6 { animation-delay: 360ms; }
+
+/* ── Card hover lift (Botardo style) ─────────────────── */
+@utility card-hover {
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+/* ── Tabular nums for data ───────────────────────────── */
+@utility font-tabular {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Leaflet ─────────────────────────────────────────── */
+.font-display { font-optical-sizing: auto; }
+
 .leaflet-container {
   height: 100%;
   width: 100%;

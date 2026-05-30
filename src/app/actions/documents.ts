@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 import { DocumentKind } from "@/generated/prisma/enums";
 
 export async function createDocumentLink(formData: FormData) {
+  await requireAuth();
   const slug = formData.get("slug") as string | null;
   const stopId = (formData.get("stopId") as string) || null;
 
@@ -22,6 +24,7 @@ export async function createDocumentLink(formData: FormData) {
 }
 
 export async function deleteDocument(id: string, path: string) {
+  await requireAuth();
   // Also delete file from disk if uploaded
   const doc = await db.document.findUnique({ where: { id }, select: { storagePath: true } });
   if (doc?.storagePath) {

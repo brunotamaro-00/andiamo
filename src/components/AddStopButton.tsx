@@ -26,9 +26,11 @@ interface StopOption {
 
 interface Props {
   stops: StopOption[];
+  /** ISO date string (YYYY-MM-DD) of the last stop's departure — used to pre-fill arrival date. */
+  lastDepartureDate?: string;
 }
 
-export function AddStopButton({ stops }: Props) {
+export function AddStopButton({ stops, lastDepartureDate }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -37,10 +39,10 @@ export function AddStopButton({ stops }: Props) {
         onClick={() => setOpen(true)}
         className={[
           "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl",
-          "border border-dashed border-sand-700 bg-sand-900/50 text-sm text-sand-500",
-          "hover:border-gold-600/50 hover:bg-sand-900 hover:text-sand-200 transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400",
-          "focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950",
+          "border border-dashed border-border-strong bg-surface/50 text-sm text-ink-3",
+          "hover:border-coral-border/50 hover:bg-surface hover:text-ink transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+          "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -48,15 +50,17 @@ export function AddStopButton({ stops }: Props) {
         <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
         Agregar ciudad
       </button>
-      {open && <AddStopModal stops={stops} onClose={() => setOpen(false)} />}
+      {open && <AddStopModal stops={stops} lastDepartureDate={lastDepartureDate} onClose={() => setOpen(false)} />}
     </>
   );
 }
 
 function AddStopModal({
-  stops, onClose,
+  stops, lastDepartureDate, onClose,
 }: {
-  stops: StopOption[]; onClose: () => void;
+  stops: StopOption[];
+  lastDepartureDate?: string;
+  onClose: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeoResult[]>([]);
@@ -106,7 +110,7 @@ function AddStopModal({
     <Modal title="Agregar ciudad" onClose={onClose}>
       {/* City search */}
       <div>
-        <label className="text-xs font-medium text-sand-400">Buscar ciudad</label>
+        <label className="text-xs font-medium text-ink-2">Buscar ciudad</label>
         <input
           type="text"
           value={query}
@@ -114,11 +118,20 @@ function AddStopModal({
           placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
           autoFocus
           aria-label="Buscar ciudad"
-          className="mt-1 w-full bg-sand-850 border border-sand-700 rounded-xl px-3 py-2.5 text-sm text-sand-100 placeholder:text-sand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-950 transition-colors"
+          className="mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
         />
         {searching && (
-          <p className="text-xs text-sand-500 mt-1">Buscando...</p>
+          <p className="text-xs text-ink-3 mt-1">Buscando...</p>
         )}
+        <p className="sr-only" role="status" aria-live="polite">
+          {searching
+            ? "Buscando ciudades"
+            : results.length > 0
+            ? `${results.length} ciudades encontradas`
+            : query.length >= 2 && !selected
+            ? "Sin resultados"
+            : ""}
+        </p>
       </div>
 
       {/* Search results */}
@@ -133,12 +146,12 @@ function AddStopModal({
                 setResults([]);
                 setQuery(r.name);
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl bg-sand-850 hover:bg-sand-800 transition-colors border border-sand-800 hover:border-sand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+              className="w-full text-left px-3 py-2.5 rounded-xl bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
             >
-              <p className="text-sm font-medium text-sand-100">
+              <p className="text-sm font-medium text-ink">
                 {r.name}{r.admin1 ? `, ${r.admin1}` : ""}
               </p>
-              <p className="text-xs text-sand-500">
+              <p className="text-xs text-ink-3">
                 {r.country} · {r.latitude.toFixed(2)}, {r.longitude.toFixed(2)}
               </p>
             </button>
@@ -148,18 +161,18 @@ function AddStopModal({
 
       {/* Selected city chip */}
       {selected && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-gold-900 border border-gold-700/40 rounded-xl">
-          <span className="text-sm font-medium text-gold-200 flex-1">
+        <div className="flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-xl">
+          <span className="text-sm font-medium text-coral-ink flex-1">
             {selected.name}
           </span>
-          <span className="text-xs text-sand-400">{selected.country}</span>
+          <span className="text-xs text-ink-2">{selected.country}</span>
           <button
             onClick={() => {
               setSelected(null);
               setQuery("");
             }}
             aria-label="Quitar ciudad seleccionada"
-            className="p-1 rounded-lg text-sand-500 hover:text-sand-200 hover:bg-sand-850 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
           >
             <X size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -170,7 +183,12 @@ function AddStopModal({
       {selected && (
         <form action={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Llegada" name="arrivalDate" type="date" />
+            <Field
+              label="Llegada"
+              name="arrivalDate"
+              type="date"
+              defaultValue={lastDepartureDate}
+            />
             <Field
               label="Noches"
               name="nights"

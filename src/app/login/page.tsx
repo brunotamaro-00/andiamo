@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { login } from "@/app/actions/auth";
-import { Plane } from "lucide-react";
+import { Wordmark } from "@/components/Wordmark";
 
-export const metadata: Metadata = { title: "Acceder — Trip 2026" };
+export const metadata: Metadata = { title: "Acceder · Andiamo" };
 
 interface Props {
   searchParams: Promise<{ error?: string; from?: string }>;
@@ -13,66 +13,54 @@ export default async function LoginPage({ searchParams }: Props) {
   const from = params.from ?? "/";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sand-950 px-4">
-      <div className="w-full max-w-sm">
-        {/* Wordmark */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-gold-900 border border-gold-700/50 flex items-center justify-center">
-              <Plane
-                size={22}
-                strokeWidth={1.5}
-                aria-hidden="true"
-                className="text-gold-400"
-              />
-            </div>
-          </div>
-          <h1 className="text-2xl font-semibold font-display text-sand-100">
-            Europa 2026
-          </h1>
-          <p className="text-sand-500 text-sm mt-1">Guía de viaje personal</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-canvas px-4 gap-10">
+      {/* Logo */}
+      <div className="text-center animate-slide-up">
+        <Wordmark size="lg" />
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 mt-2">
+          Tu guía de viaje personal
+        </p>
+      </div>
+
+      {/* Form card */}
+      <form
+        action={login}
+        className="w-full max-w-xs bg-surface rounded-2xl p-6 card-shadow space-y-5 border border-border animate-slide-up stagger-2"
+      >
+        <input type="hidden" name="from" value={from} />
+
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-[11px] font-semibold uppercase tracking-widest text-ink-3 mb-1.5"
+          >
+            Contraseña
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoFocus
+            autoComplete="current-password"
+            className="w-full px-3 py-2.5 bg-surface-2 border border-border rounded-lg text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/40 focus-visible:border-coral transition-colors duration-150 hover:border-border-strong"
+            placeholder="••••••••"
+            required
+          />
         </div>
 
-        {/* Login form */}
-        <form
-          action={login}
-          className="bg-sand-900 rounded-2xl p-6 shadow-xl space-y-4 border border-sand-800"
+        {params.error && (
+          <p className="text-danger text-xs font-semibold uppercase tracking-wide">
+            Contraseña incorrecta. Intentá de nuevo.
+          </p>
+        )}
+
+        <button
+          type="submit"
+          className="w-full py-2.5 bg-coral hover:bg-coral-hover active:bg-coral-press text-white font-bold text-sm rounded-full transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface tracking-wide"
         >
-          <input type="hidden" name="from" value={from} />
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-sand-300 mb-1.5"
-            >
-              Contraseña
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoFocus
-              autoComplete="current-password"
-              className="w-full px-3 py-2.5 bg-sand-850 border border-sand-700 rounded-xl text-sand-100 placeholder:text-sand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-900 transition-colors"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          {params.error && (
-            <p className="text-danger text-sm">
-              Contraseña incorrecta. Intentá de nuevo.
-            </p>
-          )}
-
-          <button
-            type="submit"
-            className="w-full py-2.5 bg-gold-400 hover:bg-gold-300 active:bg-gold-500 text-sand-950 font-semibold rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-900"
-          >
-            Entrar
-          </button>
-        </form>
-      </div>
+          Entrar
+        </button>
+      </form>
     </div>
   );
 }

@@ -25,15 +25,50 @@ interface RatesData {
 
 export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
   const [data, setData] = useState<RatesData | null>(null);
+  const [error, setError] = useState(false);
   const [usdInput, setUsdInput] = useState("100");
   const [localInput, setLocalInput] = useState("100");
 
   useEffect(() => {
+    let active = true;
     fetch("/api/rates")
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => {});
+      .then((r) => {
+        if (!r.ok) throw new Error("rates error");
+        return r.json();
+      })
+      .then((json) => {
+        if (!active) return;
+        if (!json?.rates) throw new Error("no rates");
+        setData(json);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
+
+  if (error) {
+    return (
+      <Card>
+        <SectionHeader title="Moneda" />
+        <p className="text-ink-3 text-sm">Sin conexión</p>
+      </Card>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Card>
+        <SectionHeader title="Moneda" />
+        <div className="space-y-3">
+          <div className="animate-pulse h-12 bg-surface-2 rounded-xl" />
+          <div className="animate-pulse h-20 bg-surface-2/60 rounded-xl" />
+        </div>
+      </Card>
+    );
+  }
 
   const rate = data?.rates[currencyCode];
   const symbol = getCurrencySymbol(currencyCode);
@@ -61,59 +96,59 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
 
       {/* Currency info */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="bg-sand-850 rounded-xl px-3 py-2 flex-1 border border-sand-800">
-          <p className="text-base font-semibold text-sand-100">
+        <div className="bg-surface-2 rounded-xl px-3 py-2 flex-1 border border-border">
+          <p className="text-base font-semibold text-ink">
             {symbol} {currencyCode}
           </p>
-          <p className="text-xs text-sand-500">{currencyName}</p>
+          <p className="text-xs text-ink-3">{currencyName}</p>
         </div>
         {rate && (
           <div className="text-right">
-            <p className="text-sm font-medium text-sand-200">
+            <p className="text-sm font-medium text-ink">
               1 USD = {fmt(symbol, fmtNum(rate, decimals))}
             </p>
-            <p className="text-xs text-sand-600">{data?.date ?? ""}</p>
+            <p className="text-xs text-ink-faint">{data?.date ?? ""}</p>
           </div>
         )}
       </div>
 
       {/* Converter */}
       {rate && (
-        <div className="bg-sand-850/50 rounded-xl p-3 border border-sand-800/50 space-y-3">
-          <p className="text-xs font-medium text-sand-500 uppercase tracking-wider">
+        <div className="bg-surface-2/50 rounded-xl p-3 border border-border/50 space-y-3">
+          <p className="text-xs font-medium text-ink-3 uppercase tracking-wider">
             Convertidor
           </p>
 
           {/* USD → local */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-sand-500 w-12 shrink-0">USD</span>
+            <span className="text-xs text-ink-3 w-12 shrink-0">USD</span>
             <input
               type="number"
               value={usdInput}
               onChange={(e) => setUsdInput(e.target.value)}
-              className="flex-1 bg-sand-900 border border-sand-700 rounded-xl px-3 py-1.5 text-sm text-sand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-850"
+              className="flex-1 bg-surface border border-border-strong rounded-xl px-3 py-1.5 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2"
               min="0"
               step="any"
               aria-label="Monto en USD"
             />
-            <span className="text-sm text-sand-300 shrink-0 min-w-[5rem] text-right">
+            <span className="text-sm text-ink-2 shrink-0 min-w-[5rem] text-right">
               {localFromUsd != null ? fmt(symbol, localFromUsd) : "–"}
             </span>
           </div>
 
           {/* local → USD */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-sand-500 w-12 shrink-0">{currencyCode}</span>
+            <span className="text-xs text-ink-3 w-12 shrink-0">{currencyCode}</span>
             <input
               type="number"
               value={localInput}
               onChange={(e) => setLocalInput(e.target.value)}
-              className="flex-1 bg-sand-900 border border-sand-700 rounded-xl px-3 py-1.5 text-sm text-sand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-850"
+              className="flex-1 bg-surface border border-border-strong rounded-xl px-3 py-1.5 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2"
               min="0"
               step="any"
               aria-label={`Monto en ${currencyCode}`}
             />
-            <span className="text-sm text-sand-300 shrink-0 min-w-[5rem] text-right">
+            <span className="text-sm text-ink-2 shrink-0 min-w-[5rem] text-right">
               {usdFromLocal != null ? fmt("$", usdFromLocal) : "–"}
             </span>
           </div>

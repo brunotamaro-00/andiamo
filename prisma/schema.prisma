@@ -41,8 +41,8 @@ model Poi {
   stop                Stop     @relation(fields: [stopId], references: [id], onDelete: Cascade)
   name                String
   type                PoiType  @default(otro)
-  latitude            Float
-  longitude           Float
+  latitude            Float?
+  longitude           Float?
   address             String?
   url                 String?
   notes               String?
@@ -54,7 +54,7 @@ model Poi {
 }
 
 enum PoiType {
-  hostel
+  hospedaje
   museo
   actividad
   comida

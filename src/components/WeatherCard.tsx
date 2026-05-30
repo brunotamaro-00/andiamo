@@ -26,15 +26,15 @@ interface WeatherIconDef {
 }
 
 function getWeatherIconDef(code: number): WeatherIconDef {
-  if (code === 0) return { icon: Sun, className: "text-gold-400" };
-  if (code <= 2) return { icon: CloudSun, className: "text-gold-400/80" };
-  if (code <= 3) return { icon: Cloud, className: "text-sand-400" };
-  if (code <= 49) return { icon: CloudFog, className: "text-sand-300" };
-  if (code <= 69) return { icon: CloudRain, className: "text-sand-300" };
-  if (code <= 79) return { icon: Snowflake, className: "text-sand-200" };
-  if (code <= 84) return { icon: CloudDrizzle, className: "text-sand-300" };
-  if (code <= 99) return { icon: CloudLightning, className: "text-warning" };
-  return { icon: Thermometer, className: "text-sand-400" };
+  if (code === 0)  return { icon: Sun,            className: "text-warning" };
+  if (code <= 2)   return { icon: CloudSun,        className: "text-warning" };
+  if (code <= 3)   return { icon: Cloud,           className: "text-ink-2" };
+  if (code <= 49)  return { icon: CloudFog,         className: "text-ink-2" };
+  if (code <= 69)  return { icon: CloudRain,        className: "text-ink-2" };
+  if (code <= 79)  return { icon: Snowflake,        className: "text-ink-3" };
+  if (code <= 84)  return { icon: CloudDrizzle,     className: "text-ink-2" };
+  if (code <= 99)  return { icon: CloudLightning,   className: "text-warning" };
+  return { icon: Thermometer, className: "text-ink-2" };
 }
 
 function WeatherIcon({ code, size = 32 }: { code: number; size?: number }) {
@@ -79,7 +79,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
     return (
       <Card>
         <SectionHeader title="Clima" />
-        <p className="text-sand-500 text-sm">Sin conexión</p>
+        <p className="text-ink-3 text-sm">Sin conexión</p>
       </Card>
     );
   }
@@ -88,7 +88,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
     return (
       <Card>
         <SectionHeader title="Clima" />
-        <div className="animate-pulse h-16 bg-sand-850 rounded-xl" />
+        <div className="animate-pulse h-16 bg-surface-2 rounded-xl" />
       </Card>
     );
   }
@@ -105,21 +105,21 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
       <div className="flex items-center gap-3 mb-4">
         <WeatherIcon code={data.current.weather_code} size={40} />
         <div>
-          <p className="text-2xl font-semibold font-display text-sand-100">
+          <p className="text-2xl font-semibold font-display text-ink">
             {Math.round(data.current.temperature_2m)}°C
           </p>
-          <p className="text-xs text-sand-400">
+          <p className="text-xs text-ink-2">
             ↑ {Math.round(daily.temperature_2m_max[0])}° · ↓{" "}
             {Math.round(daily.temperature_2m_min[0])}°
           </p>
         </div>
         <div className="ml-auto text-right space-y-1">
-          <p className="text-xs text-sand-400 flex items-center justify-end gap-1.5">
-            <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-gold-400" />
+          <p className="text-xs text-ink-2 flex items-center justify-end gap-1.5">
+            <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
             {sunrise}
           </p>
-          <p className="text-xs text-sand-400 flex items-center justify-end gap-1.5">
-            <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="text-sand-500" />
+          <p className="text-xs text-ink-2 flex items-center justify-end gap-1.5">
+            <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="text-ink-2" />
             {sunset}
           </p>
         </div>
@@ -131,16 +131,16 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
           <div
             key={date}
             className={`text-center rounded-xl py-2.5 px-1 ${
-              i === 0 ? "bg-sand-850" : "bg-sand-850/50"
+              i === 0 ? "bg-surface-2" : "bg-surface-2/50"
             }`}
           >
-            <p className="text-xs text-sand-500">
+            <p className="text-xs text-ink-3">
               {i === 0 ? "Hoy" : formatDay(date)}
             </p>
             <div className="flex justify-center my-1.5">
               <WeatherIcon code={daily.weather_code[i]} size={20} />
             </div>
-            <p className="text-xs text-sand-200">
+            <p className="text-xs text-ink">
               {Math.round(daily.temperature_2m_max[i])}° /{" "}
               {Math.round(daily.temperature_2m_min[i])}°
             </p>
