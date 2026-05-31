@@ -20,6 +20,8 @@ export default async function StopsPage() {
   ]);
 
   const tripStart = new Date("2026-08-05");
+  const tripEnd = new Date("2026-11-21");
+  const tripDays = Math.round((tripEnd.getTime() - tripStart.getTime()) / (1000 * 60 * 60 * 24));
   const today = new Date();
   const daysUntilTrip = Math.ceil(
     (tripStart.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
@@ -73,8 +75,8 @@ export default async function StopsPage() {
             value={stops.filter((s) => !s.isFlexMargin && !s.isCandidate).length.toString()}
           />
           <Stat
-            label="Noches"
-            value={stops.reduce((a, s) => a + s.nights, 0).toString()}
+            label="Días"
+            value={tripDays.toString()}
           />
           <Stat
             label="Países"
