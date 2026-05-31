@@ -7,7 +7,7 @@ import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
 import { Badge } from "@/components/ui/Badge";
 import { Wordmark } from "@/components/Wordmark";
-import { ChevronRight, Plane, FileText, Search } from "lucide-react";
+import { ChevronRight, FileText, Search } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Itinerario · Andiamo" };
@@ -23,30 +23,13 @@ export default async function StopsPage() {
   const tripEnd = new Date("2026-11-21");
   const tripDays = Math.round((tripEnd.getTime() - tripStart.getTime()) / (1000 * 60 * 60 * 24));
   const today = new Date();
-  const daysUntilTrip = Math.ceil(
-    (tripStart.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  const tripStarted = today >= tripStart;
 
   return (
     <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-canvas/95 backdrop-blur-md border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+      <header className="sticky top-0 z-10 bg-canvas/95 backdrop-blur-md border-b border-border px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div>
-            <Wordmark size="sm" />
-            {!tripStarted && daysUntilTrip > 0 && (
-              <p className="text-[11px] font-semibold text-coral-ink flex items-center gap-1 mt-0.5 tracking-wide">
-                <Plane size={10} strokeWidth={2} aria-hidden="true" />
-                {daysUntilTrip} días para el viaje
-              </p>
-            )}
-            {tripStarted && (
-              <p className="text-[11px] font-semibold text-coral-ink mt-0.5 tracking-wide">
-                ¡El viaje ya empezó!
-              </p>
-            )}
-          </div>
+          <Wordmark size="sm" />
           <div className="flex items-center gap-1">
             <Link
               href="/search"
