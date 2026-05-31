@@ -39,7 +39,7 @@ export default async function GeneralPage() {
         <div className="w-20" />
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
         <div className="bg-surface rounded-2xl border border-border p-4">
           <h2 className="text-sm font-semibold text-ink mb-1">

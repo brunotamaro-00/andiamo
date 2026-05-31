@@ -8,7 +8,7 @@ export default function Loading() {
           <Skeleton className="h-6 w-32" />
         </div>
       </header>
-      <main className="px-4 py-6 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-6 max-w-lg mx-auto pb-24">
         <div className="grid grid-cols-3 gap-3 mb-6">
           <Skeleton className="h-16" />
           <Skeleton className="h-16" />

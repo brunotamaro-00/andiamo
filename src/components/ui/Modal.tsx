@@ -30,21 +30,14 @@ export function Modal({ title, onClose, children }: ModalProps) {
       const first = panel.querySelector<HTMLElement>(FOCUSABLE);
       first?.focus();
     }
-    // position:fixed is the only reliable way to stop background scroll on iOS Safari
-    const scrollY = window.scrollY;
-    const body = document.body;
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
+    // Lock the scroll container (not body) — body no longer scrolls in this layout
+    const scrollRoot = document.getElementById("scroll-root");
+    if (!scrollRoot) return;
+    const scrollY = scrollRoot.scrollTop;
+    scrollRoot.style.overflow = "hidden";
     return () => {
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-      window.scrollTo(0, scrollY);
+      scrollRoot.style.overflow = "";
+      scrollRoot.scrollTop = scrollY;
     };
   }, []);
 

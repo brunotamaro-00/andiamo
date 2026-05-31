@@ -33,7 +33,7 @@ function getWeatherIconDef(code: number): WeatherIconDef {
   if (code <= 69)  return { icon: CloudRain,        className: "text-ink-2" };
   if (code <= 79)  return { icon: Snowflake,        className: "text-ink-3" };
   if (code <= 84)  return { icon: CloudDrizzle,     className: "text-ink-2" };
-  if (code <= 99)  return { icon: CloudLightning,   className: "text-warning" };
+  if (code <= 99)  return { icon: CloudLightning,   className: "text-ink-2" };
   return { icon: Thermometer, className: "text-ink-2" };
 }
 

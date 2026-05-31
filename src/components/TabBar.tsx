@@ -39,7 +39,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed bottom-0 inset-x-0 z-[1000] bg-surface/95 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom)]"
+      className="shrink-0 bg-surface/95 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
