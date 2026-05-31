@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
         {!hasQuery && (
           <EmptyState
             icon={Search}

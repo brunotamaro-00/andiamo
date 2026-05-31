@@ -97,7 +97,7 @@ export default async function StopPage({ params }: Props) {
         <div className="w-20" /> {/* spacer to balance left link */}
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
         {/* City header card */}
         <div

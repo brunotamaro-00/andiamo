@@ -43,8 +43,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`h-full ${montserrat.variable} ${inter.variable}`}>
-      <body className="min-h-full bg-canvas text-ink antialiased font-display">
-        {children}
+      <body className="h-full bg-canvas text-ink antialiased font-display flex flex-col overflow-hidden">
+        <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain">
+          {children}
+        </main>
         <TabBar />
       </body>
     </html>

@@ -50,7 +50,7 @@ export default async function StopsPage() {
         </div>
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         {/* Quick stats */}
         <div className="grid grid-cols-3 gap-3 mb-5 animate-fade-in">
           <Stat

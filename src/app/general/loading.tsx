@@ -10,7 +10,7 @@ export default function Loading() {
         </div>
         <div className="w-20" />
       </header>
-      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <Skeleton className="h-20 rounded-2xl" />
         <Skeleton className="h-44 rounded-2xl" />
         <Skeleton className="h-44 rounded-2xl" />
