@@ -5,7 +5,6 @@ import { getCurrentStopSlug } from "@/lib/current-stop";
 import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
-import { StopMap } from "@/components/StopMap";
 import { PoiPanel } from "@/components/PoiPanel";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
@@ -75,17 +74,6 @@ export default async function StopPage({ params }: Props) {
         )
       )
     : null;
-
-  const poiMarkers = stop.pois
-    .filter((p) => p.latitude != null && p.longitude != null)
-    .map((p) => ({
-      id: p.id,
-      name: p.name,
-      type: p.type as string,
-      latitude: p.latitude as number,
-      longitude: p.longitude as number,
-      done: p.done,
-    }));
 
   const path = `/stops/${slug}`;
 
@@ -229,14 +217,6 @@ export default async function StopPage({ params }: Props) {
 
         {/* Currency */}
         <CurrencyCard currencyCode={stop.currencyCode} />
-
-        {/* Map */}
-        <StopMap
-          centerLat={stop.latitude}
-          centerLng={stop.longitude}
-          pois={poiMarkers}
-          stopName={stop.name}
-        />
 
         {/* POIs */}
         <div id="pois" className="scroll-mt-20">
