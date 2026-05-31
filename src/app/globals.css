@@ -120,11 +120,4 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Leaflet ─────────────────────────────────────────── */
 .font-display { font-optical-sizing: auto; }
-
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  border-radius: 0.75rem;
-}
