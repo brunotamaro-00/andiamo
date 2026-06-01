@@ -84,7 +84,7 @@ function EditModal({
     <Modal title="Editar ciudad" onClose={onClose}>
       <form action={handleSave} className="space-y-3">
         <Field label="Nombre" name="name" defaultValue={name} required />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-[2fr_1fr] gap-2">
           <Field
             label="Llegada"
             name="arrivalDate"
