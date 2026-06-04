@@ -90,7 +90,7 @@ export default async function SearchPage({ searchParams }: Props) {
           <Link
             href="/stops"
             aria-label="Volver al itinerario"
-            className="h-10 w-10 -ml-1 flex items-center justify-center rounded-lg text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+            className="h-10 w-10 -ml-1 flex items-center justify-center rounded-lg text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           >
             <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" />
           </Link>
@@ -216,7 +216,7 @@ function ResultRow({
   badge?: React.ReactNode;
   external?: boolean;
 }) {
-  const className = "flex items-center gap-3 px-3 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
+  const className = "flex items-center gap-3 px-3 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
 
   const inner = (
     <>

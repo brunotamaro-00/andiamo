@@ -18,7 +18,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 const actionBtn =
   "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
   "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick";
 
 /* Keep in sync with the server route validation. */
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -245,7 +245,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                       href={`/api/documents/${doc.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${actionBtn} text-coral hover:text-coral-hover hover:bg-surface-2`}
+                      className={`${actionBtn} text-brick hover:text-brick-hover hover:bg-surface-2`}
                       aria-label={`Abrir ${doc.label} en nueva pestaña`}
                     >
                       <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />
@@ -442,7 +442,7 @@ function UploadModal({
             accept={ACCEPT}
             onChange={handleFileChange}
             disabled={uploading}
-            className="mt-1 w-full text-sm text-ink-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-border file:text-ink hover:file:bg-border-strong cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral rounded-xl disabled:opacity-50"
+            className="mt-1 w-full text-sm text-ink-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-border file:text-ink hover:file:bg-border-strong cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-xl disabled:opacity-50"
           />
           <p className="text-[11px] text-ink-faint mt-1">
             PDF, JPG, PNG o WebP · máximo 20 MB
@@ -464,7 +464,7 @@ function UploadModal({
             </div>
             <div className="h-1.5 rounded-full bg-border overflow-hidden">
               <div
-                className="h-full bg-coral transition-all duration-150"
+                className="h-full bg-brick transition-all duration-150"
                 style={{ width: `${progress}%` }}
               />
             </div>

@@ -42,7 +42,7 @@ export default async function LoginPage({ searchParams }: Props) {
             type="password"
             autoFocus
             autoComplete="current-password"
-            className="w-full px-3 py-2.5 bg-surface-2 border border-border rounded-lg text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/40 focus-visible:border-coral transition-colors duration-150 hover:border-border-strong"
+            className="w-full px-3 py-2.5 bg-surface-2 border border-border rounded-lg text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:border-brick transition-colors duration-150 hover:border-border-strong"
             placeholder="••••••••"
             required
           />
@@ -56,7 +56,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
         <button
           type="submit"
-          className="w-full py-2.5 bg-coral hover:bg-coral-hover active:bg-coral-press active:translate-x-[3px] active:translate-y-[3px] active:shadow-none text-white font-display uppercase tracking-wide text-sm rounded-[2px] hard-shadow-ink transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="w-full py-2.5 bg-brick hover:bg-brick-hover active:bg-brick-press active:translate-x-[3px] active:translate-y-[3px] active:shadow-none text-white font-display uppercase tracking-wide text-sm rounded-[2px] hard-shadow-ink transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Entrar
         </button>

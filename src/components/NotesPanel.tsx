@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 const actionBtn =
   "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
   "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick " +
   "focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 interface Note {
@@ -252,7 +252,7 @@ function NoteCard({
 
   if (editing) {
     return (
-      <div className="p-3 rounded-[4px] border border-coral-border/40 bg-surface-2/40 space-y-2">
+      <div className="p-3 rounded-[4px] border border-brick-border/40 bg-surface-2/40 space-y-2">
         <input
           value={title}
           onChange={(e) => {
@@ -318,7 +318,7 @@ function NoteCard({
       <div className="flex items-start justify-between gap-1">
         <button
           onClick={() => setEditing(true)}
-          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           aria-label={`Editar nota "${note.title}"`}
         >
           <div className="flex items-center gap-1.5">
@@ -374,7 +374,7 @@ function NoteCard({
             <button
               onClick={() => setEditing(true)}
               aria-label={`Editar nota "${note.title}"`}
-              className={`${actionBtn} text-ink-faint hover:text-coral hover:bg-surface-2`}
+              className={`${actionBtn} text-ink-faint hover:text-brick hover:bg-surface-2`}
             >
               <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
             </button>
@@ -418,7 +418,7 @@ function AddNoteModal({
             type="checkbox"
             name="pinned"
             value="true"
-            className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+            className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           />
           Fijar arriba
         </label>

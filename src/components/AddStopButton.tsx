@@ -40,8 +40,8 @@ export function AddStopButton({ stops, lastDepartureDate }: Props) {
         className={[
           "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-[4px]",
           "border border-dashed border-border-strong bg-surface/50 text-sm text-ink-3",
-          "hover:border-coral-border/50 hover:bg-surface hover:text-ink transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+          "hover:border-brick-border/50 hover:bg-surface hover:text-ink transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
           "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
         ]
           .filter(Boolean)
@@ -121,7 +121,7 @@ function AddStopModal({
           placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
           autoFocus
           aria-label="Buscar ciudad"
-          className="mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
+          className="mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
         />
         {searching && (
           <p className="text-xs text-ink-3 mt-1">Buscando...</p>
@@ -155,7 +155,7 @@ function AddStopModal({
                 setResults([]);
                 setQuery(r.name);
               }}
-              className="w-full text-left px-3 py-2.5 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+              className="w-full text-left px-3 py-2.5 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             >
               <p className="text-sm font-medium text-ink">
                 {r.name}{r.admin1 ? `, ${r.admin1}` : ""}
@@ -170,8 +170,8 @@ function AddStopModal({
 
       {/* Selected city chip */}
       {selected && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-[4px]">
-          <span className="text-sm font-medium text-coral-ink flex-1">
+        <div className="flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-[4px]">
+          <span className="text-sm font-medium text-brick-ink flex-1">
             {selected.name}
           </span>
           <span className="text-xs text-ink-2">{selected.country}</span>
@@ -181,7 +181,7 @@ function AddStopModal({
               setQuery("");
             }}
             aria-label="Quitar ciudad seleccionada"
-            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           >
             <X size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>

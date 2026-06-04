@@ -25,7 +25,7 @@ export function IconButton({
         danger
           ? "text-ink-3 hover:text-danger hover:bg-danger-bg"
           : "text-ink-3 hover:text-ink hover:bg-surface-2",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
         "focus-visible:ring-offset-1 focus-visible:ring-offset-surface",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         className,

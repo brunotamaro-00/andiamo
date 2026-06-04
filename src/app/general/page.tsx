@@ -28,7 +28,7 @@ export default async function GeneralPage() {
       <header className="sticky top-0 z-10 bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
         <Link
           href="/stops"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral rounded-lg px-1 py-0.5"
+          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
         >
           <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
           Itinerario

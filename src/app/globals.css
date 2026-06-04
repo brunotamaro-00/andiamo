@@ -17,13 +17,13 @@
   --color-ink-3:         #8A7F6A;   /* muted / subtle */
   --color-ink-faint:     #ABA090;   /* placeholder / disabled */
 
-  /* ── Brick red accent (replaces coral) ─────────────── */
-  --color-coral:        #E8462B;
-  --color-coral-hover:  #D03A20;
-  --color-coral-press:  #B83018;
-  --color-coral-ink:    #8B2010;
-  --color-coral-border: #F5BDB0;
-  --color-coral-bg:     #FDEAE6;
+  /* ── Ladrillo accent ───────────────────────────────── */
+  --color-brick:        #C44428;
+  --color-brick-hover:  #B03C22;
+  --color-brick-press:  #9A341D;
+  --color-brick-ink:    #832C18;
+  --color-brick-border: #EAAD9C;
+  --color-brick-bg:     #FAE8E3;
 
   /* ── Panini gold accent ─────────────────────────────── */
   --color-gold:         #C8A24B;
@@ -73,7 +73,7 @@
   }
 
   ::selection {
-    background-color: rgb(232 70 43 / 0.18);
+    background-color: rgb(196 68 40 / 0.18);
     color: #1B1A17;
   }
 

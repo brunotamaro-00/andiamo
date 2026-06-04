@@ -123,7 +123,7 @@ function EditModal({
               type="checkbox"
               checked={fixedChecked}
               onChange={(e) => setFixedChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             />
             Fechas confirmadas
           </label>
@@ -132,7 +132,7 @@ function EditModal({
               type="checkbox"
               checked={candidateChecked}
               onChange={(e) => setCandidateChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             />
             Candidata (sin decidir)
           </label>
@@ -141,7 +141,7 @@ function EditModal({
               type="checkbox"
               checked={transitChecked}
               onChange={(e) => setTransitChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             />
             Tránsito (solo de paso)
           </label>

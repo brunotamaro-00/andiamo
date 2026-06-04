@@ -35,14 +35,14 @@ export default async function StopsPage() {
             <Link
               href="/search"
               aria-label="Buscar en el viaje"
-              className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
+              className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
             >
               <Search size={17} strokeWidth={1.5} aria-hidden="true" />
             </Link>
             <form action={logout}>
               <button
                 type="submit"
-                className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
+                className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
               >
                 Salir
               </button>
@@ -69,7 +69,7 @@ export default async function StopsPage() {
         </div>
 
         {/* Timeline */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {stops.filter((s) => !s.isFlexMargin).length === 0 && (
             <EmptyState
               icon={MapPin}
@@ -84,18 +84,19 @@ export default async function StopsPage() {
               const isPast = stop.departureDate && today > new Date(stop.departureDate);
               const isCandidate = stop.isCandidate;
               const stagger = idx < 6 ? `stagger-${(idx % 6) + 1}` : "";
+              const hasBadges = !stop.datesFixed || stop.isTransit || isCandidate;
 
               return (
                 <Link
                   key={stop.id}
                   href={`/stops/${stop.slug}`}
                   className={[
-                    "flex items-center gap-3 px-4 py-3 rounded-[4px] border-2 transition-all duration-150 animate-fade-in",
+                    "flex items-center gap-3 px-4 py-3.5 rounded-[4px] border-2 transition-all duration-150 animate-fade-in",
                     stagger,
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-surface border-coral card-shadow"
+                      ? "bg-brick-bg border-brick card-shadow"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
@@ -108,9 +109,9 @@ export default async function StopsPage() {
                   {/* Order indicator */}
                   <div
                     className={[
-                      "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0",
+                      "w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-numeral text-sm",
                       isActive
-                        ? "border border-coral text-coral-ink"
+                        ? "bg-brick/10 text-brick-ink"
                         : isPast
                         ? "bg-surface-2 text-ink-faint"
                         : "bg-surface-2 text-ink-2",
@@ -123,39 +124,43 @@ export default async function StopsPage() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-base leading-none" aria-hidden="true">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl leading-none shrink-0" aria-hidden="true">
                         {stop.countryFlag}
                       </span>
                       <span
-                        className={`font-semibold text-sm ${
-                          isActive ? "text-coral-ink" : "text-ink"
+                        className={`font-bold text-[15px] leading-tight truncate ${
+                          isActive ? "text-brick-ink" : "text-ink"
                         }`}
                       >
                         {stop.name}
                       </span>
-                      {!stop.datesFixed && <Badge variant="warning">tentativa</Badge>}
-                      {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
-                      {isCandidate && <Badge variant="special">candidata</Badge>}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-ink-3 font-medium">
-                      <span>{stop.country}</span>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[11px] text-ink-3 font-medium">{stop.country}</span>
                       {stop.nights > 0 && (
                         <>
-                          <span className="text-border-strong">·</span>
-                          <span>{stop.nights} noches</span>
+                          <span className="text-border-strong text-[11px]">·</span>
+                          <span className="text-[11px] text-ink-3 font-medium">{stop.nights}n</span>
                         </>
                       )}
                       {stop.arrivalDate && (
                         <>
-                          <span className="text-border-strong">·</span>
-                          <span>{formatShortDate(new Date(stop.arrivalDate))}</span>
+                          <span className="text-border-strong text-[11px]">·</span>
+                          <span className="text-[11px] text-ink-3 font-medium">{formatShortDate(new Date(stop.arrivalDate))}</span>
                         </>
                       )}
                       {stop.tempRange && (
                         <>
-                          <span className="text-border-strong">·</span>
-                          <span>{stop.tempRange}</span>
+                          <span className="text-border-strong text-[11px]">·</span>
+                          <span className="text-[11px] text-ink-3 font-medium">{stop.tempRange}</span>
+                        </>
+                      )}
+                      {hasBadges && (
+                        <>
+                          {!stop.datesFixed && <Badge variant="warning">tentativa</Badge>}
+                          {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
+                          {isCandidate && <Badge variant="special">candidata</Badge>}
                         </>
                       )}
                     </div>
@@ -164,7 +169,7 @@ export default async function StopsPage() {
                   <ChevronRight
                     size={15}
                     strokeWidth={2}
-                    className={isActive ? "text-coral" : "text-border-strong"}
+                    className={isActive ? "text-brick" : "text-border-strong"}
                     aria-hidden="true"
                   />
                 </Link>
@@ -188,7 +193,7 @@ export default async function StopsPage() {
         {/* Global docs link */}
         <Link
           href="/general"
-          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
+          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
         >
           <FileText size={13} strokeWidth={1.5} aria-hidden="true" />
           Documentos generales

@@ -52,7 +52,7 @@ export function TabBar() {
                 className={[
                   "flex flex-col items-center justify-center gap-1 h-full min-h-[44px] rounded-[4px] transition-colors duration-150",
                   "active:scale-[0.96] motion-reduce:active:scale-100",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -61,19 +61,19 @@ export function TabBar() {
                 <span
                   className={[
                     "flex items-center justify-center w-10 h-6 rounded-full transition-colors duration-150",
-                    active ? "bg-coral-bg" : "",
+                    active ? "bg-brick-bg" : "",
                   ].join(" ")}
                 >
                   <Icon
                     size={18}
                     strokeWidth={active ? 2 : 1.5}
                     aria-hidden="true"
-                    className={active ? "text-coral" : "text-ink-2"}
+                    className={active ? "text-brick" : "text-ink-2"}
                   />
                 </span>
                 <span
                   className={`text-[10px] font-extrabold uppercase tracking-[0.08em] transition-colors duration-150 ${
-                    active ? "text-coral" : "text-ink-3"
+                    active ? "text-brick" : "text-ink-3"
                   }`}
                 >
                   {label}

@@ -28,7 +28,7 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
           size={16}
           strokeWidth={1.5}
           aria-hidden="true"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-coral animate-spin pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-brick animate-spin pointer-events-none"
         />
       ) : (
         <Search
@@ -46,13 +46,13 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
         aria-label="Buscar en el viaje"
         autoFocus
         enterKeyHint="search"
-        className="w-full bg-surface-2 border border-border-strong rounded-xl pl-9 pr-9 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
+        className="w-full bg-surface-2 border border-border-strong rounded-xl pl-9 pr-9 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
       />
       {value && (
         <button
           onClick={() => update("")}
           aria-label="Limpiar búsqueda"
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
         >
           <X size={14} strokeWidth={1.5} aria-hidden="true" />
         </button>
