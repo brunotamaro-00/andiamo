@@ -39,7 +39,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Navegación principal"
-      className="shrink-0 bg-surface/95 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom)]"
+      className="shrink-0 bg-surface/95 backdrop-blur-md border-t-2 border-ink pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
@@ -50,7 +50,7 @@ export function TabBar() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={[
-                  "flex flex-col items-center justify-center gap-1 h-full min-h-[44px] rounded-xl transition-colors duration-150",
+                  "flex flex-col items-center justify-center gap-1 h-full min-h-[44px] rounded-[4px] transition-colors duration-150",
                   "active:scale-[0.96] motion-reduce:active:scale-100",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
                 ]
@@ -72,7 +72,7 @@ export function TabBar() {
                   />
                 </span>
                 <span
-                  className={`text-[10px] font-semibold tracking-wide transition-colors duration-150 ${
+                  className={`text-[10px] font-extrabold uppercase tracking-[0.08em] transition-colors duration-150 ${
                     active ? "text-coral" : "text-ink-3"
                   }`}
                 >

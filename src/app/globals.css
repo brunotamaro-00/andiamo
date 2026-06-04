@@ -1,32 +1,39 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Font families ─────────────────────────────────── */
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-montserrat), system-ui, sans-serif;
+  /* ── Font families — Panini editorial system ────────── */
+  --font-display: var(--font-anton), sans-serif;          /* Anton — condensed display */
+  --font-sans:    var(--font-hanken), system-ui, sans-serif; /* Hanken Grotesk — body */
+  --font-numeral: var(--font-archivo), sans-serif;        /* Archivo 900 — big numbers */
 
-  /* ── Neutrals — Botardo OKLCH warm harmony ─────────── */
-  --color-canvas:       oklch(0.963 0.022 88);   /* warm cream page bg */
-  --color-surface:      oklch(0.990 0.012 88);   /* near-white cards */
-  --color-surface-2:    oklch(0.938 0.016 88);   /* inputs / nested / muted */
-  --color-border:       oklch(0.868 0.022 88);   /* default border */
-  --color-border-strong:oklch(0.800 0.030 88);   /* hover / strong border */
-  --color-ink:          oklch(0.200 0.010 80);   /* warm near-black text */
-  --color-ink-2:        oklch(0.480 0.018 80);   /* secondary text */
-  --color-ink-3:        oklch(0.640 0.014 80);   /* muted / subtle */
-  --color-ink-faint:    oklch(0.780 0.010 80);   /* placeholder / disabled */
+  /* ── Neutrals — Panini warm paper ──────────────────── */
+  --color-canvas:        #F3ECD8;   /* warm cream page bg */
+  --color-surface:       #FFFFFF;   /* white cards */
+  --color-surface-2:     #EAE2CB;   /* inputs / nested / muted */
+  --color-border:        #D8CFB4;   /* default border / rule */
+  --color-border-strong: #C2B08A;   /* hover / active border */
+  --color-ink:           #1B1A17;   /* warm near-black text */
+  --color-ink-2:         #6B6452;   /* secondary text */
+  --color-ink-3:         #8A7F6A;   /* muted / subtle */
+  --color-ink-faint:     #ABA090;   /* placeholder / disabled */
 
-  /* ── Coral accent ───────────────────────────────────── */
-  --color-coral:        #FF385C;
-  --color-coral-hover:  #E31C5F;
-  --color-coral-press:  #C9134E;
-  --color-coral-ink:    #C9134E;
-  --color-coral-border: #FBCAD4;
-  --color-coral-bg:     #FFF0F3;
+  /* ── Brick red accent (replaces coral) ─────────────── */
+  --color-coral:        #E8462B;
+  --color-coral-hover:  #D03A20;
+  --color-coral-press:  #B83018;
+  --color-coral-ink:    #8B2010;
+  --color-coral-border: #F5BDB0;
+  --color-coral-bg:     #FDEAE6;
+
+  /* ── Panini gold accent ─────────────────────────────── */
+  --color-gold:         #C8A24B;
+  --color-gold-bg:      #F8F0DC;
+  --color-gold-ink:     #7A5C10;
+  --color-gold-border:  #E8D4A0;
 
   /* ── Semantic (light) ───────────────────────────────── */
-  --color-success:      #1A7F4B;
-  --color-success-bg:   #E8F5EE;
+  --color-success:      #2F7D4F;
+  --color-success-bg:   #E4F0EB;
   --color-warning:      #B7791F;
   --color-warning-bg:   #FBF3E2;
   --color-danger:       #C13515;
@@ -66,8 +73,8 @@
   }
 
   ::selection {
-    background-color: oklch(0.430 0.135 27 / 0.15);
-    color: oklch(0.200 0.010 80);
+    background-color: rgb(232 70 43 / 0.18);
+    color: #1B1A17;
   }
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -80,22 +87,22 @@
   color-scheme: light;
 }
 
-/* ── Elevation utilities (Botardo bottom-heavy style) ── */
+/* ── Elevation — Panini hard-shadow sticker style ─────── */
 @utility card-shadow {
-  box-shadow:
-    0 12px 28px -24px rgb(0 0 0 / 0.18),
-    0 1px 0 0 rgb(0 0 0 / 0.04);
+  box-shadow: 3px 3px 0 #D8CFB4;
 }
 
 @utility card-shadow-lg {
-  box-shadow:
-    0 20px 40px -20px rgb(0 0 0 / 0.22),
-    0 2px 0 0 rgb(0 0 0 / 0.06);
+  box-shadow: 5px 5px 0 #1B1A17;
+}
+
+@utility hard-shadow-ink {
+  box-shadow: 3px 3px 0 #1B1A17;
 }
 
 /* Keep compat aliases */
-@utility shadow-soft    { box-shadow: 0 12px 28px -24px rgb(0 0 0 / 0.18), 0 1px 0 0 rgb(0 0 0 / 0.04); }
-@utility shadow-soft-lg { box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.22), 0 2px 0 0 rgb(0 0 0 / 0.06); }
+@utility shadow-soft    { box-shadow: 3px 3px 0 #D8CFB4; }
+@utility shadow-soft-lg { box-shadow: 5px 5px 0 #1B1A17; }
 
 /* ── Animation utilities ─────────────────────────────── */
 @utility animate-fade-in    { animation: fadeIn  400ms ease-out both; }
@@ -109,9 +116,9 @@
 @utility stagger-5 { animation-delay: 300ms; }
 @utility stagger-6 { animation-delay: 360ms; }
 
-/* ── Card hover lift (Botardo style) ─────────────────── */
+/* ── Card hover — sticker shift ──────────────────────── */
 @utility card-hover {
-  transition: box-shadow 200ms ease, transform 200ms ease;
+  transition: box-shadow 150ms ease, transform 150ms ease;
 }
 
 /* ── Tabular nums for data ───────────────────────────── */
@@ -120,4 +127,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-.font-display { font-optical-sizing: auto; }
+/* ── Numeral display — Archivo 900 ───────────────────── */
+@utility font-numeral {
+  font-family: var(--font-numeral);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.font-display, .font-sans, .font-numeral { font-optical-sizing: auto; }

@@ -82,12 +82,12 @@ export default async function StopsPage() {
                   key={stop.id}
                   href={`/stops/${stop.slug}`}
                   className={[
-                    "flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 animate-fade-in",
+                    "flex items-center gap-3 px-4 py-3 rounded-[4px] border-2 transition-all duration-150 animate-fade-in",
                     stagger,
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-surface border-border border-l-2 border-l-coral card-shadow"
+                      ? "bg-surface border-coral card-shadow"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
@@ -180,7 +180,7 @@ export default async function StopsPage() {
         {/* Global docs link */}
         <Link
           href="/general"
-          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
+          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/40"
         >
           <FileText size={13} strokeWidth={1.5} aria-hidden="true" />
           Documentos generales
@@ -192,9 +192,9 @@ export default async function StopsPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-surface rounded-xl px-3 py-3 text-center border border-border card-shadow">
-      <p className="text-2xl font-bold font-display text-ink font-tabular">{value}</p>
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-ink-3 mt-0.5">{label}</p>
+    <div className="bg-surface rounded-[4px] px-3 py-3 text-center border-2 border-border card-shadow">
+      <p className="text-4xl font-numeral text-ink leading-none">{value}</p>
+      <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-1">{label}</p>
     </div>
   );
 }

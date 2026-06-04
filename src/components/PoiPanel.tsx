@@ -440,7 +440,7 @@ function PlaceSearchField({
 
       {selected ? (
         /* Chip showing selected place */
-        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-xl">
+        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-[4px]">
           <MapPin size={13} strokeWidth={1.5} aria-hidden="true" className="text-coral shrink-0" />
           <span className="text-sm text-coral-ink flex-1 truncate">{selectedLabel}</span>
           <button
@@ -494,7 +494,7 @@ function PlaceSearchField({
                   key={i}
                   type="button"
                   onClick={() => handleSelect(r)}
-                  className="w-full text-left px-3 py-2 rounded-xl bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+                  className="w-full text-left px-3 py-2 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
                 >
                   <p className="text-sm font-medium text-ink truncate">{r.name}</p>
                   <p className="text-xs text-ink-3 truncate">{r.address}</p>

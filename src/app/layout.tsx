@@ -1,19 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat, Inter } from "next/font/google";
+import { Anton, Hanken_Grotesk, Archivo } from "next/font/google";
 import "./globals.css";
 import { TabBar } from "@/components/TabBar";
 
-const montserrat = Montserrat({
+const anton = Anton({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-montserrat",
+  weight: "400",
+  variable: "--font-anton",
   display: "swap",
 });
 
-const inter = Inter({
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-hanken",
+  display: "swap",
+});
+
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["900"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
@@ -34,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F5F0E8",
+  themeColor: "#F3ECD8",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -42,8 +49,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`h-full ${montserrat.variable} ${inter.variable}`}>
-      <body className="h-full bg-canvas text-ink antialiased font-display flex flex-col overflow-hidden">
+    <html lang="es" className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}>
+      <body className="h-full bg-canvas text-ink antialiased font-sans flex flex-col overflow-hidden">
         <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain">
           {children}
         </main>

@@ -218,7 +218,7 @@ function NoteCard({
 
   if (editing) {
     return (
-      <div className="p-3 rounded-xl border border-coral-border/40 bg-surface-2/40 space-y-2">
+      <div className="p-3 rounded-[4px] border border-coral-border/40 bg-surface-2/40 space-y-2">
         <input
           value={title}
           onChange={(e) => {
@@ -269,7 +269,7 @@ function NoteCard({
 
   return (
     <div
-      className={`p-3 rounded-xl border transition-colors ${
+      className={`p-3 rounded-[4px] border transition-colors ${
         note.pinned
           ? "border-warning/30 bg-warning-bg/40"
           : "border-border bg-surface-2/30"
