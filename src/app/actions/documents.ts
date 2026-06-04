@@ -28,8 +28,8 @@ export async function deleteDocument(id: string, path: string) {
   // Also delete file from disk if uploaded
   const doc = await db.document.findUnique({ where: { id }, select: { storagePath: true } });
   if (doc?.storagePath) {
-    const { unlink } = await import("fs/promises");
-    await unlink(doc.storagePath).catch(() => {});
+    const { deleteFromR2 } = await import("@/lib/r2");
+    await deleteFromR2(doc.storagePath).catch(() => {});
   }
   await db.document.delete({ where: { id } });
   revalidatePath(path);
