@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useTransition, useOptimistic, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   BedDouble, Landmark, Target, UtensilsCrossed, Binoculars,
-  TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search,
+  TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search, AlertCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createPoi, updatePoi, togglePoiDone, deletePoi } from "@/app/actions/pois";
@@ -65,9 +66,11 @@ type OptimisticAction =
   | { type: "add"; poi: Poi };
 
 export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editingPoi, setEditingPoi] = useState<Poi | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const [optimisticPois, applyOptimistic] = useOptimistic(
@@ -87,17 +90,29 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
   );
 
   function handleToggle(poi: Poi) {
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "toggle", id: poi.id });
-      await togglePoiDone(poi.id, slug);
+      try {
+        await togglePoiDone(poi.id, slug);
+      } catch {
+        setMutationError("No se pudo guardar el cambio. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
   function handleDelete(id: string) {
     setConfirmingId(null);
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "delete", id });
-      await deletePoi(id, slug);
+      try {
+        await deletePoi(id, slug);
+      } catch {
+        setMutationError("No se pudo borrar. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
@@ -119,17 +134,29 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
       reservationRequired: formData.get("reservationRequired") === "true",
     };
     setOpen(false);
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "add", poi: temp });
-      await createPoi(formData);
+      try {
+        await createPoi(formData);
+      } catch {
+        setMutationError("No se pudo agregar el punto de interés. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
   function handleEdit(formData: FormData, id: string) {
     formData.set("slug", slug);
     setEditingPoi(null);
+    setMutationError(null);
     startTransition(async () => {
-      await updatePoi(id, formData);
+      try {
+        await updatePoi(id, formData);
+      } catch {
+        setMutationError("No se pudo guardar los cambios. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
@@ -150,6 +177,13 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
           </Button>
         }
       />
+
+      {mutationError && (
+        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
+          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+          {mutationError}
+        </p>
+      )}
 
       {optimisticPois.length === 0 ? (
         <EmptyState

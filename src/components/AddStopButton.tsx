@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, AlertCircle } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -66,12 +66,14 @@ function AddStopModal({
   const [results, setResults] = useState<GeoResult[]>([]);
   const [selected, setSelected] = useState<GeoResult | null>(null);
   const [searching, setSearching] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handleQueryChange(val: string) {
     setQuery(val);
     setSelected(null);
+    setGeoError(null);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (val.length < 2) {
       setResults([]);
@@ -85,6 +87,7 @@ function AddStopModal({
         setResults(data.results ?? []);
       } catch {
         setResults([]);
+        setGeoError("No se pudo buscar. Revisá la conexión.");
       } finally {
         setSearching(false);
       }
@@ -122,6 +125,12 @@ function AddStopModal({
         />
         {searching && (
           <p className="text-xs text-ink-3 mt-1">Buscando...</p>
+        )}
+        {geoError && (
+          <p className="text-xs text-danger flex items-center gap-1.5 mt-1" role="alert">
+            <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+            {geoError}
+          </p>
         )}
         <p className="sr-only" role="status" aria-live="polite">
           {searching

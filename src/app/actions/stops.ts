@@ -106,6 +106,7 @@ export async function updateStop(id: string, formData: FormData) {
   const arrivalRaw = formData.get("arrivalDate") as string | null;
   const datesFixed = formData.get("datesFixed") === "true";
   const isCandidate = formData.get("isCandidate") === "true";
+  const isTransit = formData.get("isTransit") === "true";
 
   const current = await db.stop.findUnique({
     where: { id },
@@ -126,7 +127,7 @@ export async function updateStop(id: string, formData: FormData) {
 
   await db.stop.update({
     where: { id },
-    data: { name, arrivalDate, departureDate, nights, datesFixed, isCandidate, tempRange },
+    data: { name, arrivalDate, departureDate, nights, datesFixed, isCandidate, isTransit, tempRange },
   });
 
   revalidatePath(`/stops/${current.slug}`);

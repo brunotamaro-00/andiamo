@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition, useOptimistic, useRef, useEffect } from "react";
-import { Pin, Trash2, Plus, Pencil, Check, X, StickyNote, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Pin, Trash2, Plus, Pencil, Check, X, StickyNote, Loader2, AlertCircle } from "lucide-react";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -37,8 +38,10 @@ type OptimisticAction =
   | { type: "add"; note: Note };
 
 export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const [optimisticNotes, applyOptimistic] = useOptimistic(
@@ -58,17 +61,29 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   );
 
   function handleTogglePin(id: string) {
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "togglePin", id });
-      await toggleNotePin(id, path);
+      try {
+        await toggleNotePin(id, path);
+      } catch {
+        setMutationError("No se pudo guardar el cambio. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
   function handleDelete(id: string) {
     setConfirmingId(null);
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "delete", id });
-      await deleteNote(id, path);
+      try {
+        await deleteNote(id, path);
+      } catch {
+        setMutationError("No se pudo borrar la nota. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
@@ -84,17 +99,28 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
       createdAt: new Date(),
     };
     setOpen(false);
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic({ type: "add", note: temp });
-      await createNote(formData);
+      try {
+        await createNote(formData);
+      } catch {
+        setMutationError("No se pudo agregar la nota. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
-  async function handleSave(id: string, title: string, body: string) {
+  async function handleSave(id: string, title: string, body: string): Promise<"ok" | "error"> {
     const fd = new FormData();
     fd.set("title", title);
     fd.set("body", body);
-    await updateNote(id, fd, path);
+    try {
+      await updateNote(id, fd, path);
+      return "ok";
+    } catch {
+      return "error";
+    }
   }
 
   const pinned = optimisticNotes.filter((n) => n.pinned);
@@ -113,6 +139,13 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
           </Button>
         }
       />
+
+      {mutationError && (
+        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
+          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+          {mutationError}
+        </p>
+      )}
 
       {sorted.length === 0 ? (
         <EmptyState
@@ -152,7 +185,7 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   );
 }
 
-type SaveStatus = "idle" | "saving" | "saved";
+type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 function NoteCard({
   note, confirming, onTogglePin, onRequestDelete, onCancelDelete, onConfirmDelete, onSave,
@@ -163,7 +196,7 @@ function NoteCard({
   onRequestDelete: () => void;
   onCancelDelete: () => void;
   onConfirmDelete: () => void;
-  onSave: (title: string, body: string) => Promise<void>;
+  onSave: (title: string, body: string) => Promise<"ok" | "error">;
 }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(note.title);
@@ -200,9 +233,9 @@ function NoteCard({
     dirty.current = true;
     setStatus("saving");
     timer.current = setTimeout(async () => {
-      await onSave(nextTitle.trim(), nextBody);
+      const result = await onSave(nextTitle.trim(), nextBody);
       dirty.current = false;
-      setStatus("saved");
+      setStatus(result === "ok" ? "saved" : "error");
     }, 700);
   }
 
@@ -210,8 +243,9 @@ function NoteCard({
     if (timer.current) clearTimeout(timer.current);
     if (dirty.current) {
       setStatus("saving");
-      await onSave(title.trim(), body);
+      const result = await onSave(title.trim(), body);
       dirty.current = false;
+      setStatus(result === "ok" ? "saved" : "error");
     }
     setEditing(false);
   }
@@ -254,6 +288,12 @@ function NoteCard({
                 <Check size={11} strokeWidth={2} aria-hidden="true" className="text-success" />
                 Guardado
               </>
+            )}
+            {status === "error" && (
+              <span className="text-danger flex items-center gap-1">
+                <AlertCircle size={11} strokeWidth={1.5} aria-hidden="true" />
+                Error al guardar
+              </span>
             )}
             {status === "idle" && !title.trim() && body.trim() && (
               <span className="text-ink-3 text-[11px]">Sin título</span>
