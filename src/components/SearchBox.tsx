@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 
 export function SearchBox({ initialQuery }: { initialQuery: string }) {
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
+  const [isPending, startTransition] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function update(next: string) {
@@ -14,18 +15,29 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       const trimmed = next.trim();
-      router.replace(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
+      startTransition(() => {
+        router.replace(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
+      });
     }, 300);
   }
 
   return (
     <div className="relative flex-1">
-      <Search
-        size={16}
-        strokeWidth={1.5}
-        aria-hidden="true"
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none"
-      />
+      {isPending ? (
+        <Loader2
+          size={16}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-coral animate-spin pointer-events-none"
+        />
+      ) : (
+        <Search
+          size={16}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none"
+        />
+      )}
       <input
         type="search"
         value={value}

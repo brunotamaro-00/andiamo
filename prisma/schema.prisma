@@ -48,7 +48,6 @@ model Poi {
   notes               String?
   reservationRequired Boolean  @default(false)
   done                Boolean  @default(false)
-  sortOrder           Int      @default(0)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition, useOptimistic, useRef } from "react";
+import { useState, useTransition, useOptimistic, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
-  ArrowUpRight, Trash2, Plus, Upload, Check, X, AlertCircle, Loader2,
+  ArrowUpRight, Trash2, Plus, Upload, Check, X, AlertCircle, Loader2, WifiOff, Download,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
@@ -64,6 +64,68 @@ interface DocumentsPanelProps {
   slug: string | null;
   documents: Document[];
   path: string;
+}
+
+/** Button that checks the SW cache and offers to save a document offline.
+ *  Only rendered for uploaded files (source === "upload"). */
+function OfflineDocButton({ docId }: { docId: string }) {
+  const [cached, setCached] = useState<boolean | null>(null); // null = loading
+  const [saving, setSaving] = useState(false);
+  const url = `/api/documents/${docId}`;
+
+  useEffect(() => {
+    if (!("caches" in window)) {
+      setCached(false);
+      return;
+    }
+    caches
+      .match(url)
+      .then((match) => setCached(!!match))
+      .catch(() => setCached(false));
+  }, [url]);
+
+  async function handleSave() {
+    if (saving || cached) return;
+    setSaving(true);
+    try {
+      await fetch(url); // SW will intercept and cache it
+      setCached(true);
+    } catch {
+      // Network failure — can't cache right now
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (cached === null) return null; // still checking
+
+  if (cached) {
+    return (
+      <span
+        title="Disponible sin conexión"
+        aria-label="Disponible sin conexión"
+        className={`${actionBtn} text-success cursor-default`}
+      >
+        <WifiOff size={14} strokeWidth={1.5} aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleSave}
+      disabled={saving}
+      title="Guardar para usar sin conexión"
+      aria-label="Guardar documento para uso sin conexión"
+      className={`${actionBtn} text-ink-faint hover:text-ink-2 hover:bg-surface-2 disabled:opacity-40`}
+    >
+      {saving ? (
+        <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+      ) : (
+        <Download size={14} strokeWidth={1.5} aria-hidden="true" />
+      )}
+    </button>
+  );
 }
 
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
@@ -178,6 +240,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                   </div>
                 ) : (
                   <div className="flex items-center shrink-0">
+                    {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
                     <a
                       href={`/api/documents/${doc.id}`}
                       target="_blank"

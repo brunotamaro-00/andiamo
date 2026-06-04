@@ -40,7 +40,7 @@ export default async function StopPage({ params }: Props) {
       where: { slug },
       include: {
         pois: {
-          orderBy: [{ done: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+          orderBy: [{ done: "asc" }, { createdAt: "asc" }],
         },
         notes: { orderBy: [{ pinned: "desc" }, { createdAt: "desc" }] },
         documents: { orderBy: { createdAt: "asc" } },
@@ -152,6 +152,7 @@ export default async function StopPage({ params }: Props) {
                 nights={stop.nights}
                 datesFixed={stop.datesFixed}
                 isCandidate={stop.isCandidate}
+                isTransit={stop.isTransit}
                 currentOrder={stop.order}
                 allStops={allStops}
               />

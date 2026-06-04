@@ -23,6 +23,7 @@ interface Props {
   nights: number;
   datesFixed: boolean;
   isCandidate: boolean;
+  isTransit: boolean;
   currentOrder: number;
   allStops: StopOption[];
 }
@@ -48,19 +49,21 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, nights, datesFixed, isCandidate,
+  stopId, name, arrivalDate, nights, datesFixed, isCandidate, isTransit,
   currentOrder, allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [fixedChecked, setFixedChecked] = useState(datesFixed);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
+  const [transitChecked, setTransitChecked] = useState(isTransit);
   // Default: currently after the stop with order = currentOrder - 1
   const [selectedAfterOrder, setSelectedAfterOrder] = useState(currentOrder - 1);
 
   function handleSave(formData: FormData) {
     formData.set("datesFixed", fixedChecked ? "true" : "false");
     formData.set("isCandidate", candidateChecked ? "true" : "false");
+    formData.set("isTransit", transitChecked ? "true" : "false");
     startTransition(async () => {
       await updateStop(stopId, formData);
       if (selectedAfterOrder !== currentOrder - 1) {
@@ -132,6 +135,15 @@ function EditModal({
               className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
             />
             Candidata (sin decidir)
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={transitChecked}
+              onChange={(e) => setTransitChecked(e.target.checked)}
+              className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+            />
+            Tránsito (solo de paso)
           </label>
         </div>
 

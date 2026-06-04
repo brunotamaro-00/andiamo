@@ -7,7 +7,8 @@ import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
 import { Badge } from "@/components/ui/Badge";
 import { Wordmark } from "@/components/Wordmark";
-import { ChevronRight, FileText, Search } from "lucide-react";
+import { ChevronRight, FileText, MapPin, Search } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Itinerario · Andiamo" };
@@ -69,6 +70,13 @@ export default async function StopsPage() {
 
         {/* Timeline */}
         <div className="space-y-2">
+          {stops.filter((s) => !s.isFlexMargin).length === 0 && (
+            <EmptyState
+              icon={MapPin}
+              title="Sin paradas todavía"
+              description="Agregá tu primera ciudad y empezá a armar el itinerario."
+            />
+          )}
           {stops
             .filter((s) => !s.isFlexMargin)
             .map((stop, idx) => {
