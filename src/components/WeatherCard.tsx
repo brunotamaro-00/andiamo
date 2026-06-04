@@ -105,7 +105,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
       <div className="flex items-center gap-3 mb-4">
         <WeatherIcon code={data.current.weather_code} size={40} />
         <div>
-          <p className="text-2xl font-semibold font-display text-ink">
+          <p className="text-2xl font-numeral text-ink">
             {Math.round(data.current.temperature_2m)}°C
           </p>
           <p className="text-xs text-ink-2">
@@ -130,7 +130,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
         {daily.time.slice(0, 3).map((date, i) => (
           <div
             key={date}
-            className={`text-center rounded-xl py-2.5 px-1 ${
+            className={`text-center rounded-[4px] py-2.5 px-1 ${
               i === 0 ? "bg-surface-2" : "bg-surface-2/50"
             }`}
           >

@@ -16,7 +16,7 @@ export function Wordmark({ size = "sm" }: WordmarkProps) {
       >
         <g
           transform="translate(0,1024) scale(0.100000,-0.100000)"
-          fill="#FF385C"
+          fill="#E8462B"
           fillRule="evenodd"
         >
           <path d="M5415 7738 c-50 -58 -101 -153 -110 -208 -6 -34 -2 -41 67 -116 40 -44 134 -147 208 -229 74 -82 187 -206 250 -275 63 -70 211 -232 329 -361 l214 -235 213 -629 c118 -345 216 -631 219 -634 3 -2 4 263 3 590 l-3 594 -25 55 c-17 37 -74 111 -180 230 -85 96 -327 371 -539 610 -211 239 -428 486 -483 548 -55 61 -103 112 -108 112 -5 0 -29 -24 -55 -52z" />
@@ -26,9 +26,10 @@ export function Wordmark({ size = "sm" }: WordmarkProps) {
 
       <span
         className={[
-          "font-display font-bold tracking-tight text-ink",
-          lg ? "text-3xl" : "text-lg",
+          "font-display uppercase tracking-wide text-ink inline-block leading-none",
+          lg ? "text-3xl" : "text-xl",
         ].join(" ")}
+        style={{ transform: "scaleY(1.65)", transformOrigin: "50% 50%" }}
       >
         Andiamo
       </span>

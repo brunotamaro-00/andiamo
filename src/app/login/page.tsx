@@ -25,7 +25,7 @@ export default async function LoginPage({ searchParams }: Props) {
       {/* Form card */}
       <form
         action={login}
-        className="w-full max-w-xs bg-surface rounded-2xl p-6 card-shadow space-y-5 border border-border animate-slide-up stagger-2"
+        className="w-full max-w-xs bg-surface rounded-[6px] p-6 card-shadow space-y-5 border-2 border-border animate-slide-up stagger-2"
       >
         <input type="hidden" name="from" value={from} />
 
@@ -56,7 +56,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
         <button
           type="submit"
-          className="w-full py-2.5 bg-coral hover:bg-coral-hover active:bg-coral-press text-white font-bold text-sm rounded-full transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface tracking-wide"
+          className="w-full py-2.5 bg-coral hover:bg-coral-hover active:bg-coral-press active:translate-x-[3px] active:translate-y-[3px] active:shadow-none text-white font-display uppercase tracking-wide text-sm rounded-[2px] hard-shadow-ink transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Entrar
         </button>

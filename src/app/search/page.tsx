@@ -216,7 +216,7 @@ function ResultRow({
   badge?: React.ReactNode;
   external?: boolean;
 }) {
-  const className = "flex items-center gap-3 px-3 py-3 rounded-xl border border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
+  const className = "flex items-center gap-3 px-3 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
 
   const inner = (
     <>

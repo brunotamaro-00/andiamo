@@ -38,7 +38,7 @@ export function AddStopButton({ stops, lastDepartureDate }: Props) {
       <button
         onClick={() => setOpen(true)}
         className={[
-          "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl",
+          "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-[4px]",
           "border border-dashed border-border-strong bg-surface/50 text-sm text-ink-3",
           "hover:border-coral-border/50 hover:bg-surface hover:text-ink transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
@@ -146,7 +146,7 @@ function AddStopModal({
                 setResults([]);
                 setQuery(r.name);
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+              className="w-full text-left px-3 py-2.5 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
             >
               <p className="text-sm font-medium text-ink">
                 {r.name}{r.admin1 ? `, ${r.admin1}` : ""}
@@ -161,7 +161,7 @@ function AddStopModal({
 
       {/* Selected city chip */}
       {selected && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-xl">
+        <div className="flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-[4px]">
           <span className="text-sm font-medium text-coral-ink flex-1">
             {selected.name}
           </span>

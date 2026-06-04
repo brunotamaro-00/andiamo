@@ -41,12 +41,12 @@ export default async function GeneralPage() {
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
-        <div className="bg-surface rounded-2xl border border-border p-4">
+        <div className="bg-surface rounded-[6px] border-2 border-border p-4">
           <h2 className="text-sm font-semibold text-ink mb-1">
             Documentos y notas del viaje
           </h2>
           <p className="text-xs text-ink-3">
-            Seguro, vuelos, pasaportes, UK ETA, ETIAS — todo lo que aplica a todo el viaje.
+            Documentos y notas que aplican a todo el viaje, no a una parada específica.
           </p>
         </div>
 

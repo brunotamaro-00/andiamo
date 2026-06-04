@@ -140,7 +140,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
             return (
               <div
                 key={doc.id}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
+                className="flex items-center gap-2 p-2.5 rounded-[4px] bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
               >
                 <Icon
                   size={18}

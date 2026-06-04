@@ -28,36 +28,40 @@ Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives i
 
 ## Design system
 
-**Andiamo** uses a warm cream light theme inspired by Botardo's design language — OKLCH palette, bottom-heavy shadows, uppercase labels, stagger animations. Tokens live in `src/app/globals.css` under `@theme {}`. Do NOT use arbitrary Tailwind values for colors.
+**Andiamo** uses a warm cream light theme inspired by the **Panini editorial aesthetic** (7a0.com.br) — hex palette, hard sticker shadows, Anton display type, uppercase labels, stagger animations. Tokens live in `src/app/globals.css` under `@theme {}`. Do NOT use arbitrary Tailwind values for colors.
 
-### Color tokens (OKLCH warm harmony)
+### Color tokens (Panini warm paper)
 
 | Token | Role |
 |---|---|
-| `canvas` | Page background — warm cream `oklch(0.963 0.022 88)` |
-| `surface` | Cards — near-white `oklch(0.990 0.012 88)` |
-| `surface-2` | Inputs / muted / nested elements `oklch(0.938 0.016 88)` |
-| `border` | Default border `oklch(0.868 0.022 88)` |
-| `border-strong` | Hover/active border |
-| `ink` | Primary text — warm near-black |
-| `ink-2` | Secondary text |
-| `ink-3` | Muted / labels |
-| `ink-faint` | Placeholder / disabled |
-| `coral` | `#FF385C` — CTA / accent |
+| `canvas` | Page background — warm cream `#F3ECD8` |
+| `surface` | Cards — white `#FFFFFF` |
+| `surface-2` | Inputs / muted / nested elements `#EAE2CB` |
+| `border` | Default border / rule `#D8CFB4` |
+| `border-strong` | Hover/active border `#C2B08A` |
+| `ink` | Primary text — warm near-black `#1B1A17` |
+| `ink-2` | Secondary text `#6B6452` |
+| `ink-3` | Muted / labels `#8A7F6A` |
+| `ink-faint` | Placeholder / disabled `#ABA090` |
+| `coral` | `#E8462B` — brick red CTA / accent |
 | `coral-hover` / `coral-press` | Hover / press states |
-| `coral-ink` | Coral text on light bg |
+| `coral-ink` | Brick red text on light bg `#8B2010` |
 | `coral-border` / `coral-bg` | Accent border / surface |
-| `success` / `success-bg` | Success states |
+| `gold` | `#C8A24B` — Panini gold accent |
+| `gold-bg` / `gold-ink` / `gold-border` | Gold surface / text / border |
+| `success` / `success-bg` | Success / pitch green `#2F7D4F` |
 | `warning` / `warning-bg` | Warning states |
 | `danger` / `danger-bg` | Error / destructive |
 | `special` / `special-bg` | Candidate / special states |
 
-### Elevation (Botardo bottom-heavy style)
+### Elevation (Panini hard sticker style)
 
-- `card-shadow` — `0 12px 28px -24px rgb(0 0 0 / 0.18), 0 1px 0 0 rgb(0 0 0 / 0.04)` — use on all cards
-- `card-shadow-lg` — heavier version for modals/overlays
-- `card-hover` — adds `transition + translateY(-2px)` on hover (use on interactive cards)
+- `card-shadow` — `3px 3px 0 #D8CFB4` — use on all cards
+- `card-shadow-lg` — `5px 5px 0 #1B1A17` — modals/overlays
+- `hard-shadow-ink` — `3px 3px 0 #1B1A17` — CTA buttons
+- `card-hover` — transition for hover states
 - Aliases: `shadow-soft` = `card-shadow`, `shadow-soft-lg` = `card-shadow-lg`
+- CTA active state: `active:translate-x-[3px] active:translate-y-[3px] active:shadow-none` — sticker press effect
 
 ### Animations
 
@@ -68,30 +72,30 @@ Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives i
 
 ### Fonts
 
-- `font-display` → **Montserrat** (400/500/600/700) — all headings, wordmark, stat numbers, body
-- `font-sans` → **Inter** — body copy fallback
-- Body uses `font-display` (Montserrat) globally
-- `font-tabular` — tabular nums for data values
+- `font-display` → **Anton** (400) — headings, wordmark, CTA buttons (always uppercase)
+- `font-sans` → **Hanken Grotesk** (400–800) — body copy (default body font)
+- `font-numeral` → **Archivo** (900) — large editorial numerals (stats, counts)
+- `font-tabular` — tabular nums for inline data values
 
 ### Label convention (critical)
 
 All section labels, headers, and metadata use:
 ```
-text-[11px] font-semibold uppercase tracking-widest text-ink-3
+text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 ```
 
 ### Wordmark
 
-`<Wordmark size="sm" | "lg" />` — coral SVG map-pin + "Andiamo" in Montserrat Bold. Required in every page header.
+`<Wordmark size="sm" | "lg" />` — brick-red SVG map-pin + "ANDIAMO" in Anton uppercase. Required in every page header.
 
 ### Style conventions
 
-- Cards: `rounded-xl` + `card-shadow` (NOT `shadow-soft` for new code)
-- Modals: `rounded-2xl` + `card-shadow-lg`
-- Buttons primary: `rounded-full` (pill) — CTA style
-- Buttons secondary/ghost: `rounded-full`
-- Inputs: `rounded-lg` — slightly tighter
-- Transitions: `duration-150` (faster than old `duration-200`)
-- Focus rings: `ring-coral/40` (coral at 40% opacity, softer)
-- Active TabBar: coral pill bg (`bg-coral-bg`) behind icon
+- Cards: `rounded-[4px]` + `border-2 border-border` + `card-shadow`
+- Modals: `rounded-[6px]` + `border-2 border-border` + `card-shadow-lg`
+- Buttons primary: `rounded-[2px]` + `hard-shadow-ink` + `font-display uppercase` — sticker CTA style
+- Buttons secondary/ghost: `rounded-full` + `border-2 border-ink`
+- Inputs: `rounded-xl` — keep rounded for usability
+- Transitions: `duration-150`
+- Focus rings: `ring-coral/40`
+- TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick red
 <!-- END:nextjs-agent-rules -->

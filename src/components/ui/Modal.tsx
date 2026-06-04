@@ -72,7 +72,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm bg-surface rounded-2xl border border-border card-shadow-lg max-h-[90vh] flex flex-col animate-slide-up"
+        className="w-full max-w-sm bg-surface rounded-[6px] border-2 border-border card-shadow-lg max-h-[90vh] flex flex-col animate-slide-up"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Fixed header */}

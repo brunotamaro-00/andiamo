@@ -101,9 +101,9 @@ export default async function StopPage({ params }: Props) {
         <HashScroller />
         {/* City header card */}
         <div
-          className={`rounded-2xl p-4 border card-shadow ${
+          className={`rounded-[6px] p-4 border-2 card-shadow ${
             isActive
-              ? "bg-surface border-border border-t-2 border-t-coral"
+              ? "bg-surface border-border border-t-[3px] border-t-coral"
               : "bg-surface border-border"
           }`}
         >
@@ -114,7 +114,7 @@ export default async function StopPage({ params }: Props) {
                   {stop.countryFlag}
                 </span>
                 <div>
-                  <h1 className="text-2xl font-semibold font-display text-ink leading-tight">
+                  <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide">
                     {stop.name}
                   </h1>
                   <p className="text-sm text-ink-2 mt-0.5">{stop.country}</p>
@@ -176,8 +176,8 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${prevStop.slug}`}
               className={[
-                "flex-1 flex items-center gap-1.5 bg-surface border border-border",
-                "rounded-xl px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
+                "flex-1 flex items-center gap-1.5 bg-surface border-2 border-border",
+                "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -195,8 +195,8 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${nextStop.slug}`}
               className={[
-                "flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border",
-                "rounded-xl px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
+                "flex-1 flex items-center justify-end gap-1.5 bg-surface border-2 border-border",
+                "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]

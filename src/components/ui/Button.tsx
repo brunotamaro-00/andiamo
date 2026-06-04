@@ -4,14 +4,18 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
-  primary:
-    "bg-coral text-white hover:bg-coral-hover active:bg-coral-press font-semibold border border-transparent",
+  primary: [
+    "bg-coral text-white hover:bg-coral-hover active:bg-coral-press",
+    "font-display uppercase tracking-wide border border-transparent",
+    "rounded-[2px] hard-shadow-ink",
+    "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
+  ].join(" "),
   secondary:
-    "border border-border text-ink-2 hover:border-border-strong hover:text-ink bg-surface",
+    "border-2 border-ink text-ink-2 hover:text-ink bg-surface rounded-full",
   ghost:
-    "text-ink-2 hover:text-ink hover:bg-surface-2 border border-transparent",
+    "text-ink-2 hover:text-ink hover:bg-surface-2 border-2 border-transparent rounded-full",
   danger:
-    "border border-danger/40 text-danger hover:bg-danger-bg bg-transparent",
+    "border-2 border-danger/40 text-danger hover:bg-danger-bg bg-transparent rounded-full",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -35,7 +39,7 @@ export function Button({
     <button
       {...props}
       className={[
-        "inline-flex items-center justify-center gap-1.5 rounded-full font-medium transition-colors duration-150",
+        "inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50",
         "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
         "disabled:opacity-40 disabled:cursor-not-allowed",

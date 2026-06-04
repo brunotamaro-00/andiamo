@@ -96,7 +96,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
 
       {/* Currency info */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="bg-surface-2 rounded-xl px-3 py-2 flex-1 border border-border">
+        <div className="bg-surface-2 rounded-[4px] px-3 py-2 flex-1 border border-border">
           <p className="text-base font-semibold text-ink">
             {symbol} {currencyCode}
           </p>
@@ -114,7 +114,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
 
       {/* Converter */}
       {rate && (
-        <div className="bg-surface-2/50 rounded-xl p-3 border border-border/50 space-y-3">
+        <div className="bg-surface-2/50 rounded-[4px] p-3 border border-border/50 space-y-3">
           <p className="text-xs font-medium text-ink-3 uppercase tracking-wider">
             Convertidor
           </p>
