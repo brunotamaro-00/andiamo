@@ -7,7 +7,7 @@ import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
 import { Badge } from "@/components/ui/Badge";
 import { Wordmark } from "@/components/Wordmark";
-import { ChevronRight, FileText, MapPin, Search } from "lucide-react";
+import { ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
@@ -28,9 +28,12 @@ export default async function StopsPage() {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-canvas/95 backdrop-blur-md border-b border-border px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
+      <header className="sticky top-0 z-10 bg-surface backdrop-blur-md border-b border-border-strong px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <Wordmark size="sm" />
+          <div className="flex flex-col gap-0">
+            <Wordmark size="sm" />
+            <span className="text-[9px] font-display uppercase tracking-[0.14em] text-ink-3 ml-8 -mt-0.5">Europa 2026</span>
+          </div>
           <div className="flex items-center gap-1">
             <Link
               href="/search"
@@ -61,6 +64,7 @@ export default async function StopsPage() {
           <Stat
             label="Días"
             value={tripDays.toString()}
+            highlight
           />
           <Stat
             label="Países"
@@ -96,12 +100,12 @@ export default async function StopsPage() {
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-brick-bg border-brick card-shadow"
+                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#C44428]"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
                       ? "bg-surface/40 border-border/40 opacity-45"
-                      : "bg-surface border-border hover:border-border-strong card-shadow",
+                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#1B1A17]",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -109,12 +113,12 @@ export default async function StopsPage() {
                   {/* Order indicator */}
                   <div
                     className={[
-                      "w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-numeral text-sm",
+                      "w-7 shrink-0 font-numeral text-sm text-center",
                       isActive
-                        ? "bg-brick/10 text-brick-ink"
+                        ? "text-brick-ink"
                         : isPast
-                        ? "bg-surface-2 text-ink-faint"
-                        : "bg-surface-2 text-ink-2",
+                        ? "text-ink-faint"
+                        : "text-ink-3",
                     ]
                       .filter(Boolean)
                       .join(" ")}
@@ -129,7 +133,7 @@ export default async function StopsPage() {
                         {stop.countryFlag}
                       </span>
                       <span
-                        className={`font-bold text-[15px] leading-tight truncate ${
+                        className={`font-display uppercase text-[17px] leading-tight truncate ${
                           isActive ? "text-brick-ink" : "text-ink"
                         }`}
                       >
@@ -141,7 +145,7 @@ export default async function StopsPage() {
                       {stop.nights > 0 && (
                         <>
                           <span className="text-border-strong text-[11px]">·</span>
-                          <span className="text-[11px] text-ink-3 font-medium">{stop.nights}n</span>
+                          <span className="text-[11px] text-ink-3 font-medium">{stop.nights} {stop.nights === 1 ? "noche" : "noches"}</span>
                         </>
                       )}
                       {stop.arrivalDate && (
@@ -190,23 +194,15 @@ export default async function StopsPage() {
           }
         />
 
-        {/* Global docs link */}
-        <Link
-          href="/general"
-          className="mt-4 flex items-center justify-center gap-2 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong transition-colors duration-150 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-        >
-          <FileText size={13} strokeWidth={1.5} aria-hidden="true" />
-          Documentos generales
-        </Link>
       </main>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="bg-surface rounded-[4px] px-3 py-3 text-center border-2 border-border card-shadow">
-      <p className="text-4xl font-numeral text-ink leading-none">{value}</p>
+      <p className={`text-4xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>{value}</p>
       <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-1">{label}</p>
     </div>
   );

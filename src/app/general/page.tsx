@@ -25,7 +25,7 @@ export default async function GeneralPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
+      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
         <Link
           href="/stops"
           className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
@@ -41,15 +41,6 @@ export default async function GeneralPage() {
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
-        <div className="bg-surface rounded-[6px] border-2 border-border p-4">
-          <h2 className="text-sm font-semibold text-ink mb-1">
-            Documentos y notas del viaje
-          </h2>
-          <p className="text-xs text-ink-3">
-            Documentos y notas que aplican a todo el viaje, no a una parada específica.
-          </p>
-        </div>
-
         <div id="notas" className="scroll-mt-20">
           <NotesPanel
             stopId={null}

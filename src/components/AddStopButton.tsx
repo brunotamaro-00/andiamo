@@ -113,7 +113,7 @@ function AddStopModal({
     <Modal title="Agregar ciudad" onClose={onClose}>
       {/* City search */}
       <div>
-        <label className="text-xs font-medium text-ink-2">Buscar ciudad</label>
+        <label className="block text-left text-[11px] font-display uppercase tracking-wide text-ink-3 mb-1.5 leading-none">Buscar ciudad</label>
         <input
           type="text"
           value={query}
@@ -121,7 +121,7 @@ function AddStopModal({
           placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
           autoFocus
           aria-label="Buscar ciudad"
-          className="mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
+          className="w-full bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:border-brick focus-visible:bg-surface focus-visible:ring-offset-0 transition-colors duration-150 hover:border-border-strong"
         />
         {searching && (
           <p className="text-xs text-ink-3 mt-1">Buscando...</p>

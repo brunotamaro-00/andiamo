@@ -29,10 +29,10 @@ interface SectionHeaderProps {
 export function SectionHeader({ title, count, action }: SectionHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-3">
-      <h2 className="text-[11px] font-semibold text-ink-3 uppercase tracking-widest">
+      <h2 className="text-[13px] font-display uppercase tracking-wide text-ink-3 leading-none">
         {title}
         {count !== undefined && (
-          <span className="ml-2 text-ink-faint normal-case tracking-normal font-normal">
+          <span className="ml-2 text-[11px] text-ink-faint normal-case tracking-normal font-sans font-normal">
             ({count})
           </span>
         )}

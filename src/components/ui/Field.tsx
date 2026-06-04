@@ -2,12 +2,12 @@
 
 import { useId } from "react";
 
-const labelClass = "block text-[11px] font-semibold text-ink-3 uppercase tracking-widest mb-1.5";
+const labelClass = "block text-left text-[11px] font-display uppercase tracking-wide text-ink-3 mb-1.5 leading-none";
 
 const inputClass =
   "w-full bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-sm text-ink " +
   "placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 " +
-  "focus-visible:border-brick focus-visible:ring-offset-0 disabled:opacity-50 " +
+  "focus-visible:border-brick focus-visible:bg-surface focus-visible:ring-offset-0 disabled:opacity-50 " +
   "transition-colors duration-150 hover:border-border-strong";
 
 /* ── Text / number / date / url / password / file input ── */
