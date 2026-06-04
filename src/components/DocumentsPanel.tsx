@@ -180,7 +180,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           title="Sin documentos"
           description="Guardá vouchers, entradas y seguros. Subí PDFs/imágenes o pegá un link."
           action={
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" onClick={() => setMode("link")}>
                 <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
                 Link
