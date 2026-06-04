@@ -72,12 +72,12 @@ export function Modal({ title, onClose, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm bg-surface rounded-[6px] border-2 border-border card-shadow-lg max-h-[90vh] flex flex-col animate-slide-up"
+        className="w-full max-w-sm bg-surface rounded-[6px] border-2 border-border max-h-[90vh] flex flex-col animate-slide-up"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Fixed header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-border shrink-0">
-          <h3 id={titleId} className="font-semibold text-sm text-ink-2 uppercase tracking-widest">
+          <h3 id={titleId} className="font-display text-[15px] uppercase tracking-wide text-ink leading-none">
             {title}
           </h3>
           <IconButton label="Cerrar" icon={X} onClick={onClose} />

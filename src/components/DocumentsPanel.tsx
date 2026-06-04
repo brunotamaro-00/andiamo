@@ -435,7 +435,7 @@ function UploadModal({
           ))}
         </SelectField>
         <div>
-          <label className="text-xs font-medium text-ink-2">Archivo</label>
+          <label className="block text-left text-[11px] font-display uppercase tracking-wide text-ink-3 mb-1.5 leading-none">Archivo</label>
           <input
             ref={fileRef}
             type="file"

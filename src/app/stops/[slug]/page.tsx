@@ -55,7 +55,7 @@ export default async function StopPage({ params }: Props) {
   const otherStops = await db.stop.findMany({
     where: { isFlexMargin: false, NOT: { id: stop.id } },
     orderBy: { order: "asc" },
-    select: { id: true, slug: true, name: true, order: true, countryFlag: true },
+    select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true },
   });
 
   const prevStop = otherStops.filter((s) => s.order < stop.order).at(-1);
@@ -80,7 +80,7 @@ export default async function StopPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Top nav */}
-      <header className="sticky top-0 z-[1000] bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
+      <header className="sticky top-0 z-[1000] bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
         <Link
           href="/stops"
           className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
@@ -89,12 +89,13 @@ export default async function StopPage({ params }: Props) {
           Itinerario
         </Link>
         <div className="flex-1 min-w-0 text-center">
-          <p className="text-sm font-medium text-ink-2 truncate">
-            <span aria-hidden="true">{stop.countryFlag}</span>{" "}
-            {stop.name}
+          <p className="font-numeral text-sm text-ink-3 tabular-nums">
+            {String(otherStops.filter((s) => s.order < stop.order && !s.isCandidate).length + (stop.isCandidate ? 0 : 1)).padStart(2, "0")}
+            {" / "}
+            {String(otherStops.filter((s) => !s.isCandidate).length + (stop.isCandidate ? 0 : 1)).padStart(2, "0")}
           </p>
         </div>
-        <div className="w-20" /> {/* spacer to balance left link */}
+        <div className="w-20" />
       </header>
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
