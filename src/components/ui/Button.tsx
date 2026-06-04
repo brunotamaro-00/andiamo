@@ -5,7 +5,7 @@ type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
   primary: [
-    "bg-coral text-white hover:bg-coral-hover active:bg-coral-press",
+    "bg-brick text-white hover:bg-brick-hover active:bg-brick-press",
     "font-display uppercase tracking-wide border border-transparent",
     "rounded-[2px] hard-shadow-ink",
     "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
@@ -40,7 +40,7 @@ export function Button({
       {...props}
       className={[
         "inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/50",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50",
         "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         variantClasses[variant],

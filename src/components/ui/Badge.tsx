@@ -6,7 +6,7 @@ const variantClasses: Record<Variant, string> = {
   special:  "bg-special-bg text-special border border-special/30",
   muted:    "bg-surface-2 text-ink-3 border border-border",
   success:  "bg-success-bg text-success border border-success/30",
-  active:   "bg-coral-bg text-coral-ink border border-coral-border/60 font-semibold",
+  active:   "bg-brick-bg text-brick-ink border border-brick-border/60 font-semibold",
 };
 
 interface BadgeProps {

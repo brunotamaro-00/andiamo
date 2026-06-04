@@ -83,7 +83,7 @@ export default async function StopPage({ params }: Props) {
       <header className="sticky top-0 z-[1000] bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
         <Link
           href="/stops"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral rounded-lg px-1 py-0.5"
+          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
         >
           <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
           Itinerario
@@ -103,7 +103,7 @@ export default async function StopPage({ params }: Props) {
         <div
           className={`rounded-[6px] p-4 border-2 card-shadow ${
             isActive
-              ? "bg-surface border-border border-t-[3px] border-t-coral"
+              ? "bg-surface border-border border-t-[3px] border-t-brick"
               : "bg-surface border-border"
           }`}
         >
@@ -163,7 +163,7 @@ export default async function StopPage({ params }: Props) {
             <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap gap-3 text-xs text-ink-3">
               <span>Día {getTripDay(stop.arrivalDate)} del viaje</span>
               {isActive && daysLeft !== null && (
-                <span className="text-coral">
+                <span className="text-brick">
                   {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
                 </span>
               )}
@@ -179,7 +179,7 @@ export default async function StopPage({ params }: Props) {
               className={[
                 "flex-1 flex items-center gap-1.5 bg-surface border-2 border-border",
                 "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
                 .filter(Boolean)
@@ -198,7 +198,7 @@ export default async function StopPage({ params }: Props) {
               className={[
                 "flex-1 flex items-center justify-end gap-1.5 bg-surface border-2 border-border",
                 "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
                 .filter(Boolean)

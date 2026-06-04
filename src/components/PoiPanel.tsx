@@ -37,7 +37,7 @@ const TYPE_LABEL: Record<string, string> = {
 const actionBtn =
   "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
   "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick";
 
 interface Poi {
   id: string;
@@ -267,14 +267,14 @@ function PoiItem({
             ? `Marcar "${poi.name}" como pendiente`
             : `Marcar "${poi.name}" como hecho`
         }
-        className="group mt-0.5 h-11 w-11 flex items-center justify-center rounded-full shrink-0 transition-transform active:scale-90 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+        className="group mt-0.5 h-11 w-11 flex items-center justify-center rounded-full shrink-0 transition-transform active:scale-90 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
       >
         <span
           className={[
             "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
             poi.done
               ? "bg-success border-success/60 text-success-bg"
-              : "border-ink-3 group-hover:border-coral",
+              : "border-ink-3 group-hover:border-brick",
           ].join(" ")}
         >
           {poi.done && <Check size={11} strokeWidth={2.5} aria-hidden="true" />}
@@ -314,7 +314,7 @@ function PoiItem({
             href={poi.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-coral hover:text-coral-hover inline-flex items-center gap-0.5 mt-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-coral rounded"
+            className="text-xs text-brick hover:text-brick-hover inline-flex items-center gap-0.5 mt-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brick rounded"
             aria-label={`Ver ${poi.name} (abre en nueva pestaña)`}
           >
             Ver
@@ -362,7 +362,7 @@ function PoiItem({
           <button
             onClick={onEdit}
             aria-label={`Editar "${poi.name}"`}
-            className={`${actionBtn} text-ink-3 hover:text-coral hover:bg-surface-2`}
+            className={`${actionBtn} text-ink-3 hover:text-brick hover:bg-surface-2`}
           >
             <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -461,7 +461,7 @@ function PlaceSearchField({
 
   const inputClass =
     "mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink " +
-    "placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-coral " +
+    "placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick " +
     "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors";
 
   return (
@@ -474,14 +474,14 @@ function PlaceSearchField({
 
       {selected ? (
         /* Chip showing selected place */
-        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-coral-bg border border-coral-border/40 rounded-[4px]">
-          <MapPin size={13} strokeWidth={1.5} aria-hidden="true" className="text-coral shrink-0" />
-          <span className="text-sm text-coral-ink flex-1 truncate">{selectedLabel}</span>
+        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-[4px]">
+          <MapPin size={13} strokeWidth={1.5} aria-hidden="true" className="text-brick shrink-0" />
+          <span className="text-sm text-brick-ink flex-1 truncate">{selectedLabel}</span>
           <button
             type="button"
             onClick={handleClear}
             aria-label="Quitar ubicación seleccionada"
-            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           >
             <X size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -528,7 +528,7 @@ function PlaceSearchField({
                   key={i}
                   type="button"
                   onClick={() => handleSelect(r)}
-                  className="w-full text-left px-3 py-2 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+                  className="w-full text-left px-3 py-2 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
                 >
                   <p className="text-sm font-medium text-ink truncate">{r.name}</p>
                   <p className="text-xs text-ink-3 truncate">{r.address}</p>
@@ -630,7 +630,7 @@ function PoiForm({
           name="reservationRequired"
           value="true"
           defaultChecked={defaults?.reservationRequired ?? false}
-          className="rounded border-ink-faint accent-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+          className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
         />
         Requiere reserva
       </label>
