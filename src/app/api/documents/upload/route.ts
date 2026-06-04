@@ -1,8 +1,7 @@
 import { NextRequest } from "next/server";
-import { join } from "path";
-import { mkdir, writeFile } from "fs/promises";
 import { db } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
+import { uploadToR2 } from "@/lib/r2";
 import { DocumentKind } from "@/generated/prisma/enums";
 
 export const runtime = "nodejs";
@@ -29,7 +28,6 @@ export async function POST(req: NextRequest) {
   const stopId = (formData.get("stopId") as string) || null;
 
   if (!file) return Response.json({ error: "Falta el archivo" }, { status: 400 });
-  // Derive label from filename if not provided (e.g. "voucher_hostel.pdf" → "voucher_hostel")
   const effectiveLabel = label || file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || file.name;
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -46,14 +44,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const uploadDir = process.env.UPLOAD_DIR ?? "/data/uploads";
-  await mkdir(uploadDir, { recursive: true });
-
-  const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const filePath = join(uploadDir, safeName);
-
+  const key = `uploads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(filePath, buffer);
+  await uploadToR2(key, buffer, file.type);
 
   const doc = await db.document.create({
     data: {
@@ -64,7 +57,7 @@ export async function POST(req: NextRequest) {
       fileName: file.name,
       mimeType: file.type,
       sizeBytes: file.size,
-      storagePath: filePath,
+      storagePath: key,
     },
   });
 

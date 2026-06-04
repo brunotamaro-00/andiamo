@@ -1,8 +1,7 @@
 import { NextRequest } from "next/server";
-import { createReadStream } from "fs";
-import { stat } from "fs/promises";
 import { db } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
+import { getFromR2 } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -22,20 +21,17 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   if (doc.source === "upload" && doc.storagePath) {
     try {
-      await stat(doc.storagePath);
+      const stream = await getFromR2(doc.storagePath);
+      return new Response(stream, {
+        headers: {
+          "Content-Type": doc.mimeType ?? "application/octet-stream",
+          "Content-Disposition": `inline; filename="${doc.fileName ?? id}"`,
+          "Cache-Control": "private, max-age=3600",
+        },
+      });
     } catch {
-      return Response.json({ error: "File not found on disk" }, { status: 404 });
+      return Response.json({ error: "File not found in storage" }, { status: 404 });
     }
-
-    const stream = createReadStream(doc.storagePath);
-    const nodeResponse = new Response(stream as unknown as ReadableStream, {
-      headers: {
-        "Content-Type": doc.mimeType ?? "application/octet-stream",
-        "Content-Disposition": `inline; filename="${doc.fileName ?? id}"`,
-        "Cache-Control": "private, max-age=3600",
-      },
-    });
-    return nodeResponse;
   }
 
   return Response.json({ error: "No source" }, { status: 400 });
