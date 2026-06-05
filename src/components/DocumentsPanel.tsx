@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useOptimistic, useRef, useEffect } from "react";
+import { useState, useTransition, useOptimistic, useRef, useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
@@ -231,7 +231,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                   <p className="text-sm font-medium text-ink truncate">
                     {doc.label}
                   </p>
-                  <p className="text-xs text-ink-faint">
+                  <p className="text-xs text-ink-2">
                     {KIND_LABEL[doc.kind] ?? doc.kind}
                     {size ? ` · ${size}` : ""}
                   </p>
@@ -294,7 +294,6 @@ function AddLinkModal({
           name="label"
           required
           placeholder="Ej: Check-in Generator Hostel"
-          autoFocus
         />
         <SelectField label="Tipo" name="kind">
           {DOCUMENT_KINDS.map((k) => (
@@ -344,6 +343,7 @@ function UploadModal({
   stopId: string | null; onClose: () => void;
 }) {
   const router = useRouter();
+  const fileInputId = useId();
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -425,7 +425,6 @@ function UploadModal({
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Ej: Voucher hostel Londres"
-          autoFocus
         />
         <SelectField
           label="Tipo"
@@ -440,8 +439,9 @@ function UploadModal({
           ))}
         </SelectField>
         <div>
-          <label className="block text-left text-[11px] font-display uppercase tracking-wide text-ink-3 mb-1.5 leading-none">Archivo</label>
+          <label htmlFor={fileInputId} className="block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none">Archivo</label>
           <input
+            id={fileInputId}
             ref={fileRef}
             type="file"
             accept={ACCEPT}

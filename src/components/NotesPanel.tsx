@@ -388,7 +388,6 @@ function AddNoteModal({
           label="Título (opcional)"
           name="title"
           placeholder="Ej: Hostel paga en cash"
-          autoFocus
         />
         <TextareaField
           label="Cuerpo"

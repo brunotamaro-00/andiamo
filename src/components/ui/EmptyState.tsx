@@ -30,7 +30,7 @@ export function EmptyState({
       </div>
       <p className="text-sm font-semibold text-ink">{title}</p>
       {description && (
-        <p className="text-xs text-ink-3 mt-1.5 max-w-[15rem] leading-relaxed">
+        <p className="text-xs text-ink-2 mt-1.5 max-w-[15rem] leading-relaxed">
           {description}
         </p>
       )}
