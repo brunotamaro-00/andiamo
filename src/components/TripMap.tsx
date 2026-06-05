@@ -5,6 +5,38 @@ import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 import type { CityPoint, Segment } from "@/lib/map-projection";
 
+// ── Color tokens by stop state ────────────────────────────────────────────
+const STATE_COLORS = {
+  upcoming: {
+    dotStroke: "#8A7F6A",   // ink-3
+    dotFill:   "#FFFFFF",
+    numFill:   "#8A7F6A",   // ink-3
+    labelFill: "#8A7F6A",   // ink-3
+  },
+  visited: {
+    dotStroke: "#C44428",   // brick
+    dotFill:   "#FFFFFF",
+    numFill:   "#832C18",   // brick-ink
+    labelFill: "#1B1A17",   // ink
+  },
+  current: {
+    dotStroke: "#C8A24B",   // gold
+    dotFill:   "#F8F0DC",   // gold-bg
+    numFill:   "#7A5C10",   // gold-ink
+    labelFill: "#1B1A17",   // ink
+  },
+} as const;
+
+const SEG_STROKE = {
+  traveled: { stroke: "#C44428", opacity: 0.7  },  // brick
+  upcoming:  { stroke: "#ABA090", opacity: 0.45 },  // ink-faint
+} as const;
+
+// ── Pan/zoom constants ────────────────────────────────────────────────────
+const MIN_SCALE = 1;
+const MAX_SCALE = 5;
+const INITIAL = { x: 0, y: 0, scale: 1 };
+
 interface Props {
   countryPaths: string[];
   cities: CityPoint[];
@@ -13,17 +45,9 @@ interface Props {
   viewBoxHeight: number;
 }
 
-interface Transform {
-  x: number;
-  y: number;
-  scale: number;
-}
+interface Transform { x: number; y: number; scale: number; }
 
-const MIN_SCALE = 1;   // scale=1 shows 100% of the map — can't zoom out further
-const MAX_SCALE = 5;
-const INITIAL: Transform = { x: 0, y: 0, scale: 1 };
-
-/** Clamp pan so the map always fills the viewport (no empty canvas visible). */
+/** Clamp pan so the map always fills the viewport (no empty canvas). */
 function clamp(t: Transform, vbW: number, vbH: number): Transform {
   const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, t.scale));
   const x = Math.min(0, Math.max((1 - scale) * vbW, t.x));
@@ -31,13 +55,7 @@ function clamp(t: Transform, vbW: number, vbH: number): Transform {
   return { x, y, scale };
 }
 
-export function TripMap({
-  countryPaths,
-  cities,
-  segments,
-  viewBoxWidth,
-  viewBoxHeight,
-}: Props) {
+export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxHeight }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [transform, setTransform] = useState<Transform>(INITIAL);
   const dragRef = useRef<{ startX: number; startY: number; tx: number; ty: number } | null>(null);
@@ -46,19 +64,17 @@ export function TripMap({
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 
-  // ── Wheel zoom — zoom toward cursor position ────────────────────────────────
+  // ── Wheel zoom — zoom toward cursor ──────────────────────────────────────
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.07 : 1 / 1.07;
     const svg = svgRef.current;
     if (!svg) return;
     const rect = svg.getBoundingClientRect();
-    // Cursor position in viewBox coordinates
     const cx = ((e.clientX - rect.left) / rect.width) * viewBoxWidth;
     const cy = ((e.clientY - rect.top) / rect.height) * viewBoxHeight;
     setTransform((t) => {
       const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, t.scale * factor));
-      // Adjust translate so the point under the cursor stays fixed
       const newX = cx - (cx - t.x) * (newScale / t.scale);
       const newY = cy - (cy - t.y) * (newScale / t.scale);
       return clamp({ x: newX, y: newY, scale: newScale }, viewBoxWidth, viewBoxHeight);
@@ -72,41 +88,25 @@ export function TripMap({
     return () => svg.removeEventListener("wheel", handleWheel);
   }, [handleWheel]);
 
-  // ── Mouse drag ───────────────────────────────────────────────────────────────
+  // ── Mouse drag ────────────────────────────────────────────────────────────
   const onMouseDown = (e: React.MouseEvent) => {
-    dragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      tx: transform.x,
-      ty: transform.y,
-    };
+    dragRef.current = { startX: e.clientX, startY: e.clientY, tx: transform.x, ty: transform.y };
   };
-
   const onMouseMove = (e: React.MouseEvent) => {
     const drag = dragRef.current;
     if (!drag) return;
-    const dx = e.clientX - drag.startX;
-    const dy = e.clientY - drag.startY;
-    setTransform((t) => clamp({ ...t, x: drag.tx + dx, y: drag.ty + dy }, viewBoxWidth, viewBoxHeight));
+    setTransform((t) => clamp({ ...t, x: drag.tx + e.clientX - drag.startX, y: drag.ty + e.clientY - drag.startY }, viewBoxWidth, viewBoxHeight));
   };
-
   const onMouseUp = () => { dragRef.current = null; };
 
-  // ── Touch drag + pinch ───────────────────────────────────────────────────────
+  // ── Touch drag + pinch ────────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 1) {
-      dragRef.current = {
-        startX: e.touches[0].clientX,
-        startY: e.touches[0].clientY,
-        tx: transform.x,
-        ty: transform.y,
-      };
+      dragRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, tx: transform.x, ty: transform.y };
       lastPinchRef.current = null;
     } else if (e.touches.length === 2) {
       dragRef.current = null;
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      lastPinchRef.current = Math.hypot(dx, dy);
+      lastPinchRef.current = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
     }
   };
 
@@ -114,18 +114,14 @@ export function TripMap({
     e.preventDefault();
     const drag = dragRef.current;
     if (e.touches.length === 1 && drag) {
-      const dx = e.touches[0].clientX - drag.startX;
-      const dy = e.touches[0].clientY - drag.startY;
-      setTransform((t) => clamp({ ...t, x: drag.tx + dx, y: drag.ty + dy }, viewBoxWidth, viewBoxHeight));
+      setTransform((t) => clamp({ ...t, x: drag.tx + e.touches[0].clientX - drag.startX, y: drag.ty + e.touches[0].clientY - drag.startY }, viewBoxWidth, viewBoxHeight));
     } else if (e.touches.length === 2 && lastPinchRef.current != null) {
       const t0 = e.touches[0];
       const t1 = e.touches[1];
       const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
-      // Dampen pinch sensitivity — raw ratio feels too fast on touch
-      const rawFactor = dist / lastPinchRef.current;
-      const factor = rawFactor > 1 ? 1 + (rawFactor - 1) * 0.5 : 1 - (1 - rawFactor) * 0.5;
+      const raw = dist / lastPinchRef.current;
+      const factor = raw > 1 ? 1 + (raw - 1) * 0.5 : 1 - (1 - raw) * 0.5;
       lastPinchRef.current = dist;
-      // Zoom toward the midpoint between the two fingers (same logic as wheel zoom)
       const svg = svgRef.current;
       if (!svg) return;
       const rect = svg.getBoundingClientRect();
@@ -133,38 +129,81 @@ export function TripMap({
       const cy = (((t0.clientY + t1.clientY) / 2 - rect.top) / rect.height) * viewBoxHeight;
       setTransform((t) => {
         const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, t.scale * factor));
-        const ratio = newScale / t.scale;
-        const newX = cx - (cx - t.x) * ratio;
-        const newY = cy - (cy - t.y) * ratio;
-        return clamp({ x: newX, y: newY, scale: newScale }, viewBoxWidth, viewBoxHeight);
+        return clamp({ x: cx - (cx - t.x) * (newScale / t.scale), y: cy - (cy - t.y) * (newScale / t.scale), scale: newScale }, viewBoxWidth, viewBoxHeight);
       });
     }
   };
 
-  const onTouchEnd = () => {
-    dragRef.current = null;
-    lastPinchRef.current = null;
-  };
-
+  const onTouchEnd = () => { dragRef.current = null; lastPinchRef.current = null; };
   const reset = () => setTransform(INITIAL);
-
   const animated = !prefersReduced.current;
 
-  // Precompute label visibility: deduplicate by base name (strip parenthetical suffix)
-  const cityLabelInfo = (() => {
-    const seen = new Set<string>();
-    return new Map(cities.map((city) => {
-      const baseKey = city.name.toLowerCase().replace(/\s*\(.*\)\s*$/, "").trim();
-      const show = !seen.has(baseKey);
-      if (show) seen.add(baseKey);
-      const displayName = city.name.replace(/\s*\(.*\)\s*$/, "").trim();
-      return [city.slug, { show, displayName }] as const;
-    }));
-  })();
+  // ── Greedy label placement ────────────────────────────────────────────────
+  // For each visible label, pick the angle (out of 16 candidates) that:
+  //   1. Does NOT overlap any previously placed label bounding box (hard reject).
+  //   2. Maximises the minimum clearance from nearby dots + close segment midpoints.
+  // Falls back to plain maximin if all 16 angles are blocked.
+
+  const LDIST = 7 + 14; // R + 14 = 21 SVG units from dot center
+  const CHAR_W = 4.2;   // estimated Anton char width at fontSize=7
+  const LABEL_HH = 4;   // half-height (7px text ≈ 8px → 4px)
+
+  const seenNames  = new Set<string>();
+  const placedBoxes: { cx: number; cy: number; hw: number; hh: number }[] = [];
+  const segMids    = segments.map((s) => ({ x: s.mx, y: s.my }));
+
+  const cityLabelMap = new Map<string, { show: boolean; displayName: string; lx: number; ly: number }>();
+
+  for (const city of cities) {
+    const baseKey     = city.name.toLowerCase().replace(/\s*\(.*\)\s*$/, "").trim();
+    const displayName = city.name.replace(/\s*\(.*\)\s*$/, "").trim();
+    const show        = !seenNames.has(baseKey);
+    if (show) seenNames.add(baseKey);
+
+    if (!show) { cityLabelMap.set(city.slug, { show: false, displayName, lx: 0, ly: 0 }); continue; }
+
+    const hw     = (displayName.length * CHAR_W) / 2;
+    const nearby = cities.filter((c) => c.slug !== city.slug && Math.hypot(c.x - city.x, c.y - city.y) < 80);
+
+    const evalAngle = (angle: number, allowBoxOverlap: boolean): number => {
+      const lx = city.x + Math.sin(angle) * LDIST;
+      const ly = city.y + Math.cos(angle) * LDIST;
+      if (!allowBoxOverlap) {
+        for (const box of placedBoxes) {
+          if (Math.abs(lx - box.cx) < hw + box.hw + 2 && Math.abs(ly - box.cy) < LABEL_HH + box.hh + 2) return -Infinity;
+        }
+      }
+      const dotDists = nearby.map((n) => Math.hypot(n.x - lx, n.y - ly));
+      const segDists = segMids.filter((m) => Math.hypot(m.x - lx, m.y - ly) < 40).map((m) => Math.hypot(m.x - lx, m.y - ly));
+      const all = [...dotDists, ...segDists];
+      return all.length > 0 ? Math.min(...all) : 100;
+    };
+
+    let bestAngle = Math.PI; // default: straight down
+    let bestScore = -Infinity;
+
+    for (let k = 0; k < 16; k++) {
+      const angle = (k * 2 * Math.PI) / 16;
+      const score = evalAngle(angle, false);
+      if (score > bestScore) { bestScore = score; bestAngle = angle; }
+    }
+    // Fallback: ignore box overlaps (still better than nothing)
+    if (bestScore === -Infinity) {
+      for (let k = 0; k < 16; k++) {
+        const angle = (k * 2 * Math.PI) / 16;
+        const score = evalAngle(angle, true);
+        if (score > bestScore) { bestScore = score; bestAngle = angle; }
+      }
+    }
+
+    const lx = city.x + Math.sin(bestAngle) * LDIST;
+    const ly = city.y + Math.cos(bestAngle) * LDIST;
+    placedBoxes.push({ cx: lx, cy: ly, hw, hh: LABEL_HH });
+    cityLabelMap.set(city.slug, { show: true, displayName, lx, ly });
+  }
 
   return (
     <div className="relative w-full h-full min-h-0 select-none" style={{ touchAction: "none" }}>
-      {/* SVG map */}
       <svg
         ref={svgRef}
         viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
@@ -181,50 +220,35 @@ export function TripMap({
         onTouchEnd={onTouchEnd}
       >
         <g transform={`translate(${transform.x},${transform.y}) scale(${transform.scale})`}>
-          {/* ── Layer 1: Country fills ────────────────────────────────────── */}
+
+          {/* ── Layer 1: Country fills ──────────────────────────────────── */}
           <g aria-hidden="true">
             {countryPaths.map((d, i) => (
-              <path
-                key={i}
-                d={d}
-                fill="#EAE2CB"   /* surface-2 / canvas tint */
-                stroke="#D8CFB4" /* border */
-                strokeWidth={0.6}
-              />
+              <path key={i} d={d} fill="#EAE2CB" stroke="#D8CFB4" strokeWidth={0.6} />
             ))}
           </g>
 
-          {/* ── Layer 2: Segments (connections between cities) ────────────── */}
+          {/* ── Layer 2: Segments ───────────────────────────────────────── */}
           <g aria-hidden="true">
-            {segments.map((seg, i) => (
-              <g key={`seg-${i}`}>
-                {seg.mode === "flight" ? (
-                  <path
-                    d={seg.d}
-                    fill="none"
-                    stroke="#C44428" /* brick */
-                    strokeWidth={1.5}
-                    strokeDasharray="4 4"
-                    strokeLinecap="round"
-                    opacity={0.7}
-                    className={animated ? `animate-fade-in stagger-${Math.min((i % 6) + 1, 6)}` : ""}
-                  />
-                ) : (
-                  <path
-                    d={seg.d}
-                    fill="none"
-                    stroke="#C44428" /* brick */
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    opacity={0.55}
-                    className={animated ? `animate-fade-in stagger-${Math.min((i % 6) + 1, 6)}` : ""}
-                  />
-                )}
-              </g>
-            ))}
+            {segments.map((seg, i) => {
+              const { stroke, opacity } = SEG_STROKE[seg.state];
+              return (
+                <path
+                  key={`seg-${i}`}
+                  d={seg.d}
+                  fill="none"
+                  stroke={stroke}
+                  strokeWidth={1.5}
+                  strokeDasharray={seg.mode === "flight" ? "4 4" : undefined}
+                  strokeLinecap="round"
+                  opacity={opacity}
+                  className={animated ? `animate-fade-in stagger-${Math.min((i % 6) + 1, 6)}` : ""}
+                />
+              );
+            })}
           </g>
 
-          {/* ── Layer 2b: Flight icons at midpoints ───────────────────────── */}
+          {/* ── Layer 2b: Flight icons ───────────────────────────────────── */}
           {segments
             .filter((seg) => seg.mode === "flight")
             .map((seg, i) => (
@@ -234,94 +258,80 @@ export function TripMap({
                 aria-hidden="true"
                 className={animated ? `animate-fade-in stagger-${Math.min((i % 6) + 1, 6)}` : ""}
               >
-                {/* Small white bg pill for readability */}
                 <circle cx="7" cy="7" r="7" fill="#FFFFFF" opacity={0.85} />
-                {/* Plane icon — manually inlined at 14×14 to avoid client deps */}
-                <svg x="0" y="0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C44428" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg x="0" y="0" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke={seg.state === "traveled" ? "#C44428" : "#ABA090"}
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                >
                   <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.6-.6 1.1l1.5 2.8c.2.4.7.6 1.1.5L8 10l-2 4H4l-1 1 3 2 2 3 1-1v-2l4-2-.4 3.8c-.1.4.1.9.5 1.1l2.8 1.5c.5.3 1 0 1.1-.6z" />
                 </svg>
               </g>
             ))}
 
-          {/* ── Layer 3: City nodes ───────────────────────────────────────── */}
+          {/* ── Layer 3: City nodes ─────────────────────────────────────── */}
           {cities.map((city, i) => {
-            const R = 7;
-            const stagger = `stagger-${Math.min((i % 6) + 1, 6)}`;
-
-            // Pick the best label angle from 16 candidates by maximising the
-            // minimum distance from any nearby dot to the candidate label position.
-            // "Maximin" criterion: choose the direction with the most open space.
-            const NEAR_RADIUS = 80;
-            const LDIST = R + 14;
-            const nearby = cities.filter(
-              (c) => c.slug !== city.slug && Math.hypot(c.x - city.x, c.y - city.y) < NEAR_RADIUS
-            );
-            let bestAngle = 0; // default: straight down (angle=0 → +y in SVG)
-            if (nearby.length > 0) {
-              let bestScore = -Infinity;
-              const NUM = 16;
-              for (let k = 0; k < NUM; k++) {
-                const angle = (k * 2 * Math.PI) / NUM;
-                const clx = city.x + Math.sin(angle) * LDIST;
-                const cly = city.y + Math.cos(angle) * LDIST;
-                // Maximin: maximise the closest approach distance
-                const score = Math.min(...nearby.map((n) => Math.hypot(n.x - clx, n.y - cly)));
-                if (score > bestScore) { bestScore = score; bestAngle = angle; }
-              }
-            }
-            const ldx = Math.sin(bestAngle);
-            const ldy = Math.cos(bestAngle);
-            const lx = city.x + ldx * LDIST;
-            const ly = city.y + ldy * LDIST;
-            const anchor = "middle";
+            const R   = 7;
+            const col = STATE_COLORS[city.state];
+            const stagger   = `stagger-${Math.min((i % 6) + 1, 6)}`;
+            const placement = cityLabelMap.get(city.slug);
 
             return (
-              <g
-                key={city.slug}
-                className={animated ? `animate-fade-in ${stagger}` : ""}
-              >
+              <g key={city.slug} className={animated ? `animate-fade-in ${stagger}` : ""}>
+                {/* Pulse ring — current city only */}
+                {city.state === "current" && (
+                  <circle
+                    cx={city.x} cy={city.y} r={R + 5}
+                    fill="none"
+                    stroke="#C8A24B"
+                    strokeWidth={1.5}
+                    opacity={animated ? undefined : 0.3}
+                    className={animated ? "animate-map-pulse" : ""}
+                  />
+                )}
                 {/* Hard shadow */}
-                <circle cx={city.x + 1} cy={city.y + 1} r={R} fill="#1B1A17" opacity={0.15} />
-                {/* White dot */}
-                <circle cx={city.x} cy={city.y} r={R} fill="#FFFFFF" stroke="#C44428" strokeWidth={1.8} />
+                <circle cx={city.x + 1} cy={city.y + 1} r={R} fill="#1B1A17" opacity={0.12} />
+                {/* Dot */}
+                <circle
+                  cx={city.x} cy={city.y} r={R}
+                  fill={col.dotFill}
+                  stroke={col.dotStroke}
+                  strokeWidth={city.state === "current" ? 2.2 : 1.8}
+                />
                 {/* Order number */}
                 <text
-                  x={city.x}
-                  y={city.y + 3}
+                  x={city.x} y={city.y + 3}
                   textAnchor="middle"
                   fontSize={7}
                   fontFamily="var(--font-archivo)"
                   fontWeight={900}
-                  fill="#832C18"
+                  fill={col.numFill}
                 >
                   {i + 1}
                 </text>
-                {/* City name label — deduplicated by base name */}
-                {cityLabelInfo.get(city.slug)?.show && (
+                {/* City label */}
+                {placement?.show && (
                   <text
-                    x={lx}
-                    y={ly}
-                    textAnchor={anchor}
+                    x={placement.lx}
+                    y={placement.ly}
+                    textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={7}
                     fontFamily="var(--font-anton)"
                     fontWeight={400}
-                    fill="#1B1A17"
+                    fill={col.labelFill}
                     letterSpacing={0.2}
                     style={{ textTransform: "uppercase" }}
                     paintOrder="stroke"
                     stroke="#F3ECD8"
                     strokeWidth={2.5}
                   >
-                    {cityLabelInfo.get(city.slug)?.displayName}
+                    {placement.displayName}
                   </text>
                 )}
-                {/* Invisible hit area for link */}
+                {/* Invisible tap/click area */}
                 <foreignObject
-                  x={city.x - R - 2}
-                  y={city.y - R - 2}
-                  width={(R + 2) * 2}
-                  height={(R + 2) * 2}
+                  x={city.x - R - 2} y={city.y - R - 2}
+                  width={(R + 2) * 2}  height={(R + 2) * 2}
                   style={{ overflow: "visible" }}
                 >
                   <Link

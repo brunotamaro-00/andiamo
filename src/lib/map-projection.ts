@@ -5,6 +5,8 @@ export const MAP_WIDTH = 800;
 export const MAP_HEIGHT = 600;
 const PAD = 48;
 
+export type StopState = "visited" | "current" | "upcoming";
+
 export interface CityPoint {
   x: number;
   y: number;
@@ -12,6 +14,7 @@ export interface CityPoint {
   slug: string;
   countryFlag: string;
   order: number;
+  state: StopState;
 }
 
 export interface Segment {
@@ -21,6 +24,8 @@ export interface Segment {
   mx: number;
   my: number;
   mode: "flight" | "ground";
+  /** traveled = destination already visited/current; upcoming = future */
+  state: "traveled" | "upcoming";
   fromSlug: string;
   toSlug: string;
 }
@@ -34,7 +39,7 @@ const mercY = (lat: number) =>
  * relative to the SVG aspect ratio.
  */
 export function makeProjection(stops: Array<{ latitude: number; longitude: number }>) {
-  const PAD_DEG = 8;
+  const PAD_DEG = 10;
   const lngs = stops.map((s) => s.longitude);
   const lats = stops.map((s) => s.latitude);
   const minLng = Math.min(...lngs) - PAD_DEG;
@@ -104,6 +109,7 @@ export function buildSegments(
     y: number;
     slug: string;
     arrivalMode: "flight" | "ground";
+    state: StopState;
   }>
 ): Segment[] {
   const segments: Segment[] = [];
@@ -119,7 +125,11 @@ export function buildSegments(
     const mx = (from.x + to.x) / 2;
     const my = (from.y + to.y) / 2;
 
-    segments.push({ d, mx, my, mode, fromSlug: from.slug, toSlug: to.slug });
+    // Traveled if the destination has already been visited (or is current stop)
+    const segState: "traveled" | "upcoming" =
+      to.state === "visited" || to.state === "current" ? "traveled" : "upcoming";
+
+    segments.push({ d, mx, my, mode, state: segState, fromSlug: from.slug, toSlug: to.slug });
   }
   return segments;
 }

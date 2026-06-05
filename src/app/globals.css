@@ -116,6 +116,17 @@
 @utility stagger-5 { animation-delay: 300ms; }
 @utility stagger-6 { animation-delay: 360ms; }
 
+@keyframes mapPulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%       { opacity: 0;    transform: scale(1.9); }
+}
+
+@utility animate-map-pulse {
+  animation: mapPulse 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 /* ── Card hover — sticker shift ──────────────────────── */
 @utility card-hover {
   transition: box-shadow 150ms ease, transform 150ms ease;
