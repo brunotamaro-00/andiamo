@@ -2,20 +2,15 @@
 
 import { useState, useTransition, useOptimistic, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Pin, Trash2, Plus, Pencil, Check, X, StickyNote, Loader2, AlertCircle } from "lucide-react";
+import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, TextareaField } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
-
-/** Shared 40px touch target for secondary row actions. */
-const actionBtn =
-  "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
-  "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick " +
-  "focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 interface Note {
   id: string;
@@ -340,23 +335,11 @@ function NoteCard({
         </button>
 
         {confirming ? (
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="text-xs text-danger mr-1">¿Borrar?</span>
-            <button
-              onClick={onConfirmDelete}
-              aria-label={`Confirmar borrado de "${note.title}"`}
-              className={`${actionBtn} text-danger hover:bg-danger-bg`}
-            >
-              <Check size={16} strokeWidth={2} aria-hidden="true" />
-            </button>
-            <button
-              onClick={onCancelDelete}
-              aria-label="Cancelar borrado"
-              className={`${actionBtn} text-ink-2 hover:bg-surface-2`}
-            >
-              <X size={16} strokeWidth={2} aria-hidden="true" />
-            </button>
-          </div>
+          <InlineDeleteConfirm
+            label={note.title}
+            onConfirm={onConfirmDelete}
+            onCancel={onCancelDelete}
+          />
         ) : (
           <div className="flex items-center shrink-0">
             <button
