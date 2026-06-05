@@ -30,7 +30,8 @@ const numericStr = (fallback: number) =>
 const intStr = (fallback: number) =>
   z.string().transform((v) => parseInt(v, 10) || fallback);
 
-const boolStr = z.string().transform((v) => v === "true");
+/** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
+const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
 
 /** Optional Date from YYYY-MM-DD string */
 const optionalDate = z
