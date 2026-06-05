@@ -68,12 +68,12 @@ export function makeProjection(stops: Array<{ latitude: number; longitude: numbe
     .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 }
 
-/** Build SVG path strings for every European country using the stops-fitted projection. */
+/** Build SVG path strings for every European country using an already-computed projection.
+ *  Accepts the projection object directly (no need to recompute it from stops). */
 export function buildCountryPaths(
   geojson: FeatureCollection<Geometry>,
-  stops: Array<{ latitude: number; longitude: number }>
+  projection: ReturnType<typeof makeProjection>
 ): string[] {
-  const projection = makeProjection(stops);
   const path = geoPath(projection);
   return geojson.features
     .map((f) => path(f))
