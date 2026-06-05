@@ -23,7 +23,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
     return () => { opener?.focus(); };
   }, []);
 
-  /* Focus first focusable element + iOS-safe scroll-lock */
+  /* Focus first focusable element + iOS-safe scroll-lock + inert background */
   useEffect(() => {
     const panel = panelRef.current;
     if (panel) {
@@ -32,13 +32,18 @@ export function Modal({ title, onClose, children }: ModalProps) {
     }
     // Lock the scroll container (not body) — body no longer scrolls in this layout
     const scrollRoot = document.getElementById("scroll-root");
-    if (!scrollRoot) return;
-    const scrollY = scrollRoot.scrollTop;
-    scrollRoot.style.overflow = "hidden";
-    return () => {
-      scrollRoot.style.overflow = "";
-      scrollRoot.scrollTop = scrollY;
-    };
+    if (scrollRoot) {
+      const scrollY = scrollRoot.scrollTop;
+      scrollRoot.style.overflow = "hidden";
+      // Mark background content inert so screen readers stay inside the modal
+      scrollRoot.setAttribute("inert", "");
+      const restore = () => {
+        scrollRoot.style.overflow = "";
+        scrollRoot.scrollTop = scrollY;
+        scrollRoot.removeAttribute("inert");
+      };
+      return restore;
+    }
   }, []);
 
   /* Escape to close + focus trap */
