@@ -54,7 +54,7 @@ export default async function StopsPage() {
             <form action={logout}>
               <button
                 type="submit"
-                className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
               >
                 Salir
               </button>

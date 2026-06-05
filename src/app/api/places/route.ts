@@ -11,8 +11,8 @@ export async function GET(req: NextRequest) {
 
   const latParam = req.nextUrl.searchParams.get("lat");
   const lngParam = req.nextUrl.searchParams.get("lng");
-  const lat = latParam ? parseFloat(latParam) : undefined;
-  const lng = lngParam ? parseFloat(lngParam) : undefined;
+  const lat = latParam && Number.isFinite(parseFloat(latParam)) ? parseFloat(latParam) : undefined;
+  const lng = lngParam && Number.isFinite(parseFloat(lngParam)) ? parseFloat(lngParam) : undefined;
 
   const results = await searchPlaces(q, { lat, lng });
   return Response.json({ results }, {

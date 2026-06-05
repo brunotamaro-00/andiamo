@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCurrencySymbol, CURRENCY_NAMES } from "@/lib/currency-map";
 import { Card, SectionHeader } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const NO_SPACE_SYMBOLS = new Set(["$", "€", "£", "₺"]);
 
@@ -63,8 +64,8 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
       <Card>
         <SectionHeader title="Moneda" />
         <div className="space-y-3">
-          <div className="animate-pulse h-12 bg-surface-2 rounded-xl" />
-          <div className="animate-pulse h-20 bg-surface-2/60 rounded-xl" />
+          <Skeleton className="h-12" />
+          <Skeleton className="h-20 opacity-60" />
         </div>
       </Card>
     );
@@ -77,12 +78,12 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
   const decimals = currencyCode === "HUF" ? 0 : 2;
 
   const localFromUsd =
-    rate && usdInput
+    rate && Number.isFinite(parseFloat(usdInput))
       ? fmtNum(parseFloat(usdInput) * rate, decimals)
       : null;
 
   const usdFromLocal =
-    rate && localInput
+    rate && Number.isFinite(parseFloat(localInput))
       ? fmtNum(parseFloat(localInput) / rate, 2)
       : null;
 
@@ -115,7 +116,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
       {/* Converter */}
       {rate && (
         <div className="bg-surface-2/50 rounded-[4px] p-3 border border-border/50 space-y-3">
-          <p className="text-xs font-medium text-ink-3 uppercase tracking-wider">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             Convertidor
           </p>
 
