@@ -373,13 +373,13 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
       <button
         onClick={reset}
         aria-label="Restablecer vista del mapa"
-        className="absolute bottom-20 right-4 w-10 h-10 rounded-full bg-surface border-2 border-border-strong flex items-center justify-center card-shadow hover:border-brick hover:text-brick text-ink-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+        className="absolute bottom-24 right-4 w-10 h-10 rounded-full bg-surface border-2 border-border-strong flex items-center justify-center card-shadow hover:border-brick hover:text-brick text-ink-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
       >
         <RotateCcw size={15} strokeWidth={1.5} aria-hidden="true" />
       </button>
 
       {/* Legend */}
-      <div className="absolute bottom-20 left-4 flex flex-col gap-1.5 bg-surface/90 backdrop-blur-sm border border-border rounded-[4px] px-3 py-2 card-shadow">
+      <div className="absolute bottom-24 left-4 flex flex-col gap-1.5 bg-surface/90 backdrop-blur-sm border border-border rounded-[4px] px-3 py-2 card-shadow">
         <div className="flex items-center gap-2">
           <svg width="24" height="8" aria-hidden="true">
             <line x1="0" y1="4" x2="24" y2="4" stroke="var(--color-brick)" strokeWidth="1.5" strokeDasharray="4 3" />
