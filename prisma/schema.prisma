@@ -16,8 +16,8 @@ model Stop {
   slug          String     @unique
   category      String
   priceLevel    String
-  arrivalDate   DateTime?
-  departureDate DateTime?
+  arrivalDate   DateTime? @db.Date
+  departureDate DateTime? @db.Date
   nights        Int        @default(0)
   datesFixed    Boolean    @default(false)
   latitude      Float
@@ -51,6 +51,8 @@ model Poi {
   done                Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+
+  @@index([stopId])
 }
 
 enum TransportMode {
@@ -77,6 +79,8 @@ model Note {
   pinned    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([stopId])
 }
 
 model Document {
@@ -92,6 +96,8 @@ model Document {
   storagePath String?
   externalUrl String?
   createdAt   DateTime     @default(now())
+
+  @@index([stopId])
 }
 
 enum DocumentKind {

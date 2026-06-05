@@ -20,9 +20,14 @@ export default async function StopsPage() {
     getCurrentStopSlug(),
   ]);
 
-  const tripStart = new Date("2026-08-05");
-  const tripEnd = new Date("2026-11-21");
-  const tripDays = Math.round((tripEnd.getTime() - tripStart.getTime()) / (1000 * 60 * 60 * 24));
+  // Derive trip range from DB data — no hardcoded dates.
+  const confirmedWithDates = stops.filter((s) => !s.isFlexMargin && !s.isCandidate);
+  const tripStartDate = confirmedWithDates.find((s) => s.arrivalDate)?.arrivalDate ?? null;
+  const tripEndDate = [...confirmedWithDates].reverse().find((s) => s.departureDate)?.departureDate ?? null;
+  const tripDays =
+    tripStartDate && tripEndDate
+      ? Math.round((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
   const today = new Date();
 
   return (
@@ -63,7 +68,7 @@ export default async function StopsPage() {
           />
           <Stat
             label="Días"
-            value={tripDays.toString()}
+            value={tripDays?.toString() ?? "—"}
             highlight
           />
           <Stat
