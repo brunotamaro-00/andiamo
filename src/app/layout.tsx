@@ -59,6 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TabBar />
         <InstallPrompt />
         <ServiceWorkerRegister />
+        {/* Portal target for modals — outside scroll-root so inert doesn't block modal interaction */}
+        <div id="modal-root" />
       </body>
     </html>
   );
