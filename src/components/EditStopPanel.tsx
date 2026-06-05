@@ -90,20 +90,24 @@ function EditModal({
     <Modal title="Editar ciudad" onClose={onClose}>
       <form action={handleSave} className="space-y-3">
         <Field label="Nombre" name="name" defaultValue={name} required />
-        <div className="grid grid-cols-[2fr_1fr] gap-2">
-          <Field
-            label="Llegada"
-            name="arrivalDate"
-            type="date"
-            defaultValue={toDateInput(arrivalDate)}
-          />
-          <Field
-            label="Noches"
-            name="nights"
-            type="number"
-            defaultValue={nights}
-            min={0}
-          />
+        <div className="flex gap-2 items-start">
+          <div className="flex-1 min-w-0">
+            <Field
+              label="Llegada"
+              name="arrivalDate"
+              type="date"
+              defaultValue={toDateInput(arrivalDate)}
+            />
+          </div>
+          <div className="w-20 shrink-0">
+            <Field
+              label="Noches"
+              name="nights"
+              type="number"
+              defaultValue={nights}
+              min={0}
+            />
+          </div>
         </div>
 
         <SelectField
