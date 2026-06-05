@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
+import { haptics } from "@/lib/haptics";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -139,11 +140,13 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   function handleDelete(id: string) {
     setConfirmingId(null);
     setMutationError(null);
+    haptics.warning();
     startTransition(async () => {
       applyOptimistic(id);
       try {
         await deleteDocument(id, path);
       } catch {
+        haptics.error();
         setMutationError("No se pudo borrar el documento. Reintentá.");
         router.refresh();
       }
@@ -155,10 +158,12 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     if (slug) formData.set("slug", slug);
     setMode(null);
     setMutationError(null);
+    haptics.success();
     startTransition(async () => {
       try {
         await createDocumentLink(formData);
       } catch {
+        haptics.error();
         setMutationError("No se pudo agregar el link. Reintentá.");
         router.refresh();
       }
@@ -408,9 +413,11 @@ function UploadModal({
         setUploading(false);
         return;
       }
+      haptics.success();
       router.refresh();
       onClose();
     } catch {
+      haptics.error();
       setError("Error de red. Revisá la conexión e intentá de nuevo.");
       setUploading(false);
     }

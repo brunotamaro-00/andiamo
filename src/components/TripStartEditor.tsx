@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Pencil, Check } from "lucide-react";
 import { setTripStart } from "@/app/actions/stops";
+import { haptics } from "@/lib/haptics";
 
 interface Props {
   value: string; // YYYY-MM-DD or ""
@@ -29,8 +30,10 @@ export function TripStartEditor({ value }: Props) {
       try {
         const result = await setTripStart(formData);
         if (result?.error) { setError(result.error); return; }
+        haptics.success();
         setEditing(false);
       } catch {
+        haptics.error();
         setError("No se pudo guardar. Intentá de nuevo.");
       }
     });

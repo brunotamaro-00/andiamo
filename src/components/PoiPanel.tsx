@@ -10,6 +10,7 @@ import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 import type { LucideIcon } from "lucide-react";
 import { createPoi, updatePoi, togglePoiDone, deletePoi } from "@/app/actions/pois";
+import { haptics } from "@/lib/haptics";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -88,11 +89,13 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
 
   function handleToggle(poi: Poi) {
     setMutationError(null);
+    if (poi.done) haptics.tap(); else haptics.success();
     startTransition(async () => {
       applyOptimistic({ type: "toggle", id: poi.id });
       try {
         await togglePoiDone(poi.id, slug);
       } catch {
+        haptics.error();
         setMutationError("No se pudo guardar el cambio. Reintentá.");
         router.refresh();
       }
@@ -102,11 +105,13 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
   function handleDelete(id: string) {
     setConfirmingId(null);
     setMutationError(null);
+    haptics.warning();
     startTransition(async () => {
       applyOptimistic({ type: "delete", id });
       try {
         await deletePoi(id, slug);
       } catch {
+        haptics.error();
         setMutationError("No se pudo borrar. Reintentá.");
         router.refresh();
       }
@@ -132,11 +137,13 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
     };
     setOpen(false);
     setMutationError(null);
+    haptics.success();
     startTransition(async () => {
       applyOptimistic({ type: "add", poi: temp });
       try {
         await createPoi(formData);
       } catch {
+        haptics.error();
         setMutationError("No se pudo agregar el punto de interés. Reintentá.");
         router.refresh();
       }
