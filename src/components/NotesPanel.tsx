@@ -4,6 +4,7 @@ import { useState, useTransition, useOptimistic, useRef, useEffect } from "react
 import { useRouter } from "next/navigation";
 import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
+import { haptics } from "@/lib/haptics";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -57,11 +58,13 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
 
   function handleTogglePin(id: string) {
     setMutationError(null);
+    haptics.tap();
     startTransition(async () => {
       applyOptimistic({ type: "togglePin", id });
       try {
         await toggleNotePin(id, path);
       } catch {
+        haptics.error();
         setMutationError("No se pudo guardar el cambio. Reintentá.");
         router.refresh();
       }
@@ -71,11 +74,13 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   function handleDelete(id: string) {
     setConfirmingId(null);
     setMutationError(null);
+    haptics.warning();
     startTransition(async () => {
       applyOptimistic({ type: "delete", id });
       try {
         await deleteNote(id, path);
       } catch {
+        haptics.error();
         setMutationError("No se pudo borrar la nota. Reintentá.");
         router.refresh();
       }
@@ -95,11 +100,13 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     };
     setOpen(false);
     setMutationError(null);
+    haptics.success();
     startTransition(async () => {
       applyOptimistic({ type: "add", note: temp });
       try {
         await createNote(formData);
       } catch {
+        haptics.error();
         setMutationError("No se pudo agregar la nota. Reintentá.");
         router.refresh();
       }
@@ -112,8 +119,10 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     fd.set("body", body);
     try {
       await updateNote(id, fd, path);
+      haptics.success();
       return "ok";
     } catch {
+      haptics.error();
       return "error";
     }
   }

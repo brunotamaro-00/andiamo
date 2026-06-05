@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Pencil, Pin } from "lucide-react";
 import { updateStop, deleteStop, moveStop } from "@/app/actions/stops";
+import { haptics } from "@/lib/haptics";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -83,8 +84,10 @@ function EditModal({
         if (selectedAfterOrder !== currentOrder - 1) {
           await moveStop(stopId, selectedAfterOrder);
         }
+        haptics.success();
         onClose();
       } catch {
+        haptics.error();
         setMutationError("Ocurrió un error al guardar. Intentá de nuevo.");
       }
     });
@@ -96,10 +99,12 @@ function EditModal({
       return;
     }
     setMutationError(null);
+    haptics.warning();
     startTransition(async () => {
       try {
         await deleteStop(stopId);
       } catch {
+        haptics.error();
         setMutationError("No se pudo borrar la ciudad. Intentá de nuevo.");
       }
     });
