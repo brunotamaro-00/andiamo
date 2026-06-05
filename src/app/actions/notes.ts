@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { parseForm, CreateNoteSchema, UpdateNoteSchema } from "./_schemas";
 
 function derivedTitle(rawTitle: string, body: string): string {
   const t = rawTitle.trim();
@@ -14,21 +15,22 @@ function derivedTitle(rawTitle: string, body: string): string {
 
 export async function createNote(formData: FormData) {
   await requireAuth();
-  const slug = formData.get("slug") as string | null;
-  const stopId = (formData.get("stopId") as string) || null;
-  const rawTitle = (formData.get("title") as string) || "";
-  const body = (formData.get("body") as string) || "";
+
+  const parsed = parseForm(formData, CreateNoteSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { slug, stopId, title: rawTitle, body, pinned } = parsed.data;
 
   await db.note.create({
     data: {
-      stopId,
+      stopId: stopId ?? null,
       title: derivedTitle(rawTitle, body),
       body,
-      pinned: formData.get("pinned") === "true",
+      pinned,
     },
   });
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
+  revalidatePath("/search");
 }
 
 export async function toggleNotePin(id: string, path: string) {
@@ -43,12 +45,16 @@ export async function deleteNote(id: string, path: string) {
   await requireAuth();
   await db.note.delete({ where: { id } });
   revalidatePath(path);
+  revalidatePath("/search");
 }
 
 export async function updateNote(id: string, formData: FormData, path: string) {
   await requireAuth();
-  const rawTitle = (formData.get("title") as string) || "";
-  const body = (formData.get("body") as string) || "";
+
+  const parsed = parseForm(formData, UpdateNoteSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { title: rawTitle, body } = parsed.data;
+
   await db.note.update({
     where: { id },
     data: {
@@ -57,4 +63,5 @@ export async function updateNote(id: string, formData: FormData, path: string) {
     },
   });
   revalidatePath(path);
+  revalidatePath("/search");
 }
