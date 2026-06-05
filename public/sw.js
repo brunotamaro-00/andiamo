@@ -1,18 +1,37 @@
-// Andiamo Service Worker
-// Docs: cache-first for uploaded documents (cache-on-view)
-// Shell: stale-while-revalidate for navigation + Next.js static assets
+// Andiamo Service Worker v2
+// Strategy summary:
+//   /api/documents/*  GET  → cache-first (offline-capable document files)
+//   /api/weather,/api/rates → stale-while-revalidate (show last reading offline)
+//   Navigation + /_next/static/ → stale-while-revalidate (app shell)
+//   Everything else → network-only (auth-gated API routes)
 
-const DOCS_CACHE = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v1";
-const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
+const DOCS_CACHE  = "andiamo-docs-v1";
+const SHELL_CACHE = "andiamo-shell-v2";   // bumped: now includes precached routes
+const DATA_CACHE  = "andiamo-data-v1";    // weather + rates
+const OFFLINE_URL = "/offline.html";
 
-self.addEventListener("install", () => {
-  // Take control immediately without waiting for old SW to die
-  self.skipWaiting();
+const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE, DATA_CACHE];
+
+// Shell routes to precache on install so the app works offline from first load.
+const SHELL_ROUTES = [
+  "/",
+  "/stops",
+  "/map",
+  "/general",
+  "/search",
+  OFFLINE_URL,
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(SHELL_ROUTES))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
-  // Clean up caches from old versions
   event.waitUntil(
     caches
       .keys()
@@ -31,32 +50,37 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // ── 1. Document uploads — cache-first ────────────────────────────────────
+  // ── 1. Document files — cache-first ──────────────────────────────────────
   if (url.pathname.startsWith("/api/documents/") && request.method === "GET") {
     event.respondWith(cacheFirstDocs(request));
     return;
   }
 
-  // ── 2. Navigation requests — stale-while-revalidate ──────────────────────
-  if (request.mode === "navigate") {
-    event.respondWith(staleWhileRevalidate(SHELL_CACHE, request));
+  // ── 2. Weather + rates — stale-while-revalidate ───────────────────────────
+  //    Shows cached data offline; updates in background when connected.
+  if (url.pathname === "/api/weather" || url.pathname === "/api/rates") {
+    event.respondWith(staleWhileRevalidate(DATA_CACHE, request));
     return;
   }
 
-  // ── 3. Next.js static assets — stale-while-revalidate ────────────────────
+  // ── 3. Navigation — stale-while-revalidate (app shell) ───────────────────
+  if (request.mode === "navigate") {
+    event.respondWith(navigateWithFallback(request));
+    return;
+  }
+
+  // ── 4. Next.js static assets — stale-while-revalidate ────────────────────
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(staleWhileRevalidate(SHELL_CACHE, request));
     return;
   }
 
-  // Everything else: network-only (API routes with auth, etc.)
+  // Everything else: network-only (auth API routes, mutations, etc.)
 });
 
 /** Cache-first for uploaded document files.
  *  - Serve from cache immediately if available (works offline).
- *  - On a cache miss, fetch from network; cache only non-redirected 200 responses
- *    (redirects are links to external URLs — can't cache those).
- */
+ *  - On cache miss, fetch and cache only non-redirected 200 responses. */
 async function cacheFirstDocs(request) {
   const cache = await caches.open(DOCS_CACHE);
   const cached = await cache.match(request);
@@ -64,21 +88,16 @@ async function cacheFirstDocs(request) {
 
   try {
     const response = await fetch(request);
-    // Only cache actual file responses (status 200, not redirects to external URLs)
     if (response.ok && !response.redirected && response.status === 200) {
       cache.put(request, response.clone());
     }
     return response;
   } catch {
-    // Network failure and nothing in cache — let the browser show its own error
-    return new Response("Sin conexión — este documento no está guardado offline.", {
-      status: 503,
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
+    return offlinePage();
   }
 }
 
-/** Stale-while-revalidate: serve cached version immediately, update cache in background. */
+/** Stale-while-revalidate: serve cached version immediately, update in background. */
 async function staleWhileRevalidate(cacheName, request) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
@@ -90,5 +109,37 @@ async function staleWhileRevalidate(cacheName, request) {
     })
     .catch(() => null);
 
-  return cached ?? (await networkFetch) ?? new Response("Sin conexión", { status: 503 });
+  // Return cached immediately; if nothing cached, await the network fetch.
+  return cached ?? (await networkFetch) ?? offlinePage();
+}
+
+/** Navigation fallback: try network → try shell cache → offline page. */
+async function navigateWithFallback(request) {
+  try {
+    // Try network first for navigation (SSR pages)
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(SHELL_CACHE);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    // Network failed — try cache
+    const cache = await caches.open(SHELL_CACHE);
+    const cached = await cache.match(request);
+    return cached ?? offlinePage();
+  }
+}
+
+/** Returns the offline fallback HTML page. */
+async function offlinePage() {
+  const cache = await caches.open(SHELL_CACHE);
+  const cached = await cache.match(OFFLINE_URL);
+  return (
+    cached ??
+    new Response("Sin conexión", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    })
+  );
 }
