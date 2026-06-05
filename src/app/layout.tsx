@@ -3,6 +3,7 @@ import { Anton, Hanken_Grotesk, Archivo } from "next/font/google";
 import "./globals.css";
 import { TabBar } from "@/components/TabBar";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { InstallPrompt } from "@/components/InstallPrompt";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <TabBar />
+        <InstallPrompt />
         <ServiceWorkerRegister />
       </body>
     </html>
