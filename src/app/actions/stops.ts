@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
-import { fetchTempRange } from "@/lib/temp-range";
 import { shiftOrders } from "@/lib/stop-order";
-import { parseForm, CreateStopSchema, UpdateStopSchema } from "./_schemas";
+import { recalculateItinerary } from "@/lib/itinerary";
+import { parseForm, CreateStopSchema, UpdateStopSchema, TripStartSchema } from "./_schemas";
 
 function slugify(name: string): string {
   return name
@@ -34,25 +34,16 @@ export async function createStop(formData: FormData) {
 
   const parsed = parseForm(formData, CreateStopSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { name, country, countryCode, latitude, longitude, timezone, nights, arrivalDate, insertAfterOrder } = parsed.data;
+  const { name, country, countryCode, latitude, longitude, timezone, nights, insertAfterOrder } =
+    parsed.data;
 
   const currencyCode = currencyForCountry(countryCode);
   const countryFlag = flagFromCountryCode(countryCode);
   const slug = await uniqueSlug(slugify(name));
-
-  let departureDate: Date | null = null;
-  if (arrivalDate && nights > 0) {
-    departureDate = new Date(arrivalDate);
-    departureDate.setDate(departureDate.getDate() + nights);
-  }
-
-  const tempRange = await fetchTempRange(latitude, longitude, arrivalDate ?? null, departureDate);
   const newOrder = insertAfterOrder + 1;
 
   await db.$transaction(async (tx) => {
-    // Shift stops at newOrder and above to make room
     await shiftOrders(tx, { gte: newOrder }, +1, "desc");
-
     await tx.stop.create({
       data: {
         order: newOrder,
@@ -65,9 +56,8 @@ export async function createStop(formData: FormData) {
         longitude,
         timezone,
         nights,
-        arrivalDate: arrivalDate ?? null,
-        departureDate,
-        tempRange,
+        arrivalDate: null,
+        departureDate: null,
         datesFixed: false,
         isCandidate: false,
         isFlexMargin: false,
@@ -78,6 +68,8 @@ export async function createStop(formData: FormData) {
     });
   });
 
+  await recalculateItinerary();
+
   revalidatePath("/stops");
   redirect(`/stops/${slug}`);
 }
@@ -87,28 +79,26 @@ export async function updateStop(id: string, formData: FormData) {
 
   const parsed = parseForm(formData, UpdateStopSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { name, nights, arrivalDate, datesFixed, isCandidate, isTransit, arrivalMode } = parsed.data;
+  const { name, nights, arrivalDate, datesFixed, isCandidate, isTransit, arrivalMode } =
+    parsed.data;
 
   const current = await db.stop.findUnique({
     where: { id },
-    select: { slug: true, latitude: true, longitude: true, tempRange: true },
+    select: { slug: true },
   });
   if (!current) return { error: "Parada no encontrada" };
 
-  let departureDate: Date | null = null;
-  if (arrivalDate && nights > 0) {
-    departureDate = new Date(arrivalDate);
-    departureDate.setDate(departureDate.getDate() + nights);
-  }
-
-  const tempRange =
-    (await fetchTempRange(current.latitude, current.longitude, arrivalDate ?? null, departureDate)) ??
-    current.tempRange;
+  // For pinned stops, persist the user-supplied arrivalDate as the chain anchor.
+  // For normal stops, leave arrivalDate untouched — recalculateItinerary will overwrite it.
+  // Clearing it here would remove the bootstrap fallback before recalc can read existing dates.
+  const extraFields = datesFixed ? { arrivalDate: arrivalDate ?? null, departureDate: null } : {};
 
   await db.stop.update({
     where: { id },
-    data: { name, arrivalDate: arrivalDate ?? null, departureDate, nights, datesFixed, isCandidate, isTransit, tempRange, arrivalMode },
+    data: { name, nights, datesFixed, isCandidate, isTransit, arrivalMode, ...extraFields },
   });
+
+  await recalculateItinerary();
 
   revalidatePath(`/stops/${current.slug}`);
   revalidatePath("/stops");
@@ -124,15 +114,15 @@ export async function moveStop(id: string, afterOrder: number) {
     if (afterOrder === currentOrder - 1 || afterOrder === currentOrder) return;
 
     if (afterOrder > currentOrder) {
-      // Moving down — shift intermediate stops up by one
       await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1, "asc");
       await tx.stop.update({ where: { id }, data: { order: afterOrder } });
     } else {
-      // Moving up — shift intermediate stops down by one
       await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1, "desc");
       await tx.stop.update({ where: { id }, data: { order: afterOrder + 1 } });
     }
   });
+
+  await recalculateItinerary();
 
   revalidatePath("/stops");
 }
@@ -144,10 +134,29 @@ export async function deleteStop(id: string) {
 
   await db.$transaction(async (tx) => {
     await tx.stop.delete({ where: { id } });
-    // Close the gap: shift all stops above down by one
     await shiftOrders(tx, { gt: stop.order }, -1, "asc");
   });
 
+  await recalculateItinerary();
+
   revalidatePath("/stops");
   redirect("/stops");
+}
+
+export async function setTripStart(formData: FormData): Promise<void> {
+  await requireAuth();
+
+  const parsed = parseForm(formData, TripStartSchema);
+  if (!parsed.ok) return;
+  const { tripStartDate } = parsed.data;
+
+  await db.setting.upsert({
+    where: { key: "tripStartDate" },
+    create: { key: "tripStartDate", value: tripStartDate },
+    update: { value: tripStartDate },
+  });
+
+  await recalculateItinerary();
+
+  revalidatePath("/stops");
 }

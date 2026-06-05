@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Pin } from "lucide-react";
 import { updateStop, deleteStop, moveStop } from "@/app/actions/stops";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
@@ -20,6 +20,7 @@ interface Props {
   slug: string;
   name: string;
   arrivalDate: Date | null;
+  departureDate: Date | null;
   nights: number;
   datesFixed: boolean;
   isCandidate: boolean;
@@ -32,6 +33,11 @@ interface Props {
 function toDateInput(d: Date | null): string {
   if (!d) return "";
   return new Date(d).toISOString().slice(0, 10);
+}
+
+function formatDateDisplay(d: Date | null): string {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 export function EditStopPanel(props: Props) {
@@ -50,23 +56,24 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, nights, datesFixed, isCandidate, isTransit, arrivalMode,
+  stopId, name, arrivalDate, departureDate, nights, datesFixed, isCandidate, isTransit, arrivalMode,
   currentOrder, allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [fixedChecked, setFixedChecked] = useState(datesFixed);
+  const [pinnedChecked, setPinnedChecked] = useState(datesFixed);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
   const [transitChecked, setTransitChecked] = useState(isTransit);
   const [modeValue, setModeValue] = useState<"flight" | "ground">(arrivalMode);
-  // Default: currently after the stop with order = currentOrder - 1
   const [selectedAfterOrder, setSelectedAfterOrder] = useState(currentOrder - 1);
 
   function handleSave(formData: FormData) {
-    formData.set("datesFixed", fixedChecked ? "true" : "false");
+    formData.set("datesFixed", pinnedChecked ? "true" : "false");
     formData.set("isCandidate", candidateChecked ? "true" : "false");
     formData.set("isTransit", transitChecked ? "true" : "false");
     formData.set("arrivalMode", modeValue);
+    // When not pinned, ensure arrivalDate is not sent so the action clears it
+    if (!pinnedChecked) formData.delete("arrivalDate");
     startTransition(async () => {
       await updateStop(stopId, formData);
       if (selectedAfterOrder !== currentOrder - 1) {
@@ -90,24 +97,51 @@ function EditModal({
     <Modal title="Editar ciudad" onClose={onClose}>
       <form action={handleSave} className="space-y-3">
         <Field label="Nombre" name="name" defaultValue={name} required />
-        <div className="flex gap-2 items-start">
-          <div className="flex-1 min-w-0">
+
+        <Field
+          label="Noches"
+          name="nights"
+          type="number"
+          defaultValue={nights}
+          min={0}
+        />
+
+        {/* Arrival date — read-only display when not pinned; editable input when pinned */}
+        <div className="rounded-[4px] border border-border bg-surface-2 px-3 py-2.5 space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 leading-none mb-1">
+                Llegada
+              </p>
+              {!pinnedChecked && (
+                <p className="text-sm text-ink">
+                  {formatDateDisplay(arrivalDate)}
+                  {departureDate && (
+                    <span className="text-ink-3"> → {formatDateDisplay(departureDate)}</span>
+                  )}
+                  <span className="ml-1.5 text-xs text-ink-3">· calculada</span>
+                </p>
+              )}
+            </div>
+            <label className="flex items-center gap-1.5 text-xs text-ink-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={pinnedChecked}
+                onChange={(e) => setPinnedChecked(e.target.checked)}
+                className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+              />
+              <Pin size={11} strokeWidth={2} aria-hidden="true" />
+              Fijar fecha
+            </label>
+          </div>
+          {pinnedChecked && (
             <Field
-              label="Llegada"
+              label=""
               name="arrivalDate"
               type="date"
               defaultValue={toDateInput(arrivalDate)}
             />
-          </div>
-          <div className="w-20 shrink-0">
-            <Field
-              label="Noches"
-              name="nights"
-              type="number"
-              defaultValue={nights}
-              min={0}
-            />
-          </div>
+          )}
         </div>
 
         <SelectField
@@ -135,15 +169,6 @@ function EditModal({
         </SelectField>
 
         <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={fixedChecked}
-              onChange={(e) => setFixedChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-            />
-            Fechas confirmadas
-          </label>
           <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
             <input
               type="checkbox"
