@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug, getTripDayNumber } from "@/lib/current-stop";
+import { todayStr, dateToStr } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
@@ -52,7 +53,7 @@ export default async function StopPage({ params }: Props) {
     db.stop.findMany({
       where: { isFlexMargin: false },
       orderBy: { order: "asc" },
-      select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true },
+      select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true, arrivalDate: true, departureDate: true },
     }),
     getTripDayNumber(slug),
   ]);
@@ -68,16 +69,44 @@ export default async function StopPage({ params }: Props) {
 
   const isActive = slug === currentSlug;
 
-  const today = new Date();
-  const daysLeft = stop.departureDate
-    ? Math.max(
-        0,
-        Math.ceil(
-          (new Date(stop.departureDate).getTime() - today.getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
-      )
+  // UTC-safe trip phase + countdown calculations.
+  // All dates from Prisma @db.Date are UTC midnight strings — compare as YYYY-MM-DD.
+  const today = todayStr();
+  const allConfirmedForPhase = [
+    { isCandidate: stop.isCandidate, arrivalDate: stop.arrivalDate, departureDate: stop.departureDate },
+    ...allOtherStops,
+  ].filter((s) => !s.isCandidate);
+
+  const firstArrivalStr =
+    allConfirmedForPhase
+      .filter((s) => s.arrivalDate)
+      .map((s) => dateToStr(s.arrivalDate!))
+      .sort()[0] ?? null;
+  const lastDepartureStr =
+    allConfirmedForPhase
+      .filter((s) => s.departureDate)
+      .map((s) => dateToStr(s.departureDate!))
+      .sort()
+      .at(-1) ?? null;
+
+  const tripPhase: "before" | "during" | "after" =
+    firstArrivalStr && today < firstArrivalStr
+      ? "before"
+      : lastDepartureStr && today >= lastDepartureStr
+      ? "after"
+      : "during";
+
+  // Days remaining at this stop (UTC-safe — both sides are UTC midnight)
+  const depStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
+  const daysLeft = depStr
+    ? Math.max(0, Math.ceil((new Date(depStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
     : null;
+
+  // Days until trip starts (only relevant when before the trip)
+  const daysToStart =
+    tripPhase === "before" && firstArrivalStr
+      ? Math.max(0, Math.ceil((new Date(firstArrivalStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
+      : null;
 
   const path = `/stops/${slug}`;
 
@@ -143,7 +172,8 @@ export default async function StopPage({ params }: Props) {
             </div>
 
             <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
-              {isActive && <Badge variant="active">Aquí ahora</Badge>}
+              {isActive && tripPhase === "during" && <Badge variant="active">Aquí ahora</Badge>}
+              {isActive && tripPhase === "before" && <Badge variant="special">Próxima parada</Badge>}
               {stop.datesFixed && <Badge variant="warning">fecha fija</Badge>}
               {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
               {stop.isCandidate && <Badge variant="special">candidata</Badge>}
@@ -167,9 +197,14 @@ export default async function StopPage({ params }: Props) {
           {stop.arrivalDate && tripDay !== null && (
             <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap gap-3 text-xs text-ink-3">
               <span>Día {tripDay} del viaje</span>
-              {isActive && daysLeft !== null && (
+              {isActive && tripPhase === "during" && daysLeft !== null && (
                 <span className="text-brick">
                   {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
+                </span>
+              )}
+              {isActive && tripPhase === "before" && daysToStart !== null && (
+                <span className="text-brick">
+                  Faltan {daysToStart} {daysToStart === 1 ? "día" : "días"} para el inicio
                 </span>
               )}
             </div>

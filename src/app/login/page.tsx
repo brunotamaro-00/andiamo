@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
       {/* Logo */}
       <div className="text-center animate-slide-up">
         <Wordmark size="lg" />
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-3 mt-2">
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-2">
           Tu guía de viaje personal
         </p>
       </div>
@@ -32,7 +32,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <div>
           <label
             htmlFor="password"
-            className="block text-[11px] font-semibold uppercase tracking-widest text-ink-3 mb-1.5"
+            className="block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5"
           >
             Contraseña
           </label>

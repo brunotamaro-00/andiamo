@@ -10,6 +10,9 @@ export async function GET(req: NextRequest) {
   if (!lat || !lng) {
     return Response.json({ error: "Missing lat/lng" }, { status: 400 });
   }
+  if (!Number.isFinite(parseFloat(lat)) || !Number.isFinite(parseFloat(lng))) {
+    return Response.json({ error: "Invalid lat/lng" }, { status: 400 });
+  }
 
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", lat);

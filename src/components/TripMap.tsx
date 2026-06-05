@@ -300,16 +300,16 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                   stroke={col.dotStroke}
                   strokeWidth={city.state === "current" ? 2.2 : 1.8}
                 />
-                {/* Order number */}
+                {/* Order number — use city.order so numbers match the itinerary list */}
                 <text
                   x={city.x} y={city.y + 3}
                   textAnchor="middle"
-                  fontSize={7}
+                  fontSize={city.order >= 10 ? 5.5 : 7}
                   fontFamily="var(--font-archivo)"
                   fontWeight={900}
                   fill={col.numFill}
                 >
-                  {i + 1}
+                  {city.order}
                 </text>
                 {/* Invisible tap/click area */}
                 <foreignObject

@@ -133,6 +133,8 @@ export async function deleteStop(id: string) {
   if (!stop) return;
 
   await db.$transaction(async (tx) => {
+    // Clear any manual current-stop override that pointed at the deleted stop
+    await tx.setting.deleteMany({ where: { key: "manualCurrentStopId", value: id } });
     await tx.stop.delete({ where: { id } });
     await shiftOrders(tx, { gt: stop.order }, -1, "asc");
   });
@@ -143,11 +145,11 @@ export async function deleteStop(id: string) {
   redirect("/stops");
 }
 
-export async function setTripStart(formData: FormData): Promise<void> {
+export async function setTripStart(formData: FormData): Promise<{ error?: string }> {
   await requireAuth();
 
   const parsed = parseForm(formData, TripStartSchema);
-  if (!parsed.ok) return;
+  if (!parsed.ok) return { error: parsed.error };
   const { tripStartDate } = parsed.data;
 
   await db.setting.upsert({
@@ -159,4 +161,5 @@ export async function setTripStart(formData: FormData): Promise<void> {
   await recalculateItinerary();
 
   revalidatePath("/stops");
+  return {};
 }

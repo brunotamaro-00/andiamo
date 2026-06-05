@@ -110,7 +110,7 @@ function AddStopModal({
     <Modal title="Agregar ciudad" onClose={onClose}>
       {/* City search */}
       <div>
-        <label className="block text-left text-[11px] font-display uppercase tracking-wide text-ink-3 mb-1.5 leading-none">Buscar ciudad</label>
+        <label className="block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none">Buscar ciudad</label>
         <input
           type="text"
           value={query}

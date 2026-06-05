@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download, Plane, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -46,11 +46,11 @@ export function InstallPrompt() {
 
   return (
     <div
-      role="banner"
+      role="region"
       aria-label="Instalar Andiamo como app"
       className="fixed bottom-20 inset-x-4 z-50 flex items-center gap-3 bg-surface border-2 border-border card-shadow-lg rounded-[4px] px-4 py-3 animate-slide-up"
     >
-      <span className="text-2xl shrink-0" aria-hidden="true">✈️</span>
+      <Plane size={22} strokeWidth={1.5} className="shrink-0 text-brick" aria-hidden="true" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-ink leading-tight">Instalá Andiamo</p>
         <p className="text-xs text-ink-2 mt-0.5">Accedé offline, sin browser.</p>

@@ -9,15 +9,17 @@ export async function fetchTempRange(
   try {
     const a = new Date(arrival);
     const d = new Date(departure);
-    // Use the same calendar dates but in 2025 (last full year of historical data)
-    const yearOffset = 2025 - a.getFullYear();
+    // Use the same calendar dates shifted to the last completed year of historical data.
+    // UTC mutators prevent local-timezone drift on servers with a negative UTC offset.
+    const lastFullYear = new Date().getUTCFullYear() - 1;
+    const yearOffset = lastFullYear - a.getUTCFullYear();
     const startDate = new Date(a);
     const endDate = new Date(d);
-    startDate.setFullYear(a.getFullYear() + yearOffset);
-    endDate.setFullYear(d.getFullYear() + yearOffset);
+    startDate.setUTCFullYear(a.getUTCFullYear() + yearOffset);
+    endDate.setUTCFullYear(d.getUTCFullYear() + yearOffset);
 
     // endDate is exclusive (departure), archive needs inclusive end
-    endDate.setDate(endDate.getDate() - 1);
+    endDate.setUTCDate(endDate.getUTCDate() - 1);
     if (endDate <= startDate) return null;
 
     const fmt = (dt: Date) => dt.toISOString().slice(0, 10);

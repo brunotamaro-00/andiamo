@@ -21,11 +21,18 @@ function formatDisplay(dateStr: string): string {
 export function TripStartEditor({ value }: Props) {
   const [editing, setEditing] = useState(!value);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   function handleSubmit(formData: FormData) {
+    setError(null);
     startTransition(async () => {
-      await setTripStart(formData);
-      setEditing(false);
+      try {
+        const result = await setTripStart(formData);
+        if (result?.error) { setError(result.error); return; }
+        setEditing(false);
+      } catch {
+        setError("No se pudo guardar. Intentá de nuevo.");
+      }
     });
   }
 
@@ -70,6 +77,9 @@ export function TripStartEditor({ value }: Props) {
       >
         <Check size={14} strokeWidth={2} aria-hidden="true" />
       </button>
+      {error && (
+        <p className="text-[11px] text-danger font-medium" role="alert">{error}</p>
+      )}
     </form>
   );
 }

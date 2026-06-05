@@ -109,8 +109,8 @@ export default async function MapPage() {
           </div>
           <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             {visitedCount > 0
-              ? `${visitedCount} / ${cityNodes.length} paradas`
-              : `${cityNodes.length} paradas`}
+              ? `${visitedCount} / ${confirmed.length} paradas`
+              : `${confirmed.length} paradas`}
           </span>
         </div>
       </header>

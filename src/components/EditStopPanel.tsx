@@ -61,6 +61,7 @@ function EditModal({
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [mutationError, setMutationError] = useState<string | null>(null);
   const [pinnedChecked, setPinnedChecked] = useState(datesFixed);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
   const [transitChecked, setTransitChecked] = useState(isTransit);
@@ -74,12 +75,18 @@ function EditModal({
     formData.set("arrivalMode", modeValue);
     // When not pinned, ensure arrivalDate is not sent so the action clears it
     if (!pinnedChecked) formData.delete("arrivalDate");
+    setMutationError(null);
     startTransition(async () => {
-      await updateStop(stopId, formData);
-      if (selectedAfterOrder !== currentOrder - 1) {
-        await moveStop(stopId, selectedAfterOrder);
+      try {
+        const result = await updateStop(stopId, formData);
+        if (result?.error) { setMutationError(result.error); return; }
+        if (selectedAfterOrder !== currentOrder - 1) {
+          await moveStop(stopId, selectedAfterOrder);
+        }
+        onClose();
+      } catch {
+        setMutationError("Ocurrió un error al guardar. Intentá de nuevo.");
       }
-      onClose();
     });
   }
 
@@ -88,8 +95,13 @@ function EditModal({
       setConfirmDelete(true);
       return;
     }
-    startTransition(() => {
-      deleteStop(stopId);
+    setMutationError(null);
+    startTransition(async () => {
+      try {
+        await deleteStop(stopId);
+      } catch {
+        setMutationError("No se pudo borrar la ciudad. Intentá de nuevo.");
+      }
     });
   }
 
@@ -164,8 +176,8 @@ function EditModal({
           value={modeValue}
           onChange={(e) => setModeValue(e.target.value as "flight" | "ground")}
         >
-          <option value="ground">🚗 Auto / Tren</option>
-          <option value="flight">✈ Avión</option>
+          <option value="ground">Auto / Tren</option>
+          <option value="flight">Avión</option>
         </SelectField>
 
         <div className="flex flex-col gap-2">
@@ -207,6 +219,9 @@ function EditModal({
             {isPending ? "Guardando..." : "Guardar"}
           </Button>
         </div>
+        {mutationError && (
+          <p className="text-xs text-danger font-medium" role="alert">{mutationError}</p>
+        )}
       </form>
 
       {/* Danger zone */}

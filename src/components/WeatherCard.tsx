@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card, SectionHeader } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface WeatherData {
   current: { temperature_2m: number; weather_code: number };
@@ -63,16 +64,21 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    let active = true;
     fetch(`/api/weather?lat=${lat}&lng=${lng}`)
       .then((r) => {
         if (!r.ok) throw new Error("weather error");
         return r.json();
       })
       .then((json) => {
+        if (!active) return;
         if (!json?.daily) throw new Error("no daily data");
         setData(json);
       })
-      .catch(() => setError(true));
+      .catch(() => {
+        if (active) setError(true);
+      });
+    return () => { active = false; };
   }, [lat, lng]);
 
   if (error) {
@@ -88,7 +94,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
     return (
       <Card>
         <SectionHeader title="Clima" />
-        <div className="animate-pulse h-16 bg-surface-2 rounded-xl" />
+        <Skeleton className="h-16" />
       </Card>
     );
   }

@@ -74,7 +74,7 @@ export const CreatePoiSchema = z.object({
   stopId: requiredStr,
   slug: requiredStr,
   name: requiredStr,
-  type: z.string().transform((v) => v || "otro"),
+  type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
   latitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
   longitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
   address: optionalStr,
@@ -86,7 +86,7 @@ export const CreatePoiSchema = z.object({
 export const UpdatePoiSchema = z.object({
   slug: requiredStr,
   name: requiredStr,
-  type: z.string().transform((v) => v || "otro"),
+  type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
   latitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
   longitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
   address: optionalStr,
@@ -112,7 +112,7 @@ export const CreateDocumentLinkSchema = z.object({
   slug: z.string().nullable().optional(),
   stopId: z.string().transform((v) => v || null).nullable().optional(),
   label: requiredStr,
-  kind: z.string().transform((v) => v || "other"),
+  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "insurance", "flight", "other"]).catch("other"),
   url: z
     .string()
     .min(1, "URL requerida")

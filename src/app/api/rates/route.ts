@@ -26,11 +26,15 @@ export async function GET() {
     // Fallback to cached rates from DB
     const cached = await db.setting.findUnique({ where: { key: "cachedRates" } });
     if (cached) {
-      return Response.json({
-        rates: JSON.parse(cached.value),
-        source: "cached",
-        base: "USD",
-      });
+      try {
+        return Response.json({
+          rates: JSON.parse(cached.value),
+          source: "cached",
+          base: "USD",
+        });
+      } catch {
+        // Corrupt cached value — fall through to 503
+      }
     }
     return Response.json({ error: "Rates unavailable" }, { status: 503 });
   }
