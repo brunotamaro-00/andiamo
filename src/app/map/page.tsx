@@ -9,6 +9,7 @@ import {
   makeProjection,
   MAP_WIDTH,
   MAP_HEIGHT,
+  type StopState,
 } from "@/lib/map-projection";
 import type { FeatureCollection, Geometry } from "geojson";
 import europeGeo from "@/data/europe.geo.json";
@@ -29,6 +30,8 @@ export default async function MapPage() {
       countryFlag: true,
       latitude: true,
       longitude: true,
+      arrivalDate: true,
+      departureDate: true,
       arrivalMode: true,
       isCandidate: true,
       isFlexMargin: true,
@@ -42,8 +45,25 @@ export default async function MapPage() {
   const projection = makeProjection(confirmed);
   const countryPaths = buildCountryPaths(geojson, confirmed);
 
+  // Determine visit state for each stop based on today's date.
+  // We compare YYYY-MM-DD strings (ISO prefix) to avoid timezone issues:
+  // Prisma DateTime values are always UTC midnight; toISOString().slice(0,10) gives the date part.
+  const todayStr = new Date().toISOString().slice(0, 10);
+
   const cities = confirmed.map((s) => {
     const [x, y] = projection([s.longitude, s.latitude]) ?? [0, 0];
+    let state: StopState = "upcoming";
+    if (s.arrivalDate) {
+      const arrStr = s.arrivalDate.toISOString().slice(0, 10);
+      if (arrStr <= todayStr) {
+        if (s.departureDate) {
+          const depStr = s.departureDate.toISOString().slice(0, 10);
+          state = todayStr < depStr ? "current" : "visited";
+        } else {
+          state = "current";
+        }
+      }
+    }
     return {
       x: Math.round(x * 10) / 10,
       y: Math.round(y * 10) / 10,
@@ -52,10 +72,27 @@ export default async function MapPage() {
       countryFlag: s.countryFlag,
       order: s.order,
       arrivalMode: s.arrivalMode as "flight" | "ground",
+      state,
     };
   });
 
   const segments = buildSegments(cities);
+
+  // Deduplicate city nodes for rendering: cities that share the same pixel
+  // (e.g., Edimburgo #3 and Edimburgo tránsito #7) show as one point.
+  // Segments still use the full cities list so the route loop draws correctly.
+  const seenCoords = new Set<string>();
+  const cityNodes = cities.filter((city) => {
+    const key = `${Math.round(city.x)},${Math.round(city.y)}`;
+    if (seenCoords.has(key)) return false;
+    seenCoords.add(key);
+    return true;
+  });
+
+  // Count how many stops have been visited for the header
+  const visitedCount = cities.filter(
+    (c) => c.state === "visited" || c.state === "current"
+  ).length;
 
   return (
     <div className="h-full bg-canvas flex flex-col overflow-hidden">
@@ -69,7 +106,9 @@ export default async function MapPage() {
             </span>
           </div>
           <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-            {confirmed.length} paradas
+            {visitedCount > 0
+              ? `${visitedCount} / ${cityNodes.length} paradas`
+              : `${cityNodes.length} paradas`}
           </span>
         </div>
       </header>
@@ -78,7 +117,7 @@ export default async function MapPage() {
       <div className="flex-1 min-h-0">
         <TripMap
           countryPaths={countryPaths}
-          cities={cities}
+          cities={cityNodes}
           segments={segments}
           viewBoxWidth={MAP_WIDTH}
           viewBoxHeight={MAP_HEIGHT}
