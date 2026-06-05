@@ -152,7 +152,8 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
   const placedBoxes: { cx: number; cy: number; hw: number; hh: number }[] = [];
   const segMids    = segments.map((s) => ({ x: s.mx, y: s.my }));
 
-  const cityLabelMap = new Map<string, { show: boolean; displayName: string; lx: number; ly: number }>();
+  // angle: direction from dot center to label, used to render in the outer (unscaled) layer
+  const cityLabelMap = new Map<string, { show: boolean; displayName: string; angle: number }>();
 
   for (const city of cities) {
     const baseKey     = city.name.toLowerCase().replace(/\s*\(.*\)\s*$/, "").trim();
@@ -160,7 +161,7 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
     const show        = !seenNames.has(baseKey);
     if (show) seenNames.add(baseKey);
 
-    if (!show) { cityLabelMap.set(city.slug, { show: false, displayName, lx: 0, ly: 0 }); continue; }
+    if (!show) { cityLabelMap.set(city.slug, { show: false, displayName, angle: 0 }); continue; }
 
     const hw     = (displayName.length * CHAR_W) / 2;
     const nearby = cities.filter((c) => c.slug !== city.slug && Math.hypot(c.x - city.x, c.y - city.y) < 80);
@@ -196,10 +197,12 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
       }
     }
 
+    // Store SVG-space position in placedBoxes for future collision checks
     const lx = city.x + Math.sin(bestAngle) * LDIST;
     const ly = city.y + Math.cos(bestAngle) * LDIST;
     placedBoxes.push({ cx: lx, cy: ly, hw, hh: LABEL_HH });
-    cityLabelMap.set(city.slug, { show: true, displayName, lx, ly });
+    // Only store the angle — final screen position is computed dynamically in the outer label layer
+    cityLabelMap.set(city.slug, { show: true, displayName, angle: bestAngle });
   }
 
   return (
@@ -270,10 +273,9 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
 
           {/* ── Layer 3: City nodes ─────────────────────────────────────── */}
           {cities.map((city, i) => {
-            const R   = 7;
-            const col = STATE_COLORS[city.state];
-            const stagger   = `stagger-${Math.min((i % 6) + 1, 6)}`;
-            const placement = cityLabelMap.get(city.slug);
+            const R       = 7;
+            const col     = STATE_COLORS[city.state];
+            const stagger = `stagger-${Math.min((i % 6) + 1, 6)}`;
 
             return (
               <g key={city.slug} className={animated ? `animate-fade-in ${stagger}` : ""}>
@@ -308,26 +310,6 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                 >
                   {i + 1}
                 </text>
-                {/* City label */}
-                {placement?.show && (
-                  <text
-                    x={placement.lx}
-                    y={placement.ly}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={7}
-                    fontFamily="var(--font-anton)"
-                    fontWeight={400}
-                    fill={col.labelFill}
-                    letterSpacing={0.2}
-                    style={{ textTransform: "uppercase" }}
-                    paintOrder="stroke"
-                    stroke="#F3ECD8"
-                    strokeWidth={2.5}
-                  >
-                    {placement.displayName}
-                  </text>
-                )}
                 {/* Invisible tap/click area */}
                 <foreignObject
                   x={city.x - R - 2} y={city.y - R - 2}
@@ -342,6 +324,45 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                   />
                 </foreignObject>
               </g>
+            );
+          })}
+        </g>
+
+        {/* ── Layer 4: City labels — rendered outside the scale group ──────
+            Labels live in SVG viewBox space (not the pan/zoom group), so they
+            always render at a consistent font size regardless of zoom level.
+            Position is recomputed from transform state so labels follow their dots. */}
+        <g aria-hidden="true" style={{ pointerEvents: "none" }}>
+          {cities.map((city) => {
+            const label = cityLabelMap.get(city.slug);
+            if (!label?.show) return null;
+            const col = STATE_COLORS[city.state];
+            // Project dot center to SVG viewBox coordinates
+            const dotVbX = city.x * transform.scale + transform.x;
+            const dotVbY = city.y * transform.scale + transform.y;
+            // Fixed 18 viewBox-px offset in the precomputed direction
+            const OUTER_DIST = 18;
+            const lx = dotVbX + Math.sin(label.angle) * OUTER_DIST;
+            const ly = dotVbY + Math.cos(label.angle) * OUTER_DIST;
+            return (
+              <text
+                key={city.slug}
+                x={lx}
+                y={ly}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize={8}
+                fontFamily="var(--font-anton)"
+                fontWeight={400}
+                fill={col.labelFill}
+                letterSpacing={0.3}
+                style={{ textTransform: "uppercase", userSelect: "none" }}
+                paintOrder="stroke"
+                stroke="#F3ECD8"
+                strokeWidth={3}
+              >
+                {label.displayName}
+              </text>
             );
           })}
         </g>
