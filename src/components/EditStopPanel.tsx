@@ -24,6 +24,7 @@ interface Props {
   datesFixed: boolean;
   isCandidate: boolean;
   isTransit: boolean;
+  arrivalMode: "flight" | "ground";
   currentOrder: number;
   allStops: StopOption[];
 }
@@ -49,7 +50,7 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, nights, datesFixed, isCandidate, isTransit,
+  stopId, name, arrivalDate, nights, datesFixed, isCandidate, isTransit, arrivalMode,
   currentOrder, allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
@@ -57,6 +58,7 @@ function EditModal({
   const [fixedChecked, setFixedChecked] = useState(datesFixed);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
   const [transitChecked, setTransitChecked] = useState(isTransit);
+  const [modeValue, setModeValue] = useState<"flight" | "ground">(arrivalMode);
   // Default: currently after the stop with order = currentOrder - 1
   const [selectedAfterOrder, setSelectedAfterOrder] = useState(currentOrder - 1);
 
@@ -64,6 +66,7 @@ function EditModal({
     formData.set("datesFixed", fixedChecked ? "true" : "false");
     formData.set("isCandidate", candidateChecked ? "true" : "false");
     formData.set("isTransit", transitChecked ? "true" : "false");
+    formData.set("arrivalMode", modeValue);
     startTransition(async () => {
       await updateStop(stopId, formData);
       if (selectedAfterOrder !== currentOrder - 1) {
@@ -115,6 +118,16 @@ function EditModal({
               Después de {s.countryFlag} {s.name}
             </option>
           ))}
+        </SelectField>
+
+        <SelectField
+          label="Cómo llegás"
+          name="arrivalMode"
+          value={modeValue}
+          onChange={(e) => setModeValue(e.target.value as "flight" | "ground")}
+        >
+          <option value="ground">🚗 Auto / Tren</option>
+          <option value="flight">✈ Avión</option>
         </SelectField>
 
         <div className="flex flex-col gap-2">

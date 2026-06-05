@@ -154,6 +154,7 @@ export default async function StopPage({ params }: Props) {
                 datesFixed={stop.datesFixed}
                 isCandidate={stop.isCandidate}
                 isTransit={stop.isTransit}
+                arrivalMode={stop.arrivalMode as "flight" | "ground"}
                 currentOrder={stop.order}
                 allStops={allStops}
               />

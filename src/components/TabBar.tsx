@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, MapPin, FileText, Search } from "lucide-react";
+import { List, MapPin, Map, FileText, Search } from "lucide-react";
 
 const TABS = [
   {
     href: "/stops",
     label: "Itinerario",
-    icon: Map,
+    icon: List,
     match: (p: string) => p === "/stops",
   },
   {
@@ -16,6 +16,12 @@ const TABS = [
     label: "Hoy",
     icon: MapPin,
     match: (p: string) => p.startsWith("/stops/"),
+  },
+  {
+    href: "/map",
+    label: "Mapa",
+    icon: Map,
+    match: (p: string) => p.startsWith("/map"),
   },
   {
     href: "/search",
