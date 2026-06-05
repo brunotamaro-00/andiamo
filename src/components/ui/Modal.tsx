@@ -82,8 +82,8 @@ export function Modal({ title, onClose, children }: ModalProps) {
           </h3>
           <IconButton label="Cerrar" icon={X} onClick={onClose} />
         </div>
-        {/* Scrollable body — pr-6 gives 4px clearance for hard-shadow-ink (3px right) */}
-        <div className="pl-5 pr-6 py-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
+        {/* Scrollable body */}
+        <div className="px-5 py-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
           {children}
         </div>
       </div>
