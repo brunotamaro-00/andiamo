@@ -4,7 +4,7 @@ import { useState, useTransition, useOptimistic, useRef, useEffect } from "react
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
-  ArrowUpRight, Trash2, Plus, Upload, Check, X, AlertCircle, Loader2, WifiOff, Download,
+  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
@@ -13,12 +13,8 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, SelectField } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
-
-/** Shared 40px touch target for secondary row actions. */
-const actionBtn =
-  "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
-  "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick";
+import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 /* Keep in sync with the server route validation. */
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -129,8 +125,10 @@ function OfflineDocButton({ docId }: { docId: string }) {
 }
 
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
+  const router = useRouter();
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const [optimisticDocs, applyOptimistic] = useOptimistic(
@@ -140,9 +138,15 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
 
   function handleDelete(id: string) {
     setConfirmingId(null);
+    setMutationError(null);
     startTransition(async () => {
       applyOptimistic(id);
-      await deleteDocument(id, path);
+      try {
+        await deleteDocument(id, path);
+      } catch {
+        setMutationError("No se pudo borrar el documento. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
@@ -150,8 +154,14 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     if (stopId) formData.set("stopId", stopId);
     if (slug) formData.set("slug", slug);
     setMode(null);
+    setMutationError(null);
     startTransition(async () => {
-      await createDocumentLink(formData);
+      try {
+        await createDocumentLink(formData);
+      } catch {
+        setMutationError("No se pudo agregar el link. Reintentá.");
+        router.refresh();
+      }
     });
   }
 
@@ -173,6 +183,13 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           </>
         }
       />
+
+      {mutationError && (
+        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
+          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+          {mutationError}
+        </p>
+      )}
 
       {optimisticDocs.length === 0 ? (
         <EmptyState
@@ -221,23 +238,11 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                 </div>
 
                 {confirmingId === doc.id ? (
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className="text-xs text-danger mr-1">¿Borrar?</span>
-                    <button
-                      onClick={() => handleDelete(doc.id)}
-                      aria-label={`Confirmar borrado de "${doc.label}"`}
-                      className={`${actionBtn} text-danger hover:bg-danger-bg`}
-                    >
-                      <Check size={16} strokeWidth={2} aria-hidden="true" />
-                    </button>
-                    <button
-                      onClick={() => setConfirmingId(null)}
-                      aria-label="Cancelar borrado"
-                      className={`${actionBtn} text-ink-2 hover:bg-surface-2`}
-                    >
-                      <X size={16} strokeWidth={2} aria-hidden="true" />
-                    </button>
-                  </div>
+                  <InlineDeleteConfirm
+                    label={doc.label}
+                    onConfirm={() => handleDelete(doc.id)}
+                    onCancel={() => setConfirmingId(null)}
+                  />
                 ) : (
                   <div className="flex items-center shrink-0">
                     {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
