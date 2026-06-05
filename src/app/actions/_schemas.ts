@@ -50,7 +50,6 @@ export const CreateStopSchema = z.object({
   longitude: numericStr(0),
   timezone: z.string().transform((v) => v.trim() || "auto"),
   nights: intStr(0),
-  arrivalDate: optionalDate,
   insertAfterOrder: intStr(0),
 });
 
@@ -65,6 +64,10 @@ export const UpdateStopSchema = z.object({
     .string()
     .transform((v) => (v === "flight" ? "flight" : "ground"))
     .pipe(z.enum(["flight", "ground"])),
+});
+
+export const TripStartSchema = z.object({
+  tripStartDate: z.string().min(1, "required"),
 });
 
 export const CreatePoiSchema = z.object({

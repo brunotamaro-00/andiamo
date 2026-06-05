@@ -144,9 +144,7 @@ export default async function StopPage({ params }: Props) {
 
             <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
               {isActive && <Badge variant="active">Aquí ahora</Badge>}
-              {!stop.datesFixed && (
-                <Badge variant="warning">fechas tentativas</Badge>
-              )}
+              {stop.datesFixed && <Badge variant="warning">fecha fija</Badge>}
               {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
               {stop.isCandidate && <Badge variant="special">candidata</Badge>}
               <EditStopPanel
@@ -154,6 +152,7 @@ export default async function StopPage({ params }: Props) {
                 slug={stop.slug}
                 name={stop.name}
                 arrivalDate={stop.arrivalDate}
+                departureDate={stop.departureDate}
                 nights={stop.nights}
                 datesFixed={stop.datesFixed}
                 isCandidate={stop.isCandidate}
