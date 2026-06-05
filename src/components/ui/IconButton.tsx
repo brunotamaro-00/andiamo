@@ -21,7 +21,7 @@ export function IconButton({
       aria-label={label}
       {...props}
       className={[
-        "inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150",
+        "inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors duration-150",
         danger
           ? "text-ink-3 hover:text-danger hover:bg-danger-bg"
           : "text-ink-3 hover:text-ink hover:bg-surface-2",

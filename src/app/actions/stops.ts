@@ -6,12 +6,14 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
 import { fetchTempRange } from "@/lib/temp-range";
+import { shiftOrders } from "@/lib/stop-order";
+import { parseForm, CreateStopSchema, UpdateStopSchema } from "./_schemas";
 
 function slugify(name: string): string {
   return name
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/\p{Diacritic}/gu, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }
@@ -29,46 +31,27 @@ async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
 
 export async function createStop(formData: FormData) {
   await requireAuth();
-  const name = (formData.get("name") as string).trim();
-  const country = (formData.get("country") as string).trim();
-  const countryCode = (formData.get("countryCode") as string).trim().toUpperCase();
-  const latitude = parseFloat(formData.get("latitude") as string);
-  const longitude = parseFloat(formData.get("longitude") as string);
-  const timezone = (formData.get("timezone") as string) || "auto";
-  const nights = parseInt(formData.get("nights") as string) || 0;
-  const arrivalRaw = formData.get("arrivalDate") as string | null;
-  const insertAfterOrder = parseInt(formData.get("insertAfterOrder") as string) || 0;
+
+  const parsed = parseForm(formData, CreateStopSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { name, country, countryCode, latitude, longitude, timezone, nights, arrivalDate, insertAfterOrder } = parsed.data;
 
   const currencyCode = currencyForCountry(countryCode);
   const countryFlag = flagFromCountryCode(countryCode);
   const slug = await uniqueSlug(slugify(name));
 
-  const arrivalDate = arrivalRaw ? new Date(arrivalRaw) : null;
   let departureDate: Date | null = null;
   if (arrivalDate && nights > 0) {
     departureDate = new Date(arrivalDate);
     departureDate.setDate(departureDate.getDate() + nights);
   }
 
-  const tempRange = await fetchTempRange(latitude, longitude, arrivalDate, departureDate);
-
+  const tempRange = await fetchTempRange(latitude, longitude, arrivalDate ?? null, departureDate);
   const newOrder = insertAfterOrder + 1;
 
   await db.$transaction(async (tx) => {
-    // Shift existing stops up using large offset to avoid unique constraint collisions
-    const stopsToShift = await tx.stop.findMany({
-      where: { order: { gte: newOrder } },
-      select: { id: true, order: true },
-      orderBy: { order: "desc" },
-    });
-
-    const OFFSET = 10000;
-    for (const s of stopsToShift) {
-      await tx.stop.update({ where: { id: s.id }, data: { order: s.order + OFFSET } });
-    }
-    for (const s of stopsToShift) {
-      await tx.stop.update({ where: { id: s.id }, data: { order: s.order + 1 } });
-    }
+    // Shift stops at newOrder and above to make room
+    await shiftOrders(tx, { gte: newOrder }, +1, "desc");
 
     await tx.stop.create({
       data: {
@@ -82,7 +65,7 @@ export async function createStop(formData: FormData) {
         longitude,
         timezone,
         nights,
-        arrivalDate,
+        arrivalDate: arrivalDate ?? null,
         departureDate,
         tempRange,
         datesFixed: false,
@@ -101,21 +84,17 @@ export async function createStop(formData: FormData) {
 
 export async function updateStop(id: string, formData: FormData) {
   await requireAuth();
-  const name = (formData.get("name") as string).trim();
-  const nights = parseInt(formData.get("nights") as string) || 0;
-  const arrivalRaw = formData.get("arrivalDate") as string | null;
-  const datesFixed = formData.get("datesFixed") === "true";
-  const isCandidate = formData.get("isCandidate") === "true";
-  const isTransit = formData.get("isTransit") === "true";
-  const arrivalMode = (formData.get("arrivalMode") as string) === "flight" ? "flight" : "ground";
+
+  const parsed = parseForm(formData, UpdateStopSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { name, nights, arrivalDate, datesFixed, isCandidate, isTransit, arrivalMode } = parsed.data;
 
   const current = await db.stop.findUnique({
     where: { id },
     select: { slug: true, latitude: true, longitude: true, tempRange: true },
   });
-  if (!current) return;
+  if (!current) return { error: "Parada no encontrada" };
 
-  const arrivalDate = arrivalRaw ? new Date(arrivalRaw) : null;
   let departureDate: Date | null = null;
   if (arrivalDate && nights > 0) {
     departureDate = new Date(arrivalDate);
@@ -123,12 +102,12 @@ export async function updateStop(id: string, formData: FormData) {
   }
 
   const tempRange =
-    (await fetchTempRange(current.latitude, current.longitude, arrivalDate, departureDate)) ??
+    (await fetchTempRange(current.latitude, current.longitude, arrivalDate ?? null, departureDate)) ??
     current.tempRange;
 
   await db.stop.update({
     where: { id },
-    data: { name, arrivalDate, departureDate, nights, datesFixed, isCandidate, isTransit, tempRange, arrivalMode },
+    data: { name, arrivalDate: arrivalDate ?? null, departureDate, nights, datesFixed, isCandidate, isTransit, tempRange, arrivalMode },
   });
 
   revalidatePath(`/stops/${current.slug}`);
@@ -144,27 +123,13 @@ export async function moveStop(id: string, afterOrder: number) {
     const currentOrder = stop.order;
     if (afterOrder === currentOrder - 1 || afterOrder === currentOrder) return;
 
-    const OFFSET = 10000;
-
     if (afterOrder > currentOrder) {
-      // Moving down — shift intermediate stops up by one slot
-      const toShift = await tx.stop.findMany({
-        where: { order: { gt: currentOrder, lte: afterOrder } },
-        select: { id: true, order: true },
-        orderBy: { order: "asc" },
-      });
-      for (const s of toShift) await tx.stop.update({ where: { id: s.id }, data: { order: s.order + OFFSET } });
-      for (const s of toShift) await tx.stop.update({ where: { id: s.id }, data: { order: s.order - 1 } });
+      // Moving down — shift intermediate stops up by one
+      await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1, "asc");
       await tx.stop.update({ where: { id }, data: { order: afterOrder } });
     } else {
-      // Moving up — shift intermediate stops down by one slot
-      const toShift = await tx.stop.findMany({
-        where: { order: { gt: afterOrder, lt: currentOrder } },
-        select: { id: true, order: true },
-        orderBy: { order: "desc" },
-      });
-      for (const s of toShift) await tx.stop.update({ where: { id: s.id }, data: { order: s.order + OFFSET } });
-      for (const s of toShift) await tx.stop.update({ where: { id: s.id }, data: { order: s.order + 1 } });
+      // Moving up — shift intermediate stops down by one
+      await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1, "desc");
       await tx.stop.update({ where: { id }, data: { order: afterOrder + 1 } });
     }
   });
@@ -179,20 +144,8 @@ export async function deleteStop(id: string) {
 
   await db.$transaction(async (tx) => {
     await tx.stop.delete({ where: { id } });
-
-    const stopsAfter = await tx.stop.findMany({
-      where: { order: { gt: stop.order } },
-      select: { id: true, order: true },
-      orderBy: { order: "asc" },
-    });
-
-    const OFFSET = 10000;
-    for (const s of stopsAfter) {
-      await tx.stop.update({ where: { id: s.id }, data: { order: s.order + OFFSET } });
-    }
-    for (const s of stopsAfter) {
-      await tx.stop.update({ where: { id: s.id }, data: { order: s.order - 1 } });
-    }
+    // Close the gap: shift all stops above down by one
+    await shiftOrders(tx, { gt: stop.order }, -1, "asc");
   });
 
   revalidatePath("/stops");

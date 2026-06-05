@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { getCurrentStopSlug } from "@/lib/current-stop";
+import { getCurrentStopSlug, getTripDayNumber } from "@/lib/current-stop";
 import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
@@ -35,7 +35,9 @@ export default async function StopPage({ params }: Props) {
   await requireAuth();
   const { slug } = await params;
 
-  const [stop, currentSlug] = await Promise.all([
+  // All three queries are independent and run concurrently.
+  // otherStops does NOT depend on stop.id — we filter it in memory after resolving.
+  const [stop, currentSlug, allOtherStops, tripDay] = await Promise.all([
     db.stop.findUnique({
       where: { slug },
       include: {
@@ -47,16 +49,18 @@ export default async function StopPage({ params }: Props) {
       },
     }),
     getCurrentStopSlug(),
+    db.stop.findMany({
+      where: { isFlexMargin: false },
+      orderBy: { order: "asc" },
+      select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true },
+    }),
+    getTripDayNumber(slug),
   ]);
 
   if (!stop) notFound();
 
-  /* Other stops — one query powers both prev/next nav and the reorder picker */
-  const otherStops = await db.stop.findMany({
-    where: { isFlexMargin: false, NOT: { id: stop.id } },
-    orderBy: { order: "asc" },
-    select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true },
-  });
+  /* Filter out the current stop in memory — avoids a serial DB round-trip (P1 fix) */
+  const otherStops = allOtherStops.filter((s) => s.id !== stop.id);
 
   const prevStop = otherStops.filter((s) => s.order < stop.order).at(-1);
   const nextStop = otherStops.find((s) => s.order > stop.order);
@@ -161,9 +165,9 @@ export default async function StopPage({ params }: Props) {
             </div>
           </div>
 
-          {stop.arrivalDate && (
+          {stop.arrivalDate && tripDay !== null && (
             <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap gap-3 text-xs text-ink-3">
-              <span>Día {getTripDay(stop.arrivalDate)} del viaje</span>
+              <span>Día {tripDay} del viaje</span>
               {isActive && daysLeft !== null && (
                 <span className="text-brick">
                   {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
@@ -273,12 +277,3 @@ function formatDate(d: Date | string): string {
   });
 }
 
-function getTripDay(arrival: Date | string): number {
-  const start = new Date("2026-08-05");
-  const arrDate = new Date(arrival);
-  return (
-    Math.floor(
-      (arrDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-    ) + 1
-  );
-}

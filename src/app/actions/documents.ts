@@ -4,19 +4,22 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { DocumentKind } from "@/generated/prisma/enums";
+import { parseForm, CreateDocumentLinkSchema } from "./_schemas";
 
 export async function createDocumentLink(formData: FormData) {
   await requireAuth();
-  const slug = formData.get("slug") as string | null;
-  const stopId = (formData.get("stopId") as string) || null;
+
+  const parsed = parseForm(formData, CreateDocumentLinkSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { slug, stopId, label, kind, url } = parsed.data;
 
   await db.document.create({
     data: {
-      stopId,
-      label: formData.get("label") as string,
-      kind: (formData.get("kind") as DocumentKind) ?? "other",
+      stopId: stopId ?? null,
+      label,
+      kind: (kind as DocumentKind) ?? "other",
       source: "link",
-      externalUrl: formData.get("url") as string,
+      externalUrl: url,
     },
   });
 

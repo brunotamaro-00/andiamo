@@ -32,7 +32,7 @@ export function SectionHeader({ title, count, action }: SectionHeaderProps) {
       <h2 className="text-[13px] font-display uppercase tracking-wide text-ink-3 leading-none">
         {title}
         {count !== undefined && (
-          <span className="ml-2 text-[11px] text-ink-faint normal-case tracking-normal font-sans font-normal">
+          <span className="ml-2 text-[11px] text-ink-2 normal-case tracking-normal font-sans font-normal">
             ({count})
           </span>
         )}
