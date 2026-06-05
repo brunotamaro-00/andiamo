@@ -42,8 +42,10 @@ export default async function MapPage() {
   const confirmed = stops.filter((s) => !s.isCandidate && !s.isFlexMargin);
 
   const geojson = europeGeo as unknown as FeatureCollection<Geometry>;
+  // Build projection once — pass it to buildCountryPaths to avoid a second
+  // bounding-box calculation (P5 perf fix).
   const projection = makeProjection(confirmed);
-  const countryPaths = buildCountryPaths(geojson, confirmed);
+  const countryPaths = buildCountryPaths(geojson, projection);
 
   // Determine visit state for each stop based on today's date.
   // We compare YYYY-MM-DD strings (ISO prefix) to avoid timezone issues:
