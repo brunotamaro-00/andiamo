@@ -74,13 +74,13 @@
 
   ::selection {
     background-color: rgb(196 68 40 / 0.18);
-    color: #1B1A17;
+    color: var(--color-ink);
   }
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: oklch(0.938 0.016 88); }
-  ::-webkit-scrollbar-thumb { background: oklch(0.868 0.022 88); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: oklch(0.800 0.030 88); }
+  ::-webkit-scrollbar-track { background: var(--color-surface-2); }
+  ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-3); }
 }
 
 :root {
@@ -89,20 +89,20 @@
 
 /* ── Elevation — Panini hard-shadow sticker style ─────── */
 @utility card-shadow {
-  box-shadow: 3px 3px 0 #D8CFB4;
+  box-shadow: 3px 3px 0 var(--color-border);
 }
 
 @utility card-shadow-lg {
-  box-shadow: 5px 5px 0 #1B1A17;
+  box-shadow: 5px 5px 0 var(--color-ink);
 }
 
 @utility hard-shadow-ink {
-  box-shadow: 3px 3px 0 #1B1A17;
+  box-shadow: 3px 3px 0 var(--color-ink);
 }
 
 /* Keep compat aliases */
-@utility shadow-soft    { box-shadow: 3px 3px 0 #D8CFB4; }
-@utility shadow-soft-lg { box-shadow: 5px 5px 0 #1B1A17; }
+@utility shadow-soft    { box-shadow: 3px 3px 0 var(--color-border); }
+@utility shadow-soft-lg { box-shadow: 5px 5px 0 var(--color-ink); }
 
 /* ── Animation utilities ─────────────────────────────── */
 @utility animate-fade-in    { animation: fadeIn  400ms ease-out both; }

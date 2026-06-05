@@ -5,31 +5,32 @@ import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 import type { CityPoint, Segment } from "@/lib/map-projection";
 
-// ── Color tokens by stop state ────────────────────────────────────────────
+// ── Color tokens by stop state — all values reference CSS custom properties
+// defined in globals.css so that a single token change propagates everywhere.
 const STATE_COLORS = {
   upcoming: {
-    dotStroke: "#8A7F6A",   // ink-3
-    dotFill:   "#FFFFFF",
-    numFill:   "#8A7F6A",   // ink-3
-    labelFill: "#8A7F6A",   // ink-3
+    dotStroke: "var(--color-ink-3)",
+    dotFill:   "var(--color-surface)",
+    numFill:   "var(--color-ink-3)",
+    labelFill: "var(--color-ink-3)",
   },
   visited: {
-    dotStroke: "#C44428",   // brick
-    dotFill:   "#FFFFFF",
-    numFill:   "#832C18",   // brick-ink
-    labelFill: "#1B1A17",   // ink
+    dotStroke: "var(--color-brick)",
+    dotFill:   "var(--color-surface)",
+    numFill:   "var(--color-brick-ink)",
+    labelFill: "var(--color-ink)",
   },
   current: {
-    dotStroke: "#C8A24B",   // gold
-    dotFill:   "#F8F0DC",   // gold-bg
-    numFill:   "#7A5C10",   // gold-ink
-    labelFill: "#1B1A17",   // ink
+    dotStroke: "var(--color-gold)",
+    dotFill:   "var(--color-gold-bg)",
+    numFill:   "var(--color-gold-ink)",
+    labelFill: "var(--color-ink)",
   },
 } as const;
 
 const SEG_STROKE = {
-  traveled: { stroke: "#C44428", opacity: 0.7  },  // brick
-  upcoming:  { stroke: "#ABA090", opacity: 0.45 },  // ink-faint
+  traveled: { stroke: "var(--color-brick)",     opacity: 0.7  },
+  upcoming:  { stroke: "var(--color-ink-faint)", opacity: 0.45 },
 } as const;
 
 // ── Pan/zoom constants ────────────────────────────────────────────────────
@@ -227,7 +228,7 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
           {/* ── Layer 1: Country fills ──────────────────────────────────── */}
           <g aria-hidden="true">
             {countryPaths.map((d, i) => (
-              <path key={i} d={d} fill="#EAE2CB" stroke="#D8CFB4" strokeWidth={0.6} />
+              <path key={i} d={d} fill="var(--color-surface-2)" stroke="var(--color-border)" strokeWidth={0.6} />
             ))}
           </g>
 
@@ -261,9 +262,9 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                 aria-hidden="true"
                 className={animated ? `animate-fade-in stagger-${Math.min((i % 6) + 1, 6)}` : ""}
               >
-                <circle cx="7" cy="7" r="7" fill="#FFFFFF" opacity={0.85} />
+                <circle cx="7" cy="7" r="7" fill="var(--color-surface)" opacity={0.85} />
                 <svg x="0" y="0" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke={seg.state === "traveled" ? "#C44428" : "#ABA090"}
+                  stroke={seg.state === "traveled" ? "var(--color-brick)" : "var(--color-ink-faint)"}
                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                 >
                   <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.6-.6 1.1l1.5 2.8c.2.4.7.6 1.1.5L8 10l-2 4H4l-1 1 3 2 2 3 1-1v-2l4-2-.4 3.8c-.1.4.1.9.5 1.1l2.8 1.5c.5.3 1 0 1.1-.6z" />
@@ -284,14 +285,14 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                   <circle
                     cx={city.x} cy={city.y} r={R + 5}
                     fill="none"
-                    stroke="#C8A24B"
+                    stroke="var(--color-gold)"
                     strokeWidth={1.5}
                     opacity={animated ? undefined : 0.3}
                     className={animated ? "animate-map-pulse" : ""}
                   />
                 )}
                 {/* Hard shadow */}
-                <circle cx={city.x + 1} cy={city.y + 1} r={R} fill="#1B1A17" opacity={0.12} />
+                <circle cx={city.x + 1} cy={city.y + 1} r={R} fill="var(--color-ink)" opacity={0.12} />
                 {/* Dot */}
                 <circle
                   cx={city.x} cy={city.y} r={R}
@@ -358,7 +359,7 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                 letterSpacing={0.3}
                 style={{ textTransform: "uppercase", userSelect: "none" }}
                 paintOrder="stroke"
-                stroke="#F3ECD8"
+                stroke="var(--color-canvas)"
                 strokeWidth={3}
               >
                 {label.displayName}
@@ -381,13 +382,13 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
       <div className="absolute bottom-20 left-4 flex flex-col gap-1.5 bg-surface/90 backdrop-blur-sm border border-border rounded-[4px] px-3 py-2 card-shadow">
         <div className="flex items-center gap-2">
           <svg width="24" height="8" aria-hidden="true">
-            <line x1="0" y1="4" x2="24" y2="4" stroke="#C44428" strokeWidth="1.5" strokeDasharray="4 3" />
+            <line x1="0" y1="4" x2="24" y2="4" stroke="var(--color-brick)" strokeWidth="1.5" strokeDasharray="4 3" />
           </svg>
           <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Vuelo</span>
         </div>
         <div className="flex items-center gap-2">
           <svg width="24" height="8" aria-hidden="true">
-            <line x1="0" y1="4" x2="24" y2="4" stroke="#C44428" strokeWidth="1.5" />
+            <line x1="0" y1="4" x2="24" y2="4" stroke="var(--color-brick)" strokeWidth="1.5" />
           </svg>
           <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Auto / Tren</span>
         </div>
