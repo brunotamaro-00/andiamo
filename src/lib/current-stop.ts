@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { todayStr, dateToStr } from "./trip";
 
 export async function getCurrentStopSlug(): Promise<string | null> {
   // Check for manual override first
@@ -8,8 +9,9 @@ export async function getCurrentStopSlug(): Promise<string | null> {
     if (stop) return stop.slug;
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Compare YYYY-MM-DD strings — safe against server-timezone drift since
+  // all dates come from @db.Date (UTC midnight) and todayStr() uses UTC.
+  const today = todayStr();
 
   const stops = await db.stop.findMany({
     where: { isFlexMargin: false, nights: { gt: 0 } },
@@ -17,22 +19,19 @@ export async function getCurrentStopSlug(): Promise<string | null> {
     select: { slug: true, arrivalDate: true, departureDate: true, order: true },
   });
 
-  // Find the stop where today falls within arrival/departure
   for (const stop of stops) {
     if (stop.arrivalDate && stop.departureDate) {
-      const arrival = new Date(stop.arrivalDate);
-      const departure = new Date(stop.departureDate);
-      arrival.setHours(0, 0, 0, 0);
-      departure.setHours(0, 0, 0, 0);
-      if (today >= arrival && today < departure) {
+      const arr = dateToStr(stop.arrivalDate);
+      const dep = dateToStr(stop.departureDate);
+      if (arr <= today && today < dep) {
         return stop.slug;
       }
     }
   }
 
-  // If trip hasn't started, return first stop
-  const tripStart = stops[0]?.arrivalDate;
-  if (tripStart && today < new Date(tripStart)) {
+  // If trip hasn't started yet, return first stop
+  const firstArrival = stops[0]?.arrivalDate ? dateToStr(stops[0].arrivalDate) : null;
+  if (firstArrival && today < firstArrival) {
     return stops[0]?.slug ?? null;
   }
 
@@ -55,7 +54,7 @@ export async function getTripDayNumber(slug: string): Promise<number | null> {
 
   const msPerDay = 1000 * 60 * 60 * 24;
   const diff = Math.floor(
-    (new Date(thisStop.arrivalDate).getTime() - new Date(firstStop.arrivalDate).getTime()) / msPerDay
+    (thisStop.arrivalDate.getTime() - firstStop.arrivalDate.getTime()) / msPerDay,
   );
   return diff + 1;
 }
