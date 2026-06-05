@@ -118,14 +118,26 @@ export function TripMap({
       const dy = e.touches[0].clientY - drag.startY;
       setTransform((t) => clamp({ ...t, x: drag.tx + dx, y: drag.ty + dy }, viewBoxWidth, viewBoxHeight));
     } else if (e.touches.length === 2 && lastPinchRef.current != null) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.hypot(dx, dy);
+      const t0 = e.touches[0];
+      const t1 = e.touches[1];
+      const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
       // Dampen pinch sensitivity — raw ratio feels too fast on touch
       const rawFactor = dist / lastPinchRef.current;
       const factor = rawFactor > 1 ? 1 + (rawFactor - 1) * 0.5 : 1 - (1 - rawFactor) * 0.5;
       lastPinchRef.current = dist;
-      setTransform((t) => clamp({ ...t, scale: t.scale * factor }, viewBoxWidth, viewBoxHeight));
+      // Zoom toward the midpoint between the two fingers (same logic as wheel zoom)
+      const svg = svgRef.current;
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect();
+      const cx = (((t0.clientX + t1.clientX) / 2 - rect.left) / rect.width) * viewBoxWidth;
+      const cy = (((t0.clientY + t1.clientY) / 2 - rect.top) / rect.height) * viewBoxHeight;
+      setTransform((t) => {
+        const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, t.scale * factor));
+        const ratio = newScale / t.scale;
+        const newX = cx - (cx - t.x) * ratio;
+        const newY = cy - (cy - t.y) * ratio;
+        return clamp({ x: newX, y: newY, scale: newScale }, viewBoxWidth, viewBoxHeight);
+      });
     }
   };
 
@@ -240,7 +252,7 @@ export function TripMap({
             // minimum distance from any nearby dot to the candidate label position.
             // "Maximin" criterion: choose the direction with the most open space.
             const NEAR_RADIUS = 80;
-            const LDIST = R + 9;
+            const LDIST = R + 14;
             const nearby = cities.filter(
               (c) => c.slug !== city.slug && Math.hypot(c.x - city.x, c.y - city.y) < NEAR_RADIUS
             );
@@ -261,7 +273,7 @@ export function TripMap({
             const ldy = Math.cos(bestAngle);
             const lx = city.x + ldx * LDIST;
             const ly = city.y + ldy * LDIST;
-            const anchor = ldx < -0.35 ? "end" : ldx > 0.35 ? "start" : "middle";
+            const anchor = "middle";
 
             return (
               <g
@@ -288,7 +300,7 @@ export function TripMap({
                 {cityLabelInfo.get(city.slug)?.show && (
                   <text
                     x={lx}
-                    y={ly + (ldy > 0.3 ? 4 : ldy < -0.3 ? -2 : 2)}
+                    y={ly}
                     textAnchor={anchor}
                     dominantBaseline="middle"
                     fontSize={7}
