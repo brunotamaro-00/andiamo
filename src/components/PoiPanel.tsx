@@ -6,6 +6,8 @@ import {
   BedDouble, Landmark, Target, UtensilsCrossed, Binoculars,
   TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search, AlertCircle,
 } from "lucide-react";
+import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 import type { LucideIcon } from "lucide-react";
 import { createPoi, updatePoi, togglePoiDone, deletePoi } from "@/app/actions/pois";
 import { Card, SectionHeader } from "@/components/ui/Card";
@@ -33,11 +35,6 @@ const TYPE_LABEL: Record<string, string> = {
   comida: "Comida", mirador: "Mirador", transporte: "Transporte", otro: "Otro",
 };
 
-/** Shared 40px touch target for secondary row actions. */
-const actionBtn =
-  "h-10 w-10 flex items-center justify-center rounded-lg transition-all " +
-  "active:scale-90 motion-reduce:active:scale-100 shrink-0 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick";
 
 interface Poi {
   id: string;
@@ -325,22 +322,12 @@ function PoiItem({
 
       {/* Actions / inline delete confirmation */}
       {confirming ? (
-        <div className="flex items-center gap-1 pt-1.5 shrink-0">
-          <span className="text-xs text-danger mr-1">¿Borrar?</span>
-          <button
-            onClick={onConfirmDelete}
-            aria-label={`Confirmar borrado de "${poi.name}"`}
-            className={`${actionBtn} text-danger hover:bg-danger-bg`}
-          >
-            <Check size={16} strokeWidth={2} aria-hidden="true" />
-          </button>
-          <button
-            onClick={onCancelDelete}
-            aria-label="Cancelar borrado"
-            className={`${actionBtn} text-ink-2 hover:bg-surface-2`}
-          >
-            <X size={16} strokeWidth={2} aria-hidden="true" />
-          </button>
+        <div className="pt-1.5">
+          <InlineDeleteConfirm
+            label={poi.name}
+            onConfirm={onConfirmDelete}
+            onCancel={onCancelDelete}
+          />
         </div>
       ) : (
         <div className="flex items-center pt-1.5 shrink-0">

@@ -43,16 +43,16 @@ Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives i
 | `ink-2` | Secondary text `#6B6452` |
 | `ink-3` | Muted / labels `#8A7F6A` |
 | `ink-faint` | Placeholder / disabled `#ABA090` |
-| `coral` | `#E8462B` — brick red CTA / accent |
-| `coral-hover` / `coral-press` | Hover / press states |
-| `coral-ink` | Brick red text on light bg `#8B2010` |
-| `coral-border` / `coral-bg` | Accent border / surface |
+| `brick` | `#C44428` — ladrillo CTA / accent (was `coral`) |
+| `brick-hover` / `brick-press` | Hover / press states |
+| `brick-ink` | Ladrillo text on light bg `#832C18` |
+| `brick-border` / `brick-bg` | Accent border `#EAAD9C` / surface `#FAE8E3` |
 | `gold` | `#C8A24B` — Panini gold accent |
 | `gold-bg` / `gold-ink` / `gold-border` | Gold surface / text / border |
 | `success` / `success-bg` | Success / pitch green `#2F7D4F` |
 | `warning` / `warning-bg` | Warning states |
 | `danger` / `danger-bg` | Error / destructive |
-| `special` / `special-bg` | Candidate / special states |
+| `special` / `special-bg` | Candidate / special states `#7C3AED` |
 
 ### Elevation (Panini hard sticker style)
 
@@ -86,7 +86,7 @@ text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 
 ### Wordmark
 
-`<Wordmark size="sm" | "lg" />` — brick-red SVG map-pin + "ANDIAMO" in Anton uppercase. Required in every page header.
+`<Wordmark size="sm" | "lg" />` — inline SVG hand logo in `#C44428` (brick) + "Andiamo" in Anton, `text-ink`, uppercase, scaleY stretched. Required in every page header.
 
 ### Style conventions
 
@@ -96,6 +96,6 @@ text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 - Buttons secondary/ghost: `rounded-full` + `border-2 border-ink`
 - Inputs: `rounded-xl` — keep rounded for usability
 - Transitions: `duration-150`
-- Focus rings: `ring-coral/40`
-- TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick red
+- Focus rings: `ring-brick/40`
+- TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick (`text-brick`)
 <!-- END:nextjs-agent-rules -->

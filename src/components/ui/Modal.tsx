@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { IconButton } from "./IconButton";
 
@@ -16,6 +17,9 @@ interface ModalProps {
 export function Modal({ title, onClose, children }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  // Portal requires the DOM — only mount client-side
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   /* Restore focus to the element that opened the modal */
   useEffect(() => {
@@ -23,22 +27,25 @@ export function Modal({ title, onClose, children }: ModalProps) {
     return () => { opener?.focus(); };
   }, []);
 
-  /* Focus first focusable element + iOS-safe scroll-lock */
+  /* Focus first focusable element + iOS-safe scroll-lock + inert background.
+     Safe to inert #scroll-root because the modal is rendered outside it via portal. */
   useEffect(() => {
     const panel = panelRef.current;
     if (panel) {
       const first = panel.querySelector<HTMLElement>(FOCUSABLE);
       first?.focus();
     }
-    // Lock the scroll container (not body) — body no longer scrolls in this layout
     const scrollRoot = document.getElementById("scroll-root");
-    if (!scrollRoot) return;
-    const scrollY = scrollRoot.scrollTop;
-    scrollRoot.style.overflow = "hidden";
-    return () => {
-      scrollRoot.style.overflow = "";
-      scrollRoot.scrollTop = scrollY;
-    };
+    if (scrollRoot) {
+      const scrollY = scrollRoot.scrollTop;
+      scrollRoot.style.overflow = "hidden";
+      scrollRoot.setAttribute("inert", "");
+      return () => {
+        scrollRoot.style.overflow = "";
+        scrollRoot.scrollTop = scrollY;
+        scrollRoot.removeAttribute("inert");
+      };
+    }
   }, []);
 
   /* Escape to close + focus trap */
@@ -62,7 +69,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 animate-fade-in"
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
@@ -89,4 +96,10 @@ export function Modal({ title, onClose, children }: ModalProps) {
       </div>
     </div>
   );
+
+  // Render into #modal-root (outside #scroll-root and body flex flow)
+  // so inert on #scroll-root doesn't block modal interaction.
+  if (!mounted) return null;
+  const portalTarget = document.getElementById("modal-root") ?? document.body;
+  return createPortal(content, portalTarget);
 }
