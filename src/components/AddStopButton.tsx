@@ -26,11 +26,9 @@ interface StopOption {
 
 interface Props {
   stops: StopOption[];
-  /** ISO date string (YYYY-MM-DD) of the last stop's departure — used to pre-fill arrival date. */
-  lastDepartureDate?: string;
 }
 
-export function AddStopButton({ stops, lastDepartureDate }: Props) {
+export function AddStopButton({ stops }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,16 +48,15 @@ export function AddStopButton({ stops, lastDepartureDate }: Props) {
         <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
         Agregar ciudad
       </button>
-      {open && <AddStopModal stops={stops} lastDepartureDate={lastDepartureDate} onClose={() => setOpen(false)} />}
+      {open && <AddStopModal stops={stops} onClose={() => setOpen(false)} />}
     </>
   );
 }
 
 function AddStopModal({
-  stops, lastDepartureDate, onClose,
+  stops, onClose,
 }: {
   stops: StopOption[];
-  lastDepartureDate?: string;
   onClose: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -191,22 +188,14 @@ function AddStopModal({
       {/* Form — only visible when a city is selected */}
       {selected && (
         <form action={handleSubmit} className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
-            <Field
-              label="Llegada"
-              name="arrivalDate"
-              type="date"
-              defaultValue={lastDepartureDate}
-            />
-            <Field
-              label="Noches"
-              name="nights"
-              type="number"
-              defaultValue={3}
-              min={0}
-              required
-            />
-          </div>
+          <Field
+            label="Noches"
+            name="nights"
+            type="number"
+            defaultValue={3}
+            min={0}
+            required
+          />
 
           <SelectField
             label="Insertar después de"
