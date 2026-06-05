@@ -4,11 +4,11 @@ import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
 import { requireAuth } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
-import { setTripStart } from "@/app/actions/stops";
 import { AddStopButton } from "@/components/AddStopButton";
+import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
 import { Wordmark } from "@/components/Wordmark";
-import { ChevronRight, MapPin, Search, CalendarDays } from "lucide-react";
+import { ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
@@ -65,7 +65,7 @@ export default async function StopsPage() {
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-3 mb-4 animate-fade-in">
+        <div className="grid grid-cols-3 gap-3 mb-5 animate-fade-in">
           <Stat
             label="Paradas"
             value={stops.filter((s) => !s.isFlexMargin && !s.isCandidate).length.toString()}
@@ -80,29 +80,6 @@ export default async function StopsPage() {
             value={[...new Set(stops.map((s) => s.country))].length.toString()}
           />
         </div>
-
-        {/* Trip start editor */}
-        <form
-          action={setTripStart}
-          className="mb-5 animate-fade-in stagger-1 flex items-center gap-2 px-3 py-2.5 rounded-[4px] border border-border bg-surface"
-        >
-          <CalendarDays size={14} strokeWidth={1.5} className="text-ink-3 shrink-0" aria-hidden="true" />
-          <label className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
-            Inicio del viaje
-          </label>
-          <input
-            type="date"
-            name="tripStartDate"
-            defaultValue={tripStartValue}
-            className="flex-1 min-w-0 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
-          />
-          <button
-            type="submit"
-            className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-brick hover:text-brick-hover transition-colors duration-150 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
-          >
-            Guardar
-          </button>
-        </form>
 
         {/* Timeline */}
         <div className="space-y-3">
@@ -214,6 +191,11 @@ export default async function StopsPage() {
             .filter((s) => !s.isFlexMargin)
             .map((s) => ({ id: s.id, order: s.order, name: s.name, countryFlag: s.countryFlag }))}
         />
+
+        {/* Trip start editor — below fold, low noise */}
+        <div className="mt-4 animate-fade-in">
+          <TripStartEditor value={tripStartValue} />
+        </div>
 
       </main>
     </div>
