@@ -71,7 +71,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
 
   const content = (
     <div
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm px-4 pt-4 pb-0 sm:p-4 animate-fade-in"
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
@@ -79,7 +79,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm bg-surface rounded-[6px] border-2 border-border max-h-[90vh] flex flex-col animate-slide-up"
+        className="w-full max-w-sm bg-surface rounded-t-[6px] sm:rounded-[6px] border-2 border-b-0 sm:border-b-2 border-border max-h-[90vh] flex flex-col animate-slide-up"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Fixed header */}
@@ -90,7 +90,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
           <IconButton label="Cerrar" icon={X} onClick={onClose} />
         </div>
         {/* Scrollable body */}
-        <div className="px-5 py-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
+        <div className="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
           {children}
         </div>
       </div>

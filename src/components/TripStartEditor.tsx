@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Pencil, Check } from "lucide-react";
 import { setTripStart } from "@/app/actions/stops";
 import { haptics } from "@/lib/haptics";
 
 interface Props {
-  value: string; // YYYY-MM-DD or ""
+  value: string; // YYYY-MM-DD or "" — the persisted override setting
+  fallbackValue?: string; // YYYY-MM-DD — computed from first stop's arrivalDate
 }
 
 function formatDisplay(dateStr: string): string {
@@ -19,10 +20,18 @@ function formatDisplay(dateStr: string): string {
   });
 }
 
-export function TripStartEditor({ value }: Props) {
-  const [editing, setEditing] = useState(!value);
+export function TripStartEditor({ value, fallbackValue = "" }: Props) {
+  const displayValue = value || fallbackValue;
+  // Start in display mode on both server and client (SSR-safe).
+  // Switch to edit mode after hydration if there's truly nothing to show.
+  const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!displayValue) setEditing(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleSubmit(formData: FormData) {
     setError(null);
@@ -46,7 +55,7 @@ export function TripStartEditor({ value }: Props) {
           <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             Inicio del viaje
           </span>
-          <span className="text-sm font-medium text-ink">{formatDisplay(value)}</span>
+          <span className="text-sm font-medium text-ink">{formatDisplay(displayValue)}</span>
         </div>
         <button
           type="button"
@@ -68,7 +77,7 @@ export function TripStartEditor({ value }: Props) {
       <input
         type="date"
         name="tripStartDate"
-        defaultValue={value}
+        defaultValue={displayValue}
         autoFocus
         className="flex-1 min-w-0 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
       />

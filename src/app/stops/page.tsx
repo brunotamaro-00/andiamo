@@ -33,6 +33,10 @@ export default async function StopsPage() {
   const today = new Date();
 
   const tripStartValue = tripStartSetting?.value ?? "";
+  // Fallback: compute start date from first confirmed stop's arrivalDate
+  const tripStartFallback = tripStartDate
+    ? tripStartDate.toISOString().slice(0, 10)
+    : "";
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -188,7 +192,7 @@ export default async function StopsPage() {
 
         {/* Trip start editor — below fold, low noise */}
         <div className="mt-4 animate-fade-in">
-          <TripStartEditor value={tripStartValue} />
+          <TripStartEditor value={tripStartValue} fallbackValue={tripStartFallback} />
         </div>
 
       </main>

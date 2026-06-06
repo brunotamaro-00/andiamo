@@ -50,7 +50,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
     };
   }, []);
 
-  if (error) {
+  if (error && !data) {
     return (
       <Card>
         <SectionHeader title="Moneda" />

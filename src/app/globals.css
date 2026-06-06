@@ -81,6 +81,9 @@
   ::-webkit-scrollbar-track { background: var(--color-surface-2); }
   ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-3); }
+
+  /* Hide native WebKit clear button on search inputs — we use a custom one */
+  input[type="search"]::-webkit-search-cancel-button { display: none; }
 }
 
 :root {
