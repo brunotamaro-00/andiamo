@@ -21,7 +21,10 @@ export async function GET() {
       create: { key: "cachedRates", value: JSON.stringify(rates) },
     });
 
-    return Response.json({ rates, source: "live", base: "USD", date: data.date });
+    return Response.json(
+      { rates, source: "live", base: "USD", date: data.date },
+      { headers: { "Cache-Control": "public, s-maxage=43200, stale-while-revalidate=86400" } },
+    );
   } catch {
     // Fallback to cached rates from DB
     const cached = await db.setting.findUnique({ where: { key: "cachedRates" } });

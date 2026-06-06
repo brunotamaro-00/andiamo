@@ -8,16 +8,21 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+const DISMISSED_KEY = "andiamo:install-dismissed";
+
 /**
  * InstallPrompt — captures the `beforeinstallprompt` event and shows a
  * branded install banner. Hides when:
  *   - The app is already running in standalone mode (already installed)
- *   - The user dismissed the banner this session
+ *   - The user dismissed the banner (persisted in localStorage across sessions)
  *   - No PWA install prompt is available (iOS, desktop with extensions, etc.)
  */
 export function InstallPrompt() {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(DISMISSED_KEY) === "1";
+  });
 
   const isStandalone =
     typeof window !== "undefined" &&
@@ -36,12 +41,17 @@ export function InstallPrompt() {
 
   if (isStandalone || !prompt || dismissed) return null;
 
+  function dismiss() {
+    try { localStorage.setItem(DISMISSED_KEY, "1"); } catch {}
+    setDismissed(true);
+  }
+
   async function handleInstall() {
     if (!prompt) return;
     await prompt.prompt();
     const { outcome } = await prompt.userChoice;
     if (outcome === "accepted") setPrompt(null);
-    else setDismissed(true);
+    else dismiss();
   }
 
   return (
@@ -64,7 +74,7 @@ export function InstallPrompt() {
         Instalar
       </button>
       <button
-        onClick={() => setDismissed(true)}
+        onClick={dismiss}
         aria-label="Cerrar aviso de instalación"
         className="text-ink-3 hover:text-ink p-1 rounded-lg transition-colors shrink-0"
       >

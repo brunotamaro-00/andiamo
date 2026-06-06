@@ -81,7 +81,7 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
     return () => { active = false; };
   }, [lat, lng]);
 
-  if (error) {
+  if (error && !data) {
     return (
       <Card>
         <SectionHeader title="Clima" />

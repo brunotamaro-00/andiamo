@@ -55,7 +55,7 @@ export async function searchPlaces(
   try {
     const res = await fetch(url.toString(), {
       headers: { "User-Agent": "Andiamo Trip App (brunotamaro72@gmail.com)" },
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const data = await res.json() as { features: PhotonFeature[] };
