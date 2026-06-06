@@ -162,14 +162,7 @@ export default async function StopsPage() {
                           <span className="text-[11px] text-ink-3 font-medium">{formatShortDate(new Date(stop.arrivalDate))}</span>
                         </>
                       )}
-                      {stop.tempRange && (
-                        <>
-                          <span className="text-border-strong text-[11px]">·</span>
-                          <span className="text-[11px] text-ink-3 font-medium">{stop.tempRange}</span>
-                        </>
-                      )}
-                      {isCandidate && <Badge variant="special">candidata</Badge>}
-                      {stop.datesFixed && <Badge variant="warning">fecha fija</Badge>}
+                      {!stop.datesFixed && !isCandidate && <Badge variant="warning">tentativa</Badge>}
                       {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
                     </div>
                   </div>
