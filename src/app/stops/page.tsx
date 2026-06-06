@@ -162,6 +162,7 @@ export default async function StopsPage() {
                           <span className="text-[11px] text-ink-3 font-medium">{formatShortDate(new Date(stop.arrivalDate))}</span>
                         </>
                       )}
+                      {isCandidate && <Badge variant="special">candidata</Badge>}
                       {!stop.datesFixed && !isCandidate && <Badge variant="warning">tentativa</Badge>}
                       {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
                     </div>
