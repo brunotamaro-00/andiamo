@@ -21,7 +21,8 @@ export async function getCurrentStopSlug(): Promise<string | null> {
   }
 
   // Compare YYYY-MM-DD strings — safe against server-timezone drift since
-  // all dates come from @db.Date (UTC midnight) and todayStr() uses UTC.
+  // all dates come from @db.Date (UTC midnight) and todayStr() is anchored
+  // to TRIP_TIMEZONE.
   const today = todayStr();
 
   for (const stop of stops) {
