@@ -46,7 +46,8 @@ export default async function MapPage() {
   // Build projection once — pass it to buildCountryPaths to avoid a second
   // bounding-box calculation (P5 perf fix).
   const projection = makeProjection(confirmed);
-  const countryPaths = buildCountryPaths(geojson, projection);
+  const coordsKey = confirmed.map((s) => `${s.latitude},${s.longitude}`).join("|");
+  const countryPaths = buildCountryPaths(geojson, projection, coordsKey);
 
   // Determine visit state for each stop based on today's date.
   // We compare YYYY-MM-DD strings to avoid timezone issues: Prisma @db.Date
