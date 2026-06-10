@@ -1,3 +1,5 @@
+import { after } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "./db";
 import { dateToStr, addDaysStr, strToDate } from "./trip";
 import { fetchTempRange } from "./temp-range";
@@ -73,7 +75,8 @@ export function computeItinerary(
 
 /**
  * Reads the full stop list + tripStartDate setting, recomputes all dates,
- * and persists any that changed (including refreshing tempRange for those stops).
+ * and persists any that changed. The tempRange refresh (HTTP to Open-Meteo)
+ * is deferred with `after()` so mutations respond without waiting on it.
  *
  * Call this after every mutation that affects order, nights, datesFixed, or the anchor.
  * Safe to call outside a Prisma transaction — it manages its own batch update.
@@ -85,6 +88,7 @@ export async function recalculateItinerary(): Promise<void> {
       orderBy: { order: "asc" },
       select: {
         id: true,
+        slug: true,
         order: true,
         nights: true,
         datesFixed: true,
@@ -93,7 +97,6 @@ export async function recalculateItinerary(): Promise<void> {
         isCandidate: true,
         latitude: true,
         longitude: true,
-        tempRange: true,
       },
     }),
   ]);
@@ -126,26 +129,65 @@ export async function recalculateItinerary(): Promise<void> {
 
   if (changed.length === 0) return;
 
-  // Fetch tempRanges in parallel (HTTP, outside DB tx)
-  const updates = await Promise.all(
-    changed.map(async (stop) => {
+  // Phase 1 (blocking): persist the recomputed dates only
+  await db.$transaction(
+    changed.map((stop) => {
       const next = computed.get(stop.id)!;
-      const tempRange =
-        next.arrival && next.departure
-          ? (await fetchTempRange(stop.latitude, stop.longitude, next.arrival, next.departure)) ??
-            stop.tempRange
-          : stop.tempRange;
-      return { id: stop.id, arrival: next.arrival, departure: next.departure, tempRange };
+      return db.stop.update({
+        where: { id: stop.id },
+        data: { arrivalDate: next.arrival, departureDate: next.departure },
+      });
     }),
   );
 
-  // Batch update in a single transaction
-  await db.$transaction(
-    updates.map((u) =>
-      db.stop.update({
-        where: { id: u.id },
-        data: { arrivalDate: u.arrival, departureDate: u.departure, tempRange: u.tempRange },
-      }),
-    ),
-  );
+  // Phase 2 (deferred): refresh tempRanges after the response is sent
+  const toRefresh = changed
+    .map((stop) => ({ stop, next: computed.get(stop.id)! }))
+    .filter(({ next }) => next.arrival && next.departure)
+    .map(({ stop, next }) => ({
+      id: stop.id,
+      slug: stop.slug,
+      latitude: stop.latitude,
+      longitude: stop.longitude,
+      arrival: next.arrival!,
+      departure: next.departure!,
+    }));
+
+  if (toRefresh.length > 0) {
+    after(() => refreshTempRanges(toRefresh));
+  }
+}
+
+interface TempRangeTarget {
+  id: string;
+  slug: string;
+  latitude: number;
+  longitude: number;
+  arrival: Date;
+  departure: Date;
+}
+
+/** Fetches and stores tempRange for the given stops; runs outside the response path. */
+async function refreshTempRanges(targets: TempRangeTarget[]): Promise<void> {
+  try {
+    const updates = await Promise.all(
+      targets.map(async (t) => ({
+        ...t,
+        tempRange: await fetchTempRange(t.latitude, t.longitude, t.arrival, t.departure),
+      })),
+    );
+    const withRange = updates.filter((u) => u.tempRange != null);
+    if (withRange.length === 0) return;
+
+    await db.$transaction(
+      withRange.map((u) =>
+        db.stop.update({ where: { id: u.id }, data: { tempRange: u.tempRange } }),
+      ),
+    );
+
+    revalidatePath("/stops");
+    for (const u of withRange) revalidatePath(`/stops/${u.slug}`);
+  } catch {
+    // Best-effort: a failed refresh keeps the previous tempRange
+  }
 }
