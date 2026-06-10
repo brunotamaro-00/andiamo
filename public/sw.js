@@ -105,22 +105,22 @@ async function staleWhileRevalidate(cacheName, request) {
   return cached ?? (await networkFetch) ?? offlinePage();
 }
 
-/** Navigation fallback: try network → try shell cache → offline page. */
+/** Navigation: serve cached shell instantly, revalidate in background.
+ *  Hard loads on a slow network stop waiting for the server; the fresh
+ *  page replaces the cached copy for the next visit. */
 async function navigateWithFallback(request) {
-  try {
-    // Try network first for navigation (SSR pages)
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(SHELL_CACHE);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    // Network failed — try cache
-    const cache = await caches.open(SHELL_CACHE);
-    const cached = await cache.match(request);
-    return cached ?? offlinePage();
-  }
+  const cache = await caches.open(SHELL_CACHE);
+  const cached = await cache.match(request);
+
+  const networkFetch = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => null);
+
+  if (cached) return cached;
+  return (await networkFetch) ?? offlinePage();
 }
 
 /** Returns the offline fallback HTML page. */
