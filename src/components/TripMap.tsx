@@ -61,6 +61,8 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
   const [transform, setTransform] = useState<Transform>(INITIAL);
   const dragRef = useRef<{ startX: number; startY: number; tx: number; ty: number } | null>(null);
   const lastPinchRef = useRef<number | null>(null);
+  // Distinguishes a tap on a city from a pan: clicks after >6px of movement are swallowed.
+  const movedRef = useRef(false);
   const prefersReduced = useRef(
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
@@ -91,17 +93,20 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
 
   // ── Mouse drag ────────────────────────────────────────────────────────────
   const onMouseDown = (e: React.MouseEvent) => {
+    movedRef.current = false;
     dragRef.current = { startX: e.clientX, startY: e.clientY, tx: transform.x, ty: transform.y };
   };
   const onMouseMove = (e: React.MouseEvent) => {
     const drag = dragRef.current;
     if (!drag) return;
+    if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) > 6) movedRef.current = true;
     setTransform((t) => clamp({ ...t, x: drag.tx + e.clientX - drag.startX, y: drag.ty + e.clientY - drag.startY }, viewBoxWidth, viewBoxHeight));
   };
   const onMouseUp = () => { dragRef.current = null; };
 
   // ── Touch drag + pinch ────────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
+    movedRef.current = false;
     if (e.touches.length === 1) {
       dragRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, tx: transform.x, ty: transform.y };
       lastPinchRef.current = null;
@@ -115,8 +120,10 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
     e.preventDefault();
     const drag = dragRef.current;
     if (e.touches.length === 1 && drag) {
+      if (Math.hypot(e.touches[0].clientX - drag.startX, e.touches[0].clientY - drag.startY) > 6) movedRef.current = true;
       setTransform((t) => clamp({ ...t, x: drag.tx + e.touches[0].clientX - drag.startX, y: drag.ty + e.touches[0].clientY - drag.startY }, viewBoxWidth, viewBoxHeight));
     } else if (e.touches.length === 2 && lastPinchRef.current != null) {
+      movedRef.current = true;
       const t0 = e.touches[0];
       const t1 = e.touches[1];
       const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
@@ -311,15 +318,16 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
                 >
                   {city.order}
                 </text>
-                {/* Invisible tap/click area */}
+                {/* Invisible tap/click area — generous radius for touch */}
                 <foreignObject
-                  x={city.x - R - 2} y={city.y - R - 2}
-                  width={(R + 2) * 2}  height={(R + 2) * 2}
+                  x={city.x - R - 10} y={city.y - R - 10}
+                  width={(R + 10) * 2}  height={(R + 10) * 2}
                   style={{ overflow: "visible" }}
                 >
                   <Link
                     href={`/stops/${city.slug}`}
                     aria-label={`Ver ${city.name}`}
+                    onClick={(e) => { if (movedRef.current) e.preventDefault(); }}
                     className="block w-full h-full opacity-0 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-brick rounded-full"
                     style={{ display: "block", width: "100%", height: "100%" }}
                   />
@@ -380,6 +388,24 @@ export function TripMap({ countryPaths, cities, segments, viewBoxWidth, viewBoxH
 
       {/* Legend */}
       <div className="absolute bottom-24 left-4 flex flex-col gap-1.5 bg-surface/90 backdrop-blur-sm border border-border rounded-[4px] px-3 py-2 card-shadow">
+        <div className="flex items-center gap-2">
+          <svg width="24" height="10" aria-hidden="true">
+            <circle cx="12" cy="5" r="4" fill="var(--color-gold-bg)" stroke="var(--color-gold)" strokeWidth="1.5" />
+          </svg>
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Actual</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <svg width="24" height="10" aria-hidden="true">
+            <circle cx="12" cy="5" r="4" fill="var(--color-surface)" stroke="var(--color-brick)" strokeWidth="1.5" />
+          </svg>
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Visitada</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <svg width="24" height="10" aria-hidden="true">
+            <circle cx="12" cy="5" r="4" fill="var(--color-surface)" stroke="var(--color-ink-3)" strokeWidth="1.5" />
+          </svg>
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Próxima</span>
+        </div>
         <div className="flex items-center gap-2">
           <svg width="24" height="8" aria-hidden="true">
             <line x1="0" y1="4" x2="24" y2="4" stroke="var(--color-brick)" strokeWidth="1.5" strokeDasharray="4 3" />
