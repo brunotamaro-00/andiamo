@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME, isValidToken } from "@/lib/session";
 
-const PUBLIC_PATHS = ["/login", "/_next", "/favicon.ico", "/manifest.json", "/manifest.webmanifest", "/icon-", "/apple-icon", "/robots.txt"];
+// /sw.js must be public: browsers refuse to register a service worker whose
+// script is behind a redirect, so the PWA could never install pre-login.
+const PUBLIC_PATHS = ["/login", "/_next", "/favicon.ico", "/manifest.json", "/manifest.webmanifest", "/icon-", "/apple-icon", "/robots.txt", "/sw.js", "/offline.html", "/logo.svg"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

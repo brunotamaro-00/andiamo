@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
+import { Loader2 } from "lucide-react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
@@ -26,18 +27,24 @@ const sizeClasses: Record<Size, string> = {
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
+  /** Shows a spinner and disables the button while a mutation is in flight. */
+  loading?: boolean;
 }
 
 export function Button({
   variant = "secondary",
   size = "md",
+  loading = false,
   className,
   children,
+  disabled,
   ...props
 }: ButtonProps) {
   return (
     <button
       {...props}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={[
         "inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50",
@@ -50,6 +57,7 @@ export function Button({
         .filter(Boolean)
         .join(" ")}
     >
+      {loading && <Loader2 size={14} className="animate-spin shrink-0" aria-hidden="true" />}
       {children}
     </button>
   );

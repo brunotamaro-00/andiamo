@@ -1,16 +1,15 @@
-// Andiamo Service Worker v2
+// Andiamo Service Worker v3
 // Strategy summary:
 //   /api/documents/*  GET  → cache-first (offline-capable document files)
-//   /api/weather,/api/rates → stale-while-revalidate (show last reading offline)
 //   Navigation + /_next/static/ → stale-while-revalidate (app shell)
 //   Everything else → network-only (auth-gated API routes)
+// Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v2";   // bumped: now includes precached routes
-const DATA_CACHE  = "andiamo-data-v1";    // weather + rates
+const SHELL_CACHE = "andiamo-shell-v3";   // bumped: SWR navigations, no data cache
 const OFFLINE_URL = "/offline.html";
 
-const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE, DATA_CACHE];
+const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
 const SHELL_ROUTES = [
@@ -56,20 +55,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── 2. Weather + rates — stale-while-revalidate ───────────────────────────
-  //    Shows cached data offline; updates in background when connected.
-  if (url.pathname === "/api/weather" || url.pathname === "/api/rates") {
-    event.respondWith(staleWhileRevalidate(DATA_CACHE, request));
-    return;
-  }
-
-  // ── 3. Navigation — stale-while-revalidate (app shell) ───────────────────
+  // ── 2. Navigation — stale-while-revalidate (app shell) ───────────────────
   if (request.mode === "navigate") {
     event.respondWith(navigateWithFallback(request));
     return;
   }
 
-  // ── 4. Next.js static assets — stale-while-revalidate ────────────────────
+  // ── 3. Next.js static assets — stale-while-revalidate ────────────────────
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(staleWhileRevalidate(SHELL_CACHE, request));
     return;
@@ -113,22 +105,22 @@ async function staleWhileRevalidate(cacheName, request) {
   return cached ?? (await networkFetch) ?? offlinePage();
 }
 
-/** Navigation fallback: try network → try shell cache → offline page. */
+/** Navigation: serve cached shell instantly, revalidate in background.
+ *  Hard loads on a slow network stop waiting for the server; the fresh
+ *  page replaces the cached copy for the next visit. */
 async function navigateWithFallback(request) {
-  try {
-    // Try network first for navigation (SSR pages)
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(SHELL_CACHE);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    // Network failed — try cache
-    const cache = await caches.open(SHELL_CACHE);
-    const cached = await cache.match(request);
-    return cached ?? offlinePage();
-  }
+  const cache = await caches.open(SHELL_CACHE);
+  const cached = await cache.match(request);
+
+  const networkFetch = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => null);
+
+  if (cached) return cached;
+  return (await networkFetch) ?? offlinePage();
 }
 
 /** Returns the offline fallback HTML page. */

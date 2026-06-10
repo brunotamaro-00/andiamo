@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import {
   Sun, CloudSun, Cloud, CloudFog, CloudRain, Snowflake,
   CloudDrizzle, CloudLightning, Thermometer, Sunrise, Sunset,
@@ -8,18 +5,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-
-interface WeatherData {
-  current: { temperature_2m: number; weather_code: number };
-  daily: {
-    time: string[];
-    temperature_2m_max: number[];
-    temperature_2m_min: number[];
-    weather_code: number[];
-    sunrise: string[];
-    sunset: string[];
-  };
-}
+import { fetchWeather } from "@/lib/weather";
 
 interface WeatherIconDef {
   icon: LucideIcon;
@@ -59,55 +45,15 @@ function formatDay(iso: string): string {
   return new Date(iso).toLocaleDateString("es-AR", { weekday: "short" });
 }
 
-export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
-  const [data, setData] = useState<WeatherData | null>(null);
-  const [error, setError] = useState<"offline" | "failed" | null>(null);
-  const [retryToken, setRetryToken] = useState(0);
-
-  useEffect(() => {
-    let active = true;
-    fetch(`/api/weather?lat=${lat}&lng=${lng}`)
-      .then((r) => {
-        if (!r.ok) throw new Error("weather error");
-        return r.json();
-      })
-      .then((json) => {
-        if (!active) return;
-        if (!json?.daily) throw new Error("no daily data");
-        setData(json);
-      })
-      .catch(() => {
-        if (active) setError(navigator.onLine ? "failed" : "offline");
-      });
-    return () => { active = false; };
-  }, [lat, lng, retryToken]);
-
-  if (error && !data) {
-    return (
-      <Card>
-        <SectionHeader title="Clima" />
-        <p className="text-ink-3 text-sm">
-          {error === "offline" ? "Sin conexión" : "No se pudo cargar el clima."}
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setError(null);
-            setRetryToken((t) => t + 1);
-          }}
-          className="mt-2 rounded-full border-2 border-ink px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-        >
-          Reintentar
-        </button>
-      </Card>
-    );
-  }
+/** Server component — fetched during render (cached 30 min), streamed via Suspense. */
+export async function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
+  const data = await fetchWeather(lat, lng);
 
   if (!data) {
     return (
       <Card>
         <SectionHeader title="Clima" />
-        <Skeleton className="h-16" />
+        <p className="text-ink-3 text-sm">No se pudo cargar el clima.</p>
       </Card>
     );
   }
@@ -164,6 +110,31 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
               {Math.round(daily.temperature_2m_min[i])}°
             </p>
           </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+/** Suspense fallback that mirrors the final card layout — no layout shift. */
+export function WeatherCardSkeleton() {
+  return (
+    <Card>
+      <SectionHeader title="Clima" />
+      <div className="flex items-center gap-3 mb-4">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-7 w-16" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+        <div className="ml-auto space-y-1.5 flex flex-col items-end">
+          <Skeleton className="h-3 w-14" />
+          <Skeleton className="h-3 w-14" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-[88px] rounded-[4px]" />
         ))}
       </div>
     </Card>

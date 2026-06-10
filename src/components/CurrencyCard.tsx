@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getCurrencySymbol, CURRENCY_NAMES } from "@/lib/currency-map";
 import { Card, SectionHeader } from "@/components/ui/Card";
-import { Skeleton } from "@/components/ui/Skeleton";
 
 const NO_SPACE_SYMBOLS = new Set(["$", "€", "£", "₺"]);
 
@@ -18,73 +17,18 @@ function fmt(symbol: string, amount: string): string {
   return NO_SPACE_SYMBOLS.has(symbol) ? `${symbol}${amount}` : `${symbol} ${amount}`;
 }
 
-interface RatesData {
-  rates: Record<string, number>;
-  source: "live" | "cached";
+interface CurrencyCardProps {
+  currencyCode: string;
+  rate: number | null;
   date?: string;
+  source: "live" | "cached";
 }
 
-export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
-  const [data, setData] = useState<RatesData | null>(null);
-  const [error, setError] = useState<"offline" | "failed" | null>(null);
-  const [retryToken, setRetryToken] = useState(0);
+/** Client island: receives the rate from the server, keeps the converter interactive. */
+export function CurrencyCard({ currencyCode, rate, date, source }: CurrencyCardProps) {
   const [usdInput, setUsdInput] = useState("100");
   const [localInput, setLocalInput] = useState("100");
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/rates")
-      .then((r) => {
-        if (!r.ok) throw new Error("rates error");
-        return r.json();
-      })
-      .then((json) => {
-        if (!active) return;
-        if (!json?.rates) throw new Error("no rates");
-        setData(json);
-      })
-      .catch(() => {
-        if (active) setError(navigator.onLine ? "failed" : "offline");
-      });
-    return () => {
-      active = false;
-    };
-  }, [retryToken]);
-
-  if (error && !data) {
-    return (
-      <Card>
-        <SectionHeader title="Moneda" />
-        <p className="text-ink-3 text-sm">
-          {error === "offline" ? "Sin conexión" : "No se pudieron cargar las cotizaciones."}
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setError(null);
-            setRetryToken((t) => t + 1);
-          }}
-          className="mt-2 rounded-full border-2 border-ink px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-        >
-          Reintentar
-        </button>
-      </Card>
-    );
-  }
-
-  if (!data) {
-    return (
-      <Card>
-        <SectionHeader title="Moneda" />
-        <div className="space-y-3">
-          <Skeleton className="h-12" />
-          <Skeleton className="h-20 opacity-60" />
-        </div>
-      </Card>
-    );
-  }
-
-  const rate = data?.rates[currencyCode];
   const symbol = getCurrencySymbol(currencyCode);
   const currencyName = CURRENCY_NAMES[currencyCode] ?? currencyCode;
 
@@ -100,7 +44,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
       ? fmtNum(parseFloat(localInput) / rate, 2)
       : null;
 
-  const offlineAction = data?.source === "cached" ? (
+  const offlineAction = source === "cached" ? (
     <span className="text-[11px] text-warning/70">(sin conexión)</span>
   ) : undefined;
 
@@ -121,7 +65,7 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
             <p className="text-sm font-medium text-ink">
               1 USD = {fmt(symbol, fmtNum(rate, decimals))}
             </p>
-            <p className="text-xs text-ink-faint">{data?.date ?? ""}</p>
+            <p className="text-xs text-ink-faint">{date ?? ""}</p>
           </div>
         )}
       </div>
