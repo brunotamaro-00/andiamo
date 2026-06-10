@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 // computeItinerary is pure, but the module also exports recalculateItinerary
-// which pulls in the Prisma client and the temp-range fetcher — stub both out.
+// which pulls in the Prisma client, the temp-range fetcher and Next APIs — stub them out.
 vi.mock("./db", () => ({ db: {} }));
 vi.mock("./temp-range", () => ({ fetchTempRange: vi.fn() }));
+vi.mock("next/server", () => ({ after: vi.fn() }));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 import { computeItinerary } from "./itinerary";
 
