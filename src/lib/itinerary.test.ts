@@ -7,7 +7,7 @@ vi.mock("./temp-range", () => ({ fetchTempRange: vi.fn() }));
 vi.mock("next/server", () => ({ after: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-import { computeItinerary } from "./itinerary";
+import { computeItinerary, assumedDateWindow } from "./itinerary";
 
 interface StopOverrides {
   id: string;
@@ -120,5 +120,50 @@ describe("computeItinerary", () => {
   it("handles an empty stop list", () => {
     expect(computeItinerary([], "2026-06-01").size).toBe(0);
     expect(computeItinerary([], null).size).toBe(0);
+  });
+});
+
+describe("assumedDateWindow", () => {
+  const d = (s: string) => new Date(s);
+  const dated = (order: number, arrival: string | null, departure: string | null) => ({
+    order,
+    arrivalDate: arrival ? d(arrival) : null,
+    departureDate: departure ? d(departure) : null,
+  });
+
+  it("returns own dates when complete", () => {
+    const s = dated(2, "2026-08-13", "2026-08-15");
+    expect(assumedDateWindow(s, [s])).toEqual({
+      arrival: d("2026-08-13"),
+      departure: d("2026-08-15"),
+    });
+  });
+
+  it("assumes the gap between dated neighbors for an undated stop", () => {
+    const all = [
+      dated(1, "2026-10-27", "2026-10-29"),
+      dated(2, null, null),
+      dated(3, null, null),
+      dated(4, "2026-11-08", "2026-11-13"),
+    ];
+    const expected = { arrival: d("2026-10-29"), departure: d("2026-11-08") };
+    expect(assumedDateWindow(all[1], all)).toEqual(expected);
+    expect(assumedDateWindow(all[2], all)).toEqual(expected);
+  });
+
+  it("fills only the missing side when arrival is known", () => {
+    const all = [
+      dated(1, "2026-09-19", null),
+      dated(2, "2026-09-23", "2026-09-28"),
+    ];
+    expect(assumedDateWindow(all[0], all)).toEqual({
+      arrival: d("2026-09-19"),
+      departure: d("2026-09-23"),
+    });
+  });
+
+  it("returns null without a dated neighbor on the missing side", () => {
+    const all = [dated(1, "2026-10-27", "2026-10-29"), dated(2, null, null)];
+    expect(assumedDateWindow(all[1], all)).toBeNull();
   });
 });
