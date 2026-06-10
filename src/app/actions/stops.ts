@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
-import { shiftOrders } from "@/lib/stop-order";
+import { shiftOrders, PARKED_ORDER } from "@/lib/stop-order";
 import { recalculateItinerary } from "@/lib/itinerary";
 import { parseForm, CreateStopSchema, UpdateStopSchema, TripStartSchema } from "./_schemas";
 
@@ -43,7 +43,7 @@ export async function createStop(formData: FormData) {
   const newOrder = insertAfterOrder + 1;
 
   await db.$transaction(async (tx) => {
-    await shiftOrders(tx, { gte: newOrder }, +1, "desc");
+    await shiftOrders(tx, { gte: newOrder }, +1);
     await tx.stop.create({
       data: {
         order: newOrder,
@@ -115,11 +115,13 @@ export async function moveStop(id: string, afterOrder: number) {
     const currentOrder = stop.order;
     if (afterOrder === currentOrder - 1 || afterOrder === currentOrder) return;
 
+    // Park the moved stop so the shifted range can occupy its old slot
+    await tx.stop.update({ where: { id }, data: { order: PARKED_ORDER } });
     if (afterOrder > currentOrder) {
-      await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1, "asc");
+      await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1);
       await tx.stop.update({ where: { id }, data: { order: afterOrder } });
     } else {
-      await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1, "desc");
+      await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1);
       await tx.stop.update({ where: { id }, data: { order: afterOrder + 1 } });
     }
   });
@@ -139,7 +141,7 @@ export async function deleteStop(id: string) {
     // Clear any manual current-stop override that pointed at the deleted stop
     await tx.setting.deleteMany({ where: { key: "manualCurrentStopId", value: id } });
     await tx.stop.delete({ where: { id } });
-    await shiftOrders(tx, { gt: stop.order }, -1, "asc");
+    await shiftOrders(tx, { gt: stop.order }, -1);
   });
 
   await recalculateItinerary();
