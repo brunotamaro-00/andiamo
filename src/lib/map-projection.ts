@@ -68,16 +68,28 @@ export function makeProjection(stops: Array<{ latitude: number; longitude: numbe
     .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 }
 
+// The country outlines only change when the projection does (i.e. when the
+// set of stop coordinates changes), and projecting the 1.3 MB geojson is the
+// most expensive part of rendering /map — memoize per coordinate set.
+let countryPathsCache: { key: string; paths: string[] } | null = null;
+
 /** Build SVG path strings for every European country using an already-computed projection.
- *  Accepts the projection object directly (no need to recompute it from stops). */
+ *  Pass `cacheKey` (derived from the stop coords) to reuse the previous result. */
 export function buildCountryPaths(
   geojson: FeatureCollection<Geometry>,
-  projection: ReturnType<typeof makeProjection>
+  projection: ReturnType<typeof makeProjection>,
+  cacheKey?: string,
 ): string[] {
-  const path = geoPath(projection);
-  return geojson.features
+  if (cacheKey && countryPathsCache?.key === cacheKey) return countryPathsCache.paths;
+
+  // 1 decimal ≈ 0.1px precision at viewBox scale — visually identical, ~30% smaller HTML
+  const path = geoPath(projection).digits(1);
+  const paths = geojson.features
     .map((f) => path(f))
     .filter((d): d is string => d != null && d.length > 0);
+
+  if (cacheKey) countryPathsCache = { key: cacheKey, paths };
+  return paths;
 }
 
 /** Quadratic Bézier arc path between two projected points.
