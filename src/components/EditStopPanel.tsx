@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Pencil, Pin } from "lucide-react";
-import { updateStop, deleteStop, moveStop } from "@/app/actions/stops";
+import { updateStop, deleteStop } from "@/app/actions/stops";
 import { haptics } from "@/lib/haptics";
 import { dateToStr } from "@/lib/trip";
 import { IconButton } from "@/components/ui/IconButton";
@@ -80,11 +80,10 @@ function EditModal({
     setMutationError(null);
     startTransition(async () => {
       try {
-        const result = await updateStop(stopId, formData);
+        const afterOrder =
+          selectedAfterOrder !== currentOrder - 1 ? selectedAfterOrder : undefined;
+        const result = await updateStop(stopId, formData, afterOrder);
         if (result?.error) { setMutationError(result.error); return; }
-        if (selectedAfterOrder !== currentOrder - 1) {
-          await moveStop(stopId, selectedAfterOrder);
-        }
         haptics.success();
         onClose();
       } catch {
