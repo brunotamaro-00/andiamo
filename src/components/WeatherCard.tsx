@@ -61,7 +61,8 @@ function formatDay(iso: string): string {
 
 export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
   const [data, setData] = useState<WeatherData | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<"offline" | "failed" | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -76,16 +77,28 @@ export function WeatherCard({ lat, lng }: { lat: number; lng: number }) {
         setData(json);
       })
       .catch(() => {
-        if (active) setError(true);
+        if (active) setError(navigator.onLine ? "failed" : "offline");
       });
     return () => { active = false; };
-  }, [lat, lng]);
+  }, [lat, lng, retryToken]);
 
   if (error && !data) {
     return (
       <Card>
         <SectionHeader title="Clima" />
-        <p className="text-ink-3 text-sm">Sin conexión</p>
+        <p className="text-ink-3 text-sm">
+          {error === "offline" ? "Sin conexión" : "No se pudo cargar el clima."}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setError(null);
+            setRetryToken((t) => t + 1);
+          }}
+          className="mt-2 rounded-full border-2 border-ink px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+        >
+          Reintentar
+        </button>
       </Card>
     );
   }
