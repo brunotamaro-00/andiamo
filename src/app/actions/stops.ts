@@ -71,6 +71,7 @@ export async function createStop(formData: FormData) {
   await recalculateItinerary();
 
   revalidatePath("/stops");
+  revalidatePath("/map");
   redirect(`/stops/${slug}`);
 }
 
@@ -102,6 +103,7 @@ export async function updateStop(id: string, formData: FormData) {
 
   revalidatePath(`/stops/${current.slug}`);
   revalidatePath("/stops");
+  revalidatePath("/map");
 }
 
 export async function moveStop(id: string, afterOrder: number) {
@@ -125,6 +127,7 @@ export async function moveStop(id: string, afterOrder: number) {
   await recalculateItinerary();
 
   revalidatePath("/stops");
+  revalidatePath("/map");
 }
 
 export async function deleteStop(id: string) {
@@ -142,6 +145,7 @@ export async function deleteStop(id: string) {
   await recalculateItinerary();
 
   revalidatePath("/stops");
+  revalidatePath("/map");
   redirect("/stops");
 }
 
@@ -161,5 +165,6 @@ export async function setTripStart(formData: FormData): Promise<{ error?: string
   await recalculateItinerary();
 
   revalidatePath("/stops");
+  revalidatePath("/map");
   return {};
 }
