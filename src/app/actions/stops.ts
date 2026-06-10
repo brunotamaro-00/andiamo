@@ -75,7 +75,32 @@ export async function createStop(formData: FormData) {
   redirect(`/stops/${slug}`);
 }
 
-export async function updateStop(id: string, formData: FormData) {
+/** Reorder transaction: park the moved stop, shift the affected range, place it. */
+async function applyMove(id: string, afterOrder: number): Promise<void> {
+  await db.$transaction(async (tx) => {
+    const stop = await tx.stop.findUnique({ where: { id }, select: { order: true } });
+    if (!stop) return;
+
+    const currentOrder = stop.order;
+    if (afterOrder === currentOrder - 1 || afterOrder === currentOrder) return;
+
+    // Park the moved stop so the shifted range can occupy its old slot
+    await tx.stop.update({ where: { id }, data: { order: PARKED_ORDER } });
+    if (afterOrder > currentOrder) {
+      await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1);
+      await tx.stop.update({ where: { id }, data: { order: afterOrder } });
+    } else {
+      await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1);
+      await tx.stop.update({ where: { id }, data: { order: afterOrder + 1 } });
+    }
+  });
+}
+
+/**
+ * Updates a stop's fields and, when `afterOrder` is provided, reorders it in
+ * the same mutation — a single recalculateItinerary instead of two round-trips.
+ */
+export async function updateStop(id: string, formData: FormData, afterOrder?: number) {
   await requireAuth();
 
   const parsed = parseForm(formData, UpdateStopSchema);
@@ -99,35 +124,13 @@ export async function updateStop(id: string, formData: FormData) {
     data: { name, nights, datesFixed, isCandidate, isTransit, arrivalMode, ...extraFields },
   });
 
+  if (afterOrder !== undefined) {
+    await applyMove(id, afterOrder);
+  }
+
   await recalculateItinerary();
 
   revalidatePath(`/stops/${current.slug}`);
-  revalidatePath("/stops");
-  revalidatePath("/map");
-}
-
-export async function moveStop(id: string, afterOrder: number) {
-  await requireAuth();
-  await db.$transaction(async (tx) => {
-    const stop = await tx.stop.findUnique({ where: { id }, select: { order: true } });
-    if (!stop) return;
-
-    const currentOrder = stop.order;
-    if (afterOrder === currentOrder - 1 || afterOrder === currentOrder) return;
-
-    // Park the moved stop so the shifted range can occupy its old slot
-    await tx.stop.update({ where: { id }, data: { order: PARKED_ORDER } });
-    if (afterOrder > currentOrder) {
-      await shiftOrders(tx, { gt: currentOrder, lte: afterOrder }, -1);
-      await tx.stop.update({ where: { id }, data: { order: afterOrder } });
-    } else {
-      await shiftOrders(tx, { gt: afterOrder, lt: currentOrder }, +1);
-      await tx.stop.update({ where: { id }, data: { order: afterOrder + 1 } });
-    }
-  });
-
-  await recalculateItinerary();
-
   revalidatePath("/stops");
   revalidatePath("/map");
 }

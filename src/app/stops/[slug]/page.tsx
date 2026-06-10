@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { computeCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
-import { WeatherCard } from "@/components/WeatherCard";
-import { CurrencyCard } from "@/components/CurrencyCard";
+import { Suspense } from "react";
+import { WeatherCard, WeatherCardSkeleton } from "@/components/WeatherCard";
+import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
 import { PoiPanel } from "@/components/PoiPanel";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
@@ -268,11 +269,15 @@ export default async function StopPage({ params }: Props) {
           )}
         </div>
 
-        {/* Weather */}
-        <WeatherCard lat={stop.latitude} lng={stop.longitude} />
+        {/* Weather — streamed; the page shell doesn't wait for Open-Meteo */}
+        <Suspense fallback={<WeatherCardSkeleton />}>
+          <WeatherCard lat={stop.latitude} lng={stop.longitude} />
+        </Suspense>
 
-        {/* Currency */}
-        <CurrencyCard currencyCode={stop.currencyCode} />
+        {/* Currency — streamed; converter stays interactive client-side */}
+        <Suspense fallback={<CurrencyCardSkeleton />}>
+          <CurrencySection currencyCode={stop.currencyCode} />
+        </Suspense>
 
         {/* POIs */}
         <div id="pois" className="scroll-mt-20">
