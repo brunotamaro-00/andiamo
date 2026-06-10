@@ -1,16 +1,15 @@
-// Andiamo Service Worker v2
+// Andiamo Service Worker v3
 // Strategy summary:
 //   /api/documents/*  GET  → cache-first (offline-capable document files)
-//   /api/weather,/api/rates → stale-while-revalidate (show last reading offline)
 //   Navigation + /_next/static/ → stale-while-revalidate (app shell)
 //   Everything else → network-only (auth-gated API routes)
+// Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v2";   // bumped: now includes precached routes
-const DATA_CACHE  = "andiamo-data-v1";    // weather + rates
+const SHELL_CACHE = "andiamo-shell-v3";   // bumped: SWR navigations, no data cache
 const OFFLINE_URL = "/offline.html";
 
-const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE, DATA_CACHE];
+const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
 const SHELL_ROUTES = [
@@ -56,20 +55,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── 2. Weather + rates — stale-while-revalidate ───────────────────────────
-  //    Shows cached data offline; updates in background when connected.
-  if (url.pathname === "/api/weather" || url.pathname === "/api/rates") {
-    event.respondWith(staleWhileRevalidate(DATA_CACHE, request));
-    return;
-  }
-
-  // ── 3. Navigation — stale-while-revalidate (app shell) ───────────────────
+  // ── 2. Navigation — stale-while-revalidate (app shell) ───────────────────
   if (request.mode === "navigate") {
     event.respondWith(navigateWithFallback(request));
     return;
   }
 
-  // ── 4. Next.js static assets — stale-while-revalidate ────────────────────
+  // ── 3. Next.js static assets — stale-while-revalidate ────────────────────
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(staleWhileRevalidate(SHELL_CACHE, request));
     return;
