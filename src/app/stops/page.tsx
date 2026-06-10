@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr } from "@/lib/trip";
+import { todayStr, dateToStr, tripDayNumber, daysBetween } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
@@ -83,6 +83,15 @@ export default async function StopsPage() {
             value={[...new Set(stops.map((s) => s.country))].length.toString()}
           />
         </div>
+
+        {/* Today context */}
+        <TodayCard
+          stops={stops}
+          currentSlug={currentSlug}
+          today={today}
+          tripStartDate={tripStartDate}
+          tripEndDate={tripEndDate}
+        />
 
         {/* Timeline */}
         <div className="space-y-3">
@@ -196,6 +205,102 @@ export default async function StopsPage() {
 
       </main>
     </div>
+  );
+}
+
+interface TodayCardStop {
+  slug: string;
+  name: string;
+  countryFlag: string;
+  arrivalDate: Date | null;
+  departureDate: Date | null;
+  isCandidate: boolean;
+  isFlexMargin: boolean;
+}
+
+/** Answers "¿dónde estoy hoy?" at a glance — gold-accented context card above the timeline. */
+function TodayCard({
+  stops, currentSlug, today, tripStartDate, tripEndDate,
+}: {
+  stops: TodayCardStop[];
+  currentSlug: string | null;
+  today: string;
+  tripStartDate: Date | null;
+  tripEndDate: Date | null;
+}) {
+  if (!tripStartDate) return null;
+
+  const firstArrivalStr = dateToStr(tripStartDate);
+  const lastDepartureStr = tripEndDate ? dateToStr(tripEndDate) : null;
+  const currentStop = stops.find((s) => s.slug === currentSlug) ?? null;
+
+  const phase: "before" | "during" | "after" =
+    today < firstArrivalStr
+      ? "before"
+      : lastDepartureStr && today >= lastDepartureStr
+      ? "after"
+      : "during";
+
+  let numeral: string;
+  let numeralLabel: string;
+  let line: React.ReactNode;
+
+  if (phase === "before") {
+    const daysToStart = Math.max(0, daysBetween(today, firstArrivalStr));
+    const firstStop = stops.find((s) => !s.isCandidate && !s.isFlexMargin && s.arrivalDate);
+    numeral = daysToStart.toString();
+    numeralLabel = daysToStart === 1 ? "día" : "días";
+    line = (
+      <>
+        Faltan para el despegue
+        {firstStop && (
+          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
+            Primera parada: <span aria-hidden="true">{firstStop.countryFlag}</span> {firstStop.name} · {formatShortDate(firstStop.arrivalDate!)}
+          </span>
+        )}
+      </>
+    );
+  } else if (phase === "during" && currentStop) {
+    const day = tripDayNumber(currentStop.arrivalDate, tripStartDate) ?? daysBetween(firstArrivalStr, today) + 1;
+    numeral = day.toString();
+    numeralLabel = "día";
+    line = (
+      <>
+        Estás en <span aria-hidden="true">{currentStop.countryFlag}</span> {currentStop.name}
+        {currentStop.departureDate && (
+          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
+            Hasta el {formatShortDate(currentStop.departureDate)}
+          </span>
+        )}
+      </>
+    );
+  } else {
+    return null;
+  }
+
+  const card = (
+    <div className="flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-[4px] px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150 hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+      <div className="text-center shrink-0">
+        <p className="text-4xl font-numeral leading-none text-gold-ink">{numeral}</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">{numeralLabel}</p>
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70">Hoy</p>
+        <p className="text-sm font-semibold text-ink mt-0.5">{line}</p>
+      </div>
+      <ChevronRight size={16} strokeWidth={2} aria-hidden="true" className="ml-auto shrink-0 text-gold-ink/60" />
+    </div>
+  );
+
+  const href = phase === "during" && currentStop ? `/stops/${currentStop.slug}` : null;
+  if (!href) return card;
+  return (
+    <Link
+      href={href}
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[4px]"
+    >
+      {card}
+    </Link>
   );
 }
 
