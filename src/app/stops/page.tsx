@@ -112,12 +112,12 @@ export default async function StopsPage() {
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#C44428]"
+                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#C44428]"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
                       ? "bg-surface/40 border-border/40 opacity-45"
-                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#1B1A17]",
+                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#1B1A17]",
                   ]
                     .filter(Boolean)
                     .join(" ")}
