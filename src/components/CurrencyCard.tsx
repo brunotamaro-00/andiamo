@@ -26,7 +26,8 @@ interface RatesData {
 
 export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
   const [data, setData] = useState<RatesData | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<"offline" | "failed" | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   const [usdInput, setUsdInput] = useState("100");
   const [localInput, setLocalInput] = useState("100");
 
@@ -43,18 +44,30 @@ export function CurrencyCard({ currencyCode }: { currencyCode: string }) {
         setData(json);
       })
       .catch(() => {
-        if (active) setError(true);
+        if (active) setError(navigator.onLine ? "failed" : "offline");
       });
     return () => {
       active = false;
     };
-  }, []);
+  }, [retryToken]);
 
   if (error && !data) {
     return (
       <Card>
         <SectionHeader title="Moneda" />
-        <p className="text-ink-3 text-sm">Sin conexión</p>
+        <p className="text-ink-3 text-sm">
+          {error === "offline" ? "Sin conexión" : "No se pudieron cargar las cotizaciones."}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setError(null);
+            setRetryToken((t) => t + 1);
+          }}
+          className="mt-2 rounded-full border-2 border-ink px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+        >
+          Reintentar
+        </button>
       </Card>
     );
   }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
+import { todayStr, dateToStr } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
@@ -30,13 +31,11 @@ export default async function StopsPage() {
     tripStartDate && tripEndDate
       ? Math.round((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24))
       : null;
-  const today = new Date();
+  const today = todayStr();
 
   const tripStartValue = tripStartSetting?.value ?? "";
   // Fallback: compute start date from first confirmed stop's arrivalDate
-  const tripStartFallback = tripStartDate
-    ? tripStartDate.toISOString().slice(0, 10)
-    : "";
+  const tripStartFallback = tripStartDate ? dateToStr(tripStartDate) : "";
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -98,7 +97,7 @@ export default async function StopsPage() {
             .filter((s) => !s.isFlexMargin)
             .map((stop, idx) => {
               const isActive = stop.slug === currentSlug;
-              const isPast = stop.departureDate && today > new Date(stop.departureDate);
+              const isPast = stop.departureDate && today > dateToStr(stop.departureDate);
               const isCandidate = stop.isCandidate;
               const stagger = idx < 6 ? `stagger-${(idx % 6) + 1}` : "";
 
@@ -112,12 +111,12 @@ export default async function StopsPage() {
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#C44428]"
+                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#C44428]"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
                       ? "bg-surface/40 border-border/40 opacity-45"
-                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] hover:shadow-[5px_5px_0_#1B1A17]",
+                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#1B1A17]",
                   ]
                     .filter(Boolean)
                     .join(" ")}

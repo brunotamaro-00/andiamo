@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Pencil, Pin } from "lucide-react";
 import { updateStop, deleteStop, moveStop } from "@/app/actions/stops";
 import { haptics } from "@/lib/haptics";
+import { dateToStr } from "@/lib/trip";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -33,7 +34,7 @@ interface Props {
 
 function toDateInput(d: Date | null): string {
   if (!d) return "";
-  return new Date(d).toISOString().slice(0, 10);
+  return dateToStr(new Date(d));
 }
 
 function formatDateDisplay(d: Date | null): string {

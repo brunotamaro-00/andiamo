@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { getCurrentStopSlug, getTripDayNumber } from "@/lib/current-stop";
-import { todayStr, dateToStr } from "@/lib/trip";
+import { computeCurrentStopSlug } from "@/lib/current-stop";
+import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
@@ -36,9 +36,9 @@ export default async function StopPage({ params }: Props) {
   await requireAuth();
   const { slug } = await params;
 
-  // All three queries are independent and run concurrently.
-  // otherStops does NOT depend on stop.id — we filter it in memory after resolving.
-  const [stop, currentSlug, allOtherStops, tripDay] = await Promise.all([
+  // All three queries are independent and run concurrently. The stop list is
+  // fetched once and shared by the current-stop, trip-day, and nav derivations.
+  const [stop, allStopsRaw, currentOverride] = await Promise.all([
     db.stop.findUnique({
       where: { slug },
       include: {
@@ -49,18 +49,35 @@ export default async function StopPage({ params }: Props) {
         documents: { orderBy: { createdAt: "asc" } },
       },
     }),
-    getCurrentStopSlug(),
     db.stop.findMany({
-      where: { isFlexMargin: false },
       orderBy: { order: "asc" },
-      select: { id: true, slug: true, name: true, order: true, countryFlag: true, isCandidate: true, arrivalDate: true, departureDate: true },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        order: true,
+        nights: true,
+        countryFlag: true,
+        isCandidate: true,
+        isFlexMargin: true,
+        arrivalDate: true,
+        departureDate: true,
+      },
     }),
-    getTripDayNumber(slug),
+    db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
   ]);
 
   if (!stop) notFound();
 
-  /* Filter out the current stop in memory — avoids a serial DB round-trip (P1 fix) */
+  const currentSlug = computeCurrentStopSlug(allStopsRaw, currentOverride?.value ?? null);
+
+  const allOtherStops = allStopsRaw.filter((s) => !s.isFlexMargin);
+  const firstDatedArrival = allOtherStops.find((s) => s.arrivalDate)?.arrivalDate ?? null;
+  const tripDay = tripDayNumber(
+    allOtherStops.find((s) => s.slug === slug)?.arrivalDate,
+    firstDatedArrival,
+  );
+
   const otherStops = allOtherStops.filter((s) => s.id !== stop.id);
 
   const prevStop = otherStops.filter((s) => s.order < stop.order).at(-1);
@@ -96,16 +113,14 @@ export default async function StopPage({ params }: Props) {
       ? "after"
       : "during";
 
-  // Days remaining at this stop (UTC-safe — both sides are UTC midnight)
+  // Days remaining at this stop
   const depStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
-  const daysLeft = depStr
-    ? Math.max(0, Math.ceil((new Date(depStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
-    : null;
+  const daysLeft = depStr ? Math.max(0, daysBetween(today, depStr)) : null;
 
   // Days until trip starts (only relevant when before the trip)
   const daysToStart =
     tripPhase === "before" && firstArrivalStr
-      ? Math.max(0, Math.ceil((new Date(firstArrivalStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
+      ? Math.max(0, daysBetween(today, firstArrivalStr))
       : null;
 
   const path = `/stops/${slug}`;

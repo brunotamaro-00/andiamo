@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useTransition, useOptimistic, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
 import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { haptics } from "@/lib/haptics";
+import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, TextareaField } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 interface Note {
@@ -34,13 +35,10 @@ type OptimisticAction =
   | { type: "add"; note: Note };
 
 export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [mutationError, setMutationError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const [optimisticNotes, applyOptimistic] = useOptimistic(
+  const { items: optimisticNotes, mutate, mutationError, isPending } = useOptimisticList(
     notes,
     (state, action: OptimisticAction) => {
       switch (action.type) {
@@ -57,34 +55,14 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   );
 
   function handleTogglePin(id: string) {
-    setMutationError(null);
     haptics.tap();
-    startTransition(async () => {
-      applyOptimistic({ type: "togglePin", id });
-      try {
-        await toggleNotePin(id, path);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo guardar el cambio. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "togglePin", id }, () => toggleNotePin(id, path), "No se pudo guardar el cambio. Reintentá.");
   }
 
   function handleDelete(id: string) {
     setConfirmingId(null);
-    setMutationError(null);
     haptics.warning();
-    startTransition(async () => {
-      applyOptimistic({ type: "delete", id });
-      try {
-        await deleteNote(id, path);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo borrar la nota. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "delete", id }, () => deleteNote(id, path), "No se pudo borrar la nota. Reintentá.");
   }
 
   function handleAdd(formData: FormData) {
@@ -99,18 +77,8 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
       createdAt: new Date(),
     };
     setOpen(false);
-    setMutationError(null);
     haptics.success();
-    startTransition(async () => {
-      applyOptimistic({ type: "add", note: temp });
-      try {
-        await createNote(formData);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo agregar la nota. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "add", note: temp }, () => createNote(formData), "No se pudo agregar la nota. Reintentá.");
   }
 
   async function handleSave(id: string, title: string, body: string): Promise<"ok" | "error"> {
@@ -144,12 +112,7 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
         }
       />
 
-      {mutationError && (
-        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
-          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
-          {mutationError}
-        </p>
-      )}
+      <MutationErrorBanner message={mutationError} />
 
       {sorted.length === 0 ? (
         <EmptyState
