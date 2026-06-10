@@ -5,7 +5,6 @@ import { computeCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { Suspense } from "react";
-import { WeatherCard, WeatherCardSkeleton } from "@/components/WeatherCard";
 import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
 import { PoiPanel } from "@/components/PoiPanel";
 import { NotesPanel } from "@/components/NotesPanel";
@@ -13,8 +12,10 @@ import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, Thermometer } from "lucide-react";
+import { ArrowLeft, ArrowRight, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { HashScroller } from "@/components/HashScroller";
+import { tentativeSunTimes } from "@/lib/sun";
+import { assumedDateWindow } from "@/lib/itinerary";
 
 export const dynamic = "force-dynamic";
 
@@ -124,6 +125,20 @@ export default async function StopPage({ params }: Props) {
       ? Math.max(0, daysBetween(today, firstArrivalStr))
       : null;
 
+  // Stay window — own dates, or the assumed gap between dated neighbors
+  const stayWindow = assumedDateWindow(stop, allStopsRaw);
+
+  // Tentative sunrise/sunset for the stay — pure local computation, no API
+  const sunTimes = stayWindow
+    ? tentativeSunTimes(
+        stop.latitude,
+        stop.longitude,
+        stayWindow.arrival,
+        stayWindow.departure,
+        stop.timezone,
+      )
+    : null;
+
   const path = `/stops/${slug}`;
 
   return (
@@ -172,16 +187,26 @@ export default async function StopPage({ params }: Props) {
               </div>
 
               <div className="flex flex-wrap gap-2 mt-3">
-                {stop.arrivalDate && (
+                {stop.arrivalDate ? (
                   <DateBadge>
                     {formatDate(stop.arrivalDate)} –{" "}
-                    {stop.departureDate ? formatDate(stop.departureDate) : "?"}
+                    {stop.departureDate
+                      ? formatDate(stop.departureDate)
+                      : stayWindow
+                      ? `≈${formatDate(stayWindow.departure)}`
+                      : "?"}
                   </DateBadge>
+                ) : (
+                  stayWindow && (
+                    <DateBadge>
+                      ≈{formatDate(stayWindow.arrival)} – {formatDate(stayWindow.departure)}
+                    </DateBadge>
+                  )
                 )}
                 {stop.tempRange && (
                   <DateBadge>
                     <Thermometer size={11} strokeWidth={1.5} aria-hidden="true" className="inline mr-1" />
-                    {stop.tempRange}
+                    ≈{stop.tempRange}
                   </DateBadge>
                 )}
               </div>
@@ -210,17 +235,29 @@ export default async function StopPage({ params }: Props) {
             </div>
           </div>
 
-          {stop.arrivalDate && tripDay !== null && (
-            <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap gap-3 text-xs text-ink-3">
-              <span>Día {tripDay} del viaje</span>
-              {isActive && tripPhase === "during" && daysLeft !== null && (
-                <span className="text-brick">
-                  {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
-                </span>
+          {((stop.arrivalDate && tripDay !== null) || sunTimes) && (
+            <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap items-center gap-3 text-xs text-ink-3">
+              {stop.arrivalDate && tripDay !== null && (
+                <>
+                  <span>Día {tripDay} del viaje</span>
+                  {isActive && tripPhase === "during" && daysLeft !== null && (
+                    <span className="text-brick">
+                      {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
+                    </span>
+                  )}
+                  {isActive && tripPhase === "before" && daysToStart !== null && (
+                    <span className="text-brick">
+                      Faltan {daysToStart} {daysToStart === 1 ? "día" : "días"} para el inicio
+                    </span>
+                  )}
+                </>
               )}
-              {isActive && tripPhase === "before" && daysToStart !== null && (
-                <span className="text-brick">
-                  Faltan {daysToStart} {daysToStart === 1 ? "día" : "días"} para el inicio
+              {sunTimes && (
+                <span className="ml-auto flex items-center gap-1.5 tabular-nums">
+                  <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
+                  {sunTimes.sunrise}
+                  <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="ml-1.5" />
+                  {sunTimes.sunset}
                 </span>
               )}
             </div>
@@ -269,16 +306,6 @@ export default async function StopPage({ params }: Props) {
           )}
         </div>
 
-        {/* Weather — streamed; the page shell doesn't wait for Open-Meteo */}
-        <Suspense fallback={<WeatherCardSkeleton />}>
-          <WeatherCard lat={stop.latitude} lng={stop.longitude} />
-        </Suspense>
-
-        {/* Currency — streamed; converter stays interactive client-side */}
-        <Suspense fallback={<CurrencyCardSkeleton />}>
-          <CurrencySection currencyCode={stop.currencyCode} />
-        </Suspense>
-
         {/* POIs */}
         <div id="pois" className="scroll-mt-20">
           <PoiPanel
@@ -309,6 +336,11 @@ export default async function StopPage({ params }: Props) {
           }
           path={path}
         />
+
+        {/* Currency — streamed; converter stays interactive client-side */}
+        <Suspense fallback={<CurrencyCardSkeleton />}>
+          <CurrencySection currencyCode={stop.currencyCode} />
+        </Suspense>
       </main>
     </div>
   );

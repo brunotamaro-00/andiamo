@@ -73,6 +73,47 @@ export function computeItinerary(
   return result;
 }
 
+interface DatedStop {
+  order: number;
+  arrivalDate: Date | null;
+  departureDate: Date | null;
+}
+
+/**
+ * Pure function — effective stay window for a stop. If its own dates are
+ * incomplete, assumes the gap between neighbors in itinerary order: from the
+ * last dated stop before it to the first dated stop after it.
+ */
+export function assumedDateWindow(
+  stop: DatedStop,
+  allStops: DatedStop[],
+): { arrival: Date; departure: Date } | null {
+  if (stop.arrivalDate && stop.departureDate) {
+    return { arrival: stop.arrivalDate, departure: stop.departureDate };
+  }
+
+  const sorted = [...allStops].sort((a, b) => a.order - b.order);
+  const arrival =
+    stop.arrivalDate ??
+    sorted
+      .filter((s) => s.order < stop.order)
+      .map((s) => s.departureDate ?? s.arrivalDate)
+      .filter((d): d is Date => d != null)
+      .at(-1) ??
+    null;
+  const departure =
+    stop.departureDate ??
+    sorted
+      .filter((s) => s.order > stop.order)
+      .map((s) => s.arrivalDate ?? s.departureDate)
+      .filter((d): d is Date => d != null)[0] ??
+    null;
+
+  if (!arrival || !departure) return null;
+  if (departure.getTime() < arrival.getTime()) return null;
+  return { arrival, departure };
+}
+
 /**
  * Reads the full stop list + tripStartDate setting, recomputes all dates,
  * and persists any that changed. The tempRange refresh (HTTP to Open-Meteo)
@@ -97,6 +138,7 @@ export async function recalculateItinerary(): Promise<void> {
         isCandidate: true,
         latitude: true,
         longitude: true,
+        tempRange: true,
       },
     }),
   ]);
@@ -127,30 +169,43 @@ export async function recalculateItinerary(): Promise<void> {
     return oldArr !== newArr || oldDep !== newDep;
   });
 
-  if (changed.length === 0) return;
-
   // Phase 1 (blocking): persist the recomputed dates only
-  await db.$transaction(
-    changed.map((stop) => {
-      const next = computed.get(stop.id)!;
-      return db.stop.update({
-        where: { id: stop.id },
-        data: { arrivalDate: next.arrival, departureDate: next.departure },
-      });
-    }),
-  );
+  if (changed.length > 0) {
+    await db.$transaction(
+      changed.map((stop) => {
+        const next = computed.get(stop.id)!;
+        return db.stop.update({
+          where: { id: stop.id },
+          data: { arrivalDate: next.arrival, departureDate: next.departure },
+        });
+      }),
+    );
+  }
 
-  // Phase 2 (deferred): refresh tempRanges after the response is sent
-  const toRefresh = changed
-    .map((stop) => ({ stop, next: computed.get(stop.id)! }))
-    .filter(({ next }) => next.arrival && next.departure)
-    .map(({ stop, next }) => ({
+  // Phase 2 (deferred): refresh temp ranges after the response is sent.
+  // Stops without complete dates use the assumed gap between dated neighbors;
+  // they also refresh on any itinerary change since their window derives from it.
+  const changedIds = new Set(changed.map((s) => s.id));
+  const computedStops = stops.map((stop) => {
+    const next = computed.get(stop.id)!;
+    return { ...stop, arrivalDate: next.arrival, departureDate: next.departure };
+  });
+  const toRefresh = computedStops
+    .map((stop) => ({ stop, window: assumedDateWindow(stop, computedStops) }))
+    .filter((t): t is typeof t & { window: NonNullable<(typeof t)["window"]> } => t.window != null)
+    .filter(
+      ({ stop }) =>
+        changedIds.has(stop.id) ||
+        stop.tempRange == null ||
+        (changed.length > 0 && (!stop.arrivalDate || !stop.departureDate)),
+    )
+    .map(({ stop, window }) => ({
       id: stop.id,
       slug: stop.slug,
       latitude: stop.latitude,
       longitude: stop.longitude,
-      arrival: next.arrival!,
-      departure: next.departure!,
+      arrival: window.arrival,
+      departure: window.departure,
     }));
 
   if (toRefresh.length > 0) {
