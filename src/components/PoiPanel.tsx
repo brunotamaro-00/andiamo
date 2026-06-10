@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useTransition, useOptimistic, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef } from "react";
 import {
   BedDouble, Landmark, Target, UtensilsCrossed, Binoculars,
-  TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search, AlertCircle,
+  TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search,
 } from "lucide-react";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 import type { LucideIcon } from "lucide-react";
 import { createPoi, updatePoi, togglePoiDone, deletePoi } from "@/app/actions/pois";
 import { haptics } from "@/lib/haptics";
+import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -64,14 +65,11 @@ type OptimisticAction =
   | { type: "add"; poi: Poi };
 
 export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editingPoi, setEditingPoi] = useState<Poi | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [mutationError, setMutationError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const [optimisticPois, applyOptimistic] = useOptimistic(
+  const { items: optimisticPois, mutate, run, mutationError, isPending } = useOptimisticList(
     pois,
     (state, action: OptimisticAction) => {
       switch (action.type) {
@@ -88,34 +86,14 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
   );
 
   function handleToggle(poi: Poi) {
-    setMutationError(null);
     if (poi.done) haptics.tap(); else haptics.success();
-    startTransition(async () => {
-      applyOptimistic({ type: "toggle", id: poi.id });
-      try {
-        await togglePoiDone(poi.id, slug);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo guardar el cambio. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "toggle", id: poi.id }, () => togglePoiDone(poi.id, slug), "No se pudo guardar el cambio. Reintentá.");
   }
 
   function handleDelete(id: string) {
     setConfirmingId(null);
-    setMutationError(null);
     haptics.warning();
-    startTransition(async () => {
-      applyOptimistic({ type: "delete", id });
-      try {
-        await deletePoi(id, slug);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo borrar. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "delete", id }, () => deletePoi(id, slug), "No se pudo borrar. Reintentá.");
   }
 
   function handleAdd(formData: FormData) {
@@ -136,32 +114,14 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
       reservationRequired: formData.get("reservationRequired") === "true",
     };
     setOpen(false);
-    setMutationError(null);
     haptics.success();
-    startTransition(async () => {
-      applyOptimistic({ type: "add", poi: temp });
-      try {
-        await createPoi(formData);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo agregar el punto de interés. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate({ type: "add", poi: temp }, () => createPoi(formData), "No se pudo agregar el punto de interés. Reintentá.");
   }
 
   function handleEdit(formData: FormData, id: string) {
     formData.set("slug", slug);
     setEditingPoi(null);
-    setMutationError(null);
-    startTransition(async () => {
-      try {
-        await updatePoi(id, formData);
-      } catch {
-        setMutationError("No se pudo guardar los cambios. Reintentá.");
-        router.refresh();
-      }
-    });
+    run(() => updatePoi(id, formData), "No se pudo guardar los cambios. Reintentá.");
   }
 
   const pending = optimisticPois.filter((p) => !p.done);
@@ -182,12 +142,7 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
         }
       />
 
-      {mutationError && (
-        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
-          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
-          {mutationError}
-        </p>
-      )}
+      <MutationErrorBanner message={mutationError} />
 
       {optimisticPois.length === 0 ? (
         <EmptyState
