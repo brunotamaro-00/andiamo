@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useOptimistic } from "react";
 import { useRouter } from "next/navigation";
+import { haptics } from "./haptics";
 
 /**
  * useOptimisticList — shared hook for panels that manage a list with optimistic mutations.
@@ -38,6 +39,22 @@ export function useOptimisticList<T, A>(
       try {
         await serverAction();
       } catch {
+        haptics.error();
+        setMutationError(errorMsg);
+        router.refresh();
+      }
+    });
+  }
+
+  /** Call `serverAction` inside the shared transition without an optimistic
+   *  update — for mutations whose result can't be predicted locally (edits). */
+  function run(serverAction: () => Promise<unknown>, errorMsg: string) {
+    setMutationError(null);
+    startTransition(async () => {
+      try {
+        await serverAction();
+      } catch {
+        haptics.error();
         setMutationError(errorMsg);
         router.refresh();
       }
@@ -47,6 +64,7 @@ export function useOptimisticList<T, A>(
   return {
     items: optimisticItems,
     mutate,
+    run,
     mutationError,
     clearError: () => setMutationError(null),
     isPending,

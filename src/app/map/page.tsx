@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { todayStr, dateToStr } from "@/lib/trip";
 import { Wordmark } from "@/components/Wordmark";
 import { TripMap } from "@/components/TripMap";
 import {
@@ -48,19 +49,19 @@ export default async function MapPage() {
   const countryPaths = buildCountryPaths(geojson, projection);
 
   // Determine visit state for each stop based on today's date.
-  // We compare YYYY-MM-DD strings (ISO prefix) to avoid timezone issues:
-  // Prisma DateTime values are always UTC midnight; toISOString().slice(0,10) gives the date part.
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // We compare YYYY-MM-DD strings to avoid timezone issues: Prisma @db.Date
+  // values are UTC midnight, and todayStr() is anchored to TRIP_TIMEZONE.
+  const today = todayStr();
 
   const cities = confirmed.map((s) => {
     const [x, y] = projection([s.longitude, s.latitude]) ?? [0, 0];
     let state: StopState = "upcoming";
     if (s.arrivalDate) {
-      const arrStr = s.arrivalDate.toISOString().slice(0, 10);
-      if (arrStr <= todayStr) {
+      const arrStr = dateToStr(s.arrivalDate);
+      if (arrStr <= today) {
         if (s.departureDate) {
-          const depStr = s.departureDate.toISOString().slice(0, 10);
-          state = todayStr < depStr ? "current" : "visited";
+          const depStr = dateToStr(s.departureDate);
+          state = today < depStr ? "current" : "visited";
         } else {
           state = "current";
         }

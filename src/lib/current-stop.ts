@@ -1,23 +1,35 @@
 import { db } from "./db";
-import { todayStr, dateToStr } from "./trip";
+import { todayStr, dateToStr, tripDayNumber } from "./trip";
 
-export async function getCurrentStopSlug(): Promise<string | null> {
-  // Check for manual override first
-  const override = await db.setting.findUnique({ where: { key: "manualCurrentStopId" } });
-  if (override) {
-    const stop = await db.stop.findUnique({ where: { id: override.value }, select: { slug: true } });
-    if (stop) return stop.slug;
+export interface CurrentStopInput {
+  id: string;
+  slug: string;
+  order: number;
+  nights: number;
+  isFlexMargin: boolean;
+  arrivalDate: Date | null;
+  departureDate: Date | null;
+}
+
+/**
+ * Pure core of getCurrentStopSlug — pass the full stop list (sorted by order)
+ * and the manual override id, get the slug to highlight as "current".
+ *
+ * Compares YYYY-MM-DD strings — safe against server-timezone drift since all
+ * dates come from @db.Date (UTC midnight) and todayStr() is anchored to
+ * TRIP_TIMEZONE.
+ */
+export function computeCurrentStopSlug(
+  allStops: CurrentStopInput[],
+  overrideId: string | null,
+  today: string = todayStr(),
+): string | null {
+  if (overrideId) {
+    const overridden = allStops.find((s) => s.id === overrideId);
+    if (overridden) return overridden.slug;
   }
 
-  // Compare YYYY-MM-DD strings — safe against server-timezone drift since
-  // all dates come from @db.Date (UTC midnight) and todayStr() uses UTC.
-  const today = todayStr();
-
-  const stops = await db.stop.findMany({
-    where: { isFlexMargin: false, nights: { gt: 0 } },
-    orderBy: { order: "asc" },
-    select: { slug: true, arrivalDate: true, departureDate: true, order: true },
-  });
+  const stops = allStops.filter((s) => !s.isFlexMargin && s.nights > 0);
 
   for (const stop of stops) {
     if (stop.arrivalDate && stop.departureDate) {
@@ -40,6 +52,26 @@ export async function getCurrentStopSlug(): Promise<string | null> {
   return lastWithDate?.slug ?? stops[0]?.slug ?? null;
 }
 
+export async function getCurrentStopSlug(): Promise<string | null> {
+  const [override, stops] = await Promise.all([
+    db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
+    db.stop.findMany({
+      orderBy: { order: "asc" },
+      select: {
+        id: true,
+        slug: true,
+        order: true,
+        nights: true,
+        isFlexMargin: true,
+        arrivalDate: true,
+        departureDate: true,
+      },
+    }),
+  ]);
+
+  return computeCurrentStopSlug(stops, override?.value ?? null);
+}
+
 export async function getTripDayNumber(slug: string): Promise<number | null> {
   const stops = await db.stop.findMany({
     where: { isFlexMargin: false },
@@ -50,11 +82,5 @@ export async function getTripDayNumber(slug: string): Promise<number | null> {
   const firstStop = stops.find((s) => s.arrivalDate);
   const thisStop = stops.find((s) => s.slug === slug);
 
-  if (!firstStop?.arrivalDate || !thisStop?.arrivalDate) return null;
-
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const diff = Math.floor(
-    (thisStop.arrivalDate.getTime() - firstStop.arrivalDate.getTime()) / msPerDay,
-  );
-  return diff + 1;
+  return tripDayNumber(thisStop?.arrivalDate, firstStop?.arrivalDate);
 }

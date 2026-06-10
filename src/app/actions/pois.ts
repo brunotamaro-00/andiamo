@@ -13,19 +13,27 @@ export async function createPoi(formData: FormData) {
   if (!parsed.ok) return { error: parsed.error };
   const { stopId, slug, name, type, latitude, longitude, address, url, notes, reservationRequired } = parsed.data;
 
-  await db.poi.create({
-    data: {
-      stop: { connect: { id: stopId } },
-      name,
-      type: (type as PoiType) ?? "otro",
-      latitude: latitude ?? null,
-      longitude: longitude ?? null,
-      address: address ?? null,
-      url: url ?? null,
-      notes: notes ?? null,
-      reservationRequired,
-    },
-  });
+  try {
+    await db.poi.create({
+      data: {
+        stop: { connect: { id: stopId } },
+        name,
+        type: (type as PoiType) ?? "otro",
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        address: address ?? null,
+        url: url ?? null,
+        notes: notes ?? null,
+        reservationRequired,
+      },
+    });
+  } catch (e) {
+    // P2025: the connected stop doesn't exist — surface it instead of a 500
+    if ((e as { code?: string }).code === "P2025") {
+      return { error: "Parada no encontrada" };
+    }
+    throw e;
+  }
 
   revalidatePath(`/stops/${slug}`);
   revalidatePath("/stops");
