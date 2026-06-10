@@ -23,12 +23,40 @@ const optionalUrl = z
     { message: "La URL debe comenzar con http:// o https://" },
   );
 
-/** Coerce a numeric string, with a fallback for empty/invalid */
+/** Coerce a numeric string. Empty → fallback; malformed input is rejected (never silently coerced). */
 const numericStr = (fallback: number) =>
-  z.string().transform((v) => parseFloat(v) || fallback);
+  z.string().transform((v, ctx) => {
+    const t = v.trim();
+    if (!t) return fallback;
+    const n = parseFloat(t);
+    if (!Number.isFinite(n)) {
+      ctx.addIssue({ code: "custom", message: "Número inválido" });
+      return z.NEVER;
+    }
+    return n;
+  });
 
 const intStr = (fallback: number) =>
-  z.string().transform((v) => parseInt(v, 10) || fallback);
+  z.string().transform((v, ctx) => {
+    const t = v.trim();
+    if (!t) return fallback;
+    const n = parseInt(t, 10);
+    if (!Number.isFinite(n)) {
+      ctx.addIssue({ code: "custom", message: "Número inválido" });
+      return z.NEVER;
+    }
+    return n;
+  });
+
+/** Optional coordinate-style number — empty/invalid → null, but a valid "0" is kept. */
+const optionalNumeric = z
+  .string()
+  .transform((v) => {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  })
+  .nullable()
+  .optional();
 
 /** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
 const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
@@ -75,8 +103,8 @@ export const CreatePoiSchema = z.object({
   slug: requiredStr,
   name: requiredStr,
   type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
-  latitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
-  longitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
+  latitude: optionalNumeric,
+  longitude: optionalNumeric,
   address: optionalStr,
   url: optionalUrl,
   notes: optionalStr,
@@ -87,8 +115,8 @@ export const UpdatePoiSchema = z.object({
   slug: requiredStr,
   name: requiredStr,
   type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
-  latitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
-  longitude: z.string().transform((v) => parseFloat(v) || null).nullable().optional(),
+  latitude: optionalNumeric,
+  longitude: optionalNumeric,
   address: optionalStr,
   url: optionalUrl,
   notes: optionalStr,
