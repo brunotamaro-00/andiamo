@@ -219,7 +219,7 @@ function EditModal({
             type="submit"
             variant="primary"
             className="flex-1"
-            disabled={isPending}
+            loading={isPending}
           >
             {isPending ? "Guardando..." : "Guardar"}
           </Button>
@@ -250,7 +250,7 @@ function EditModal({
                 variant="danger"
                 className="flex-1"
                 onClick={handleDelete}
-                disabled={isPending}
+                loading={isPending}
               >
                 {isPending ? "Borrando..." : "Sí, borrar"}
               </Button>

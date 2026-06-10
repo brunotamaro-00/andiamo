@@ -223,7 +223,7 @@ function AddStopModal({
               type="submit"
               variant="primary"
               className="flex-1"
-              disabled={isPending}
+              loading={isPending}
             >
               {isPending ? "Agregando..." : "Agregar"}
             </Button>
