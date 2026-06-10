@@ -1,15 +1,6 @@
 import { db } from "./db";
-import { dateToStr } from "./trip";
+import { dateToStr, addDaysStr, strToDate } from "./trip";
 import { fetchTempRange } from "./temp-range";
-
-function addDaysStr(dateStr: string, n: number): string {
-  const ms = new Date(`${dateStr}T00:00:00.000Z`).getTime() + n * 86_400_000;
-  return new Date(ms).toISOString().slice(0, 10);
-}
-
-function strToDate(s: string): Date {
-  return new Date(`${s}T00:00:00.000Z`);
-}
 
 interface StopInput {
   id: string;

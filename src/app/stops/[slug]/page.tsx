@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug, getTripDayNumber } from "@/lib/current-stop";
-import { todayStr, dateToStr } from "@/lib/trip";
+import { todayStr, dateToStr, daysBetween } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { WeatherCard } from "@/components/WeatherCard";
 import { CurrencyCard } from "@/components/CurrencyCard";
@@ -96,16 +96,14 @@ export default async function StopPage({ params }: Props) {
       ? "after"
       : "during";
 
-  // Days remaining at this stop (UTC-safe — both sides are UTC midnight)
+  // Days remaining at this stop
   const depStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
-  const daysLeft = depStr
-    ? Math.max(0, Math.ceil((new Date(depStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
-    : null;
+  const daysLeft = depStr ? Math.max(0, daysBetween(today, depStr)) : null;
 
   // Days until trip starts (only relevant when before the trip)
   const daysToStart =
     tripPhase === "before" && firstArrivalStr
-      ? Math.max(0, Math.ceil((new Date(firstArrivalStr).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)))
+      ? Math.max(0, daysBetween(today, firstArrivalStr))
       : null;
 
   const path = `/stops/${slug}`;

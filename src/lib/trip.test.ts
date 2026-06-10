@@ -1,9 +1,34 @@
 import { describe, expect, it } from "vitest";
-import { dateToStr, todayStr, tripDayNumber } from "./trip";
+import { addDaysStr, dateToStr, daysBetween, strToDate, todayStr, tripDayNumber, TRIP_TIMEZONE } from "./trip";
 
 describe("todayStr", () => {
   it("returns a YYYY-MM-DD string", () => {
     expect(todayStr()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("matches the calendar date in TRIP_TIMEZONE, not the server's", () => {
+    const expected = new Intl.DateTimeFormat("en-CA", { timeZone: TRIP_TIMEZONE }).format(new Date());
+    expect(todayStr()).toBe(expected);
+  });
+});
+
+describe("strToDate / addDaysStr", () => {
+  it("round-trips with dateToStr", () => {
+    expect(dateToStr(strToDate("2026-06-10"))).toBe("2026-06-10");
+  });
+
+  it("adds days across month and year boundaries", () => {
+    expect(addDaysStr("2026-06-29", 3)).toBe("2026-07-02");
+    expect(addDaysStr("2026-12-30", 3)).toBe("2027-01-02");
+    expect(addDaysStr("2026-06-10", 0)).toBe("2026-06-10");
+  });
+});
+
+describe("daysBetween", () => {
+  it("counts whole days between YYYY-MM-DD strings", () => {
+    expect(daysBetween("2026-06-01", "2026-06-06")).toBe(5);
+    expect(daysBetween("2026-06-06", "2026-06-01")).toBe(-5);
+    expect(daysBetween("2026-06-01", "2026-06-01")).toBe(0);
   });
 });
 
