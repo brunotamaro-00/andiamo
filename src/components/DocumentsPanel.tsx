@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useOptimistic, useRef, useEffect, useId } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
@@ -9,12 +9,14 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
 import { haptics } from "@/lib/haptics";
+import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, SelectField } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
+import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 /* Keep in sync with the server route validation. */
@@ -126,48 +128,26 @@ function OfflineDocButton({ docId }: { docId: string }) {
 }
 
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
-  const router = useRouter();
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [mutationError, setMutationError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const [optimisticDocs, applyOptimistic] = useOptimistic(
+  const { items: optimisticDocs, mutate, run, mutationError, isPending } = useOptimisticList(
     documents,
     (state, id: string) => state.filter((d) => d.id !== id)
   );
 
   function handleDelete(id: string) {
     setConfirmingId(null);
-    setMutationError(null);
     haptics.warning();
-    startTransition(async () => {
-      applyOptimistic(id);
-      try {
-        await deleteDocument(id, path);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo borrar el documento. Reintentá.");
-        router.refresh();
-      }
-    });
+    mutate(id, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.");
   }
 
   function handleAddLink(formData: FormData) {
     if (stopId) formData.set("stopId", stopId);
     if (slug) formData.set("slug", slug);
     setMode(null);
-    setMutationError(null);
     haptics.success();
-    startTransition(async () => {
-      try {
-        await createDocumentLink(formData);
-      } catch {
-        haptics.error();
-        setMutationError("No se pudo agregar el link. Reintentá.");
-        router.refresh();
-      }
-    });
+    run(() => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.");
   }
 
   return (
@@ -189,12 +169,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         }
       />
 
-      {mutationError && (
-        <p className="text-xs text-danger flex items-center gap-1.5 mb-2" role="alert">
-          <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
-          {mutationError}
-        </p>
-      )}
+      <MutationErrorBanner message={mutationError} />
 
       {optimisticDocs.length === 0 ? (
         <EmptyState
