@@ -6,14 +6,16 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v3";   // bumped: SWR navigations, no data cache
+const SHELL_CACHE = "andiamo-shell-v4";   // bumped: never cache/serve redirected navigations
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
+// "/" is intentionally excluded: it always issues a redirect (→ /stops or
+// /login), and a redirected response cannot be returned to a navigation
+// request — doing so triggers ERR_FAILED.
 const SHELL_ROUTES = [
-  "/",
   "/stops",
   "/map",
   "/general",
@@ -96,7 +98,7 @@ async function staleWhileRevalidate(cacheName, request) {
 
   const networkFetch = fetch(request)
     .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+      if (response.ok && !response.redirected) cache.put(request, response.clone());
       return response;
     })
     .catch(() => null);
@@ -114,12 +116,16 @@ async function navigateWithFallback(request) {
 
   const networkFetch = fetch(request)
     .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+      // Never cache a redirected response: returning one to a navigation
+      // request fails with ERR_FAILED.
+      if (response.ok && !response.redirected) cache.put(request, response.clone());
       return response;
     })
     .catch(() => null);
 
-  if (cached) return cached;
+  // A cached redirected response can't be served to a navigation either —
+  // fall through to the network in that case.
+  if (cached && !cached.redirected) return cached;
   return (await networkFetch) ?? offlinePage();
 }
 
