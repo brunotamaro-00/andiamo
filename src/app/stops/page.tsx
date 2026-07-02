@@ -271,8 +271,17 @@ function TodayCard({
     return null;
   }
 
+  const href = phase === "during" && currentStop ? `/stops/${currentStop.slug}` : null;
+
   const card = (
-    <div className="flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-[4px] px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150 hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+    <div
+      className={[
+        "flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-[4px] px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150",
+        href ? "hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="text-center shrink-0">
         <p className="text-4xl font-numeral leading-none text-gold-ink">{numeral}</p>
         <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">{numeralLabel}</p>
@@ -281,11 +290,12 @@ function TodayCard({
         <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70">Hoy</p>
         <p className="text-sm font-semibold text-ink mt-0.5">{line}</p>
       </div>
-      <ChevronRight size={16} strokeWidth={2} aria-hidden="true" className="ml-auto shrink-0 text-gold-ink/60" />
+      {href && (
+        <ChevronRight size={16} strokeWidth={2} aria-hidden="true" className="ml-auto shrink-0 text-gold-ink/60" />
+      )}
     </div>
   );
 
-  const href = phase === "during" && currentStop ? `/stops/${currentStop.slug}` : null;
   if (!href) return card;
   return (
     <Link
