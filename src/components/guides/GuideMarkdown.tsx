@@ -112,15 +112,11 @@ const components: Components = {
   ),
   ul: ({ children }) => <ul className="space-y-2 pl-1">{children}</ul>,
   ol: ({ children }) => <ol className="space-y-2 pl-5 list-decimal">{children}</ol>,
-  li: ({ children, ...props }) => {
-    const checked = (props as { checked?: boolean | null }).checked;
-    if (checked === true || checked === false) {
-      return (
-        <li className="list-none">
-          <TaskCheck state={checked ? "done" : "todo"} />
-          {children}
-        </li>
-      );
+  li: ({ children, className }) => {
+    // remark-gfm marks task items with this class; the checkbox itself is an
+    // <input> child rendered by the `input` mapping below.
+    if (className?.includes("task-list-item")) {
+      return <li className="list-none">{children}</li>;
     }
     const { isMaybe, children: rest } = extractMaybeMarker(children);
     if (isMaybe) {
@@ -133,7 +129,8 @@ const components: Components = {
     }
     return <li className="ml-3 list-disc marker:text-ink-3">{children}</li>;
   },
-  input: () => null, // GFM checkbox inputs — replaced by TaskCheck in li
+  input: ({ type, checked }) =>
+    type === "checkbox" ? <TaskCheck state={checked ? "done" : "todo"} /> : null,
   blockquote: ({ children }) => (
     <blockquote className="border-l-[3px] border-gold bg-gold-bg/40 px-3 py-2 rounded-r-[4px] [&>p]:m-0">
       {children}
