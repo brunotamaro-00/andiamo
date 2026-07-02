@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
 import { getManifest } from "@/lib/guides";
 
 export const metadata: Metadata = { title: "Guías · Andiamo" };
@@ -23,6 +23,23 @@ export default function GuidesIndexPage() {
       </header>
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
+        {/* Urgent reservations shortcut */}
+        <Link
+          href="/guias/reservas"
+          className="flex items-center gap-3 bg-brick-bg border-2 border-brick-border rounded-[4px] px-4 py-3.5 card-shadow animate-fade-in transition-all duration-150 hover:border-brick hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#C44428] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+        >
+          <AlertTriangle size={20} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
+          <div className="flex-1 min-w-0">
+            <p className="font-display uppercase text-[17px] leading-tight text-brick-ink">
+              Reservas urgentes
+            </p>
+            <p className="text-[11px] text-brick-ink/70 font-semibold mt-0.5">
+              Lo que hay que reservar con anticipación, por fecha de llegada
+            </p>
+          </div>
+          <ChevronRight size={15} strokeWidth={2} className="text-brick shrink-0" aria-hidden="true" />
+        </Link>
+
         {/* Trip-wide docs */}
         <section className="animate-fade-in">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2 flex items-center gap-1.5">
