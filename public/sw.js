@@ -6,7 +6,7 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v4";   // bumped: never cache/serve redirected navigations
+const SHELL_CACHE = "andiamo-shell-v5";   // bumped: /map removed from the shell
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
@@ -17,7 +17,6 @@ const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 // request — doing so triggers ERR_FAILED.
 const SHELL_ROUTES = [
   "/stops",
-  "/map",
   "/general",
   "/search",
   OFFLINE_URL,
