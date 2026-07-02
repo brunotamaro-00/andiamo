@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import manifestJson from "../../content/guides/manifest.json";
 import type { Guide, GuideDoc, GuideManifest } from "./guide-types";
+import { extractUrgentSection } from "./urgent";
 
 export type { Guide, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
 
@@ -117,6 +118,31 @@ export function stopSlugsForGuide(guideSlug: string): string[] {
   return Object.entries(STOP_TO_GUIDES)
     .filter(([, guides]) => guides.includes(guideSlug))
     .map(([stopSlug]) => stopSlug);
+}
+
+export interface UrgentEntry {
+  guide: Guide;
+  doc: GuideDoc;
+  heading: string;
+  body: string;
+}
+
+let urgentCache: Promise<UrgentEntry[]> | null = null;
+
+/** Scans every guide doc for a "reservas urgentes"-style section.
+ *  Content is immutable per deploy, so the scan runs once per process. */
+export function collectUrgentSections(): Promise<UrgentEntry[]> {
+  urgentCache ??= (async () => {
+    const entries: UrgentEntry[] = [];
+    for (const guide of getAllGuides()) {
+      for (const doc of guide.docs) {
+        const section = extractUrgentSection(await readDocMarkdown(doc.file));
+        if (section) entries.push({ guide, doc, ...section });
+      }
+    }
+    return entries;
+  })();
+  return urgentCache;
 }
 
 function normalize(text: string): string {
