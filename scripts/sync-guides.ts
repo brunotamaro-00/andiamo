@@ -145,7 +145,6 @@ function main() {
   mkdirSync(DEST, { recursive: true });
 
   const manifest: GuideManifest = {
-    generatedAt: new Date().toISOString(),
     countries: [],
     general: [],
     resources: [],

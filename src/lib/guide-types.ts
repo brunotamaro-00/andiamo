@@ -27,8 +27,9 @@ export interface GuideCountry {
   countryDocs: GuideDoc[];
 }
 
+/** Deliberately no timestamp field: the output must be byte-identical when
+ *  the source hasn't changed, so re-running the sync leaves git clean. */
 export interface GuideManifest {
-  generatedAt: string;
   countries: GuideCountry[];
   /** Trip-wide docs (itinerario general, checklist, Eurail, presupuesto…) */
   general: GuideDoc[];
