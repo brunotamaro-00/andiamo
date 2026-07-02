@@ -21,7 +21,10 @@ export async function login(formData: FormData) {
     path: "/",
   });
 
-  redirect(from.startsWith("/") ? from : "/");
+  // Only allow single-slash internal paths — "//evil.com" and "/\evil.com"
+  // are treated as protocol-relative URLs by the browser.
+  const isSafePath = /^\/(?![/\\])/.test(from);
+  redirect(isSafePath ? from : "/");
 }
 
 export async function logout() {
