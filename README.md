@@ -4,7 +4,7 @@ Personal PWA travel guide for a 26-stop Europe trip. Designed to run as a home-s
 
 ## Features
 
-- Stop list with map, weather widget, and currency info
+- Stop list with weather widget and currency info
 - POI management per stop (hostels, museums, food, transport…)
 - Notes and document storage per stop (and globally)
 - Password-protected, single-user
@@ -15,7 +15,6 @@ Personal PWA travel guide for a 26-stop Europe trip. Designed to run as a home-s
 - React 19 + TypeScript
 - Tailwind CSS 4
 - Prisma 7 + PostgreSQL via `pg` driver adapter
-- Leaflet for maps
 
 ## Environment variables
 
@@ -45,7 +44,7 @@ src/
     stops/       # Stop list page + [slug] detail page
     general/     # Global notes and documents page
     login/       # Auth page
-  components/    # Feature components (panels, cards, map)
+  components/    # Feature components (panels, cards)
   components/ui/ # Primitive UI (Button, Card, Modal, Field, Badge…)
   lib/           # db singleton, session utils, helpers
 prisma/
