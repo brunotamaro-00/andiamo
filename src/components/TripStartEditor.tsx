@@ -29,7 +29,10 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!displayValue) setEditing(true);
+    if (displayValue) return;
+    // Deferred a frame: SSR and hydration both render display mode first.
+    const frame = requestAnimationFrame(() => setEditing(true));
+    return () => cancelAnimationFrame(frame);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

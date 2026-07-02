@@ -73,14 +73,17 @@ function OfflineDocButton({ docId }: { docId: string }) {
   const url = `/api/documents/${docId}`;
 
   useEffect(() => {
-    if (!("caches" in window)) {
-      setCached(false);
-      return;
-    }
-    caches
-      .match(url)
-      .then((match) => setCached(!!match))
-      .catch(() => setCached(false));
+    let cancelled = false;
+    const check =
+      "caches" in window
+        ? caches.match(url).then((match) => !!match, () => false)
+        : Promise.resolve(false);
+    check.then((value) => {
+      if (!cancelled) setCached(value);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [url]);
 
   async function handleSave() {
