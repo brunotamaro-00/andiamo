@@ -135,7 +135,10 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
 
 export async function deleteStop(id: string) {
   await requireAuth();
-  const stop = await db.stop.findUnique({ where: { id }, select: { order: true } });
+  const stop = await db.stop.findUnique({
+    where: { id },
+    select: { order: true, documents: { select: { storagePath: true } } },
+  });
   if (!stop) return;
 
   await db.$transaction(async (tx) => {
@@ -144,6 +147,16 @@ export async function deleteStop(id: string) {
     await tx.stop.delete({ where: { id } });
     await shiftOrders(tx, { gt: stop.order }, -1);
   });
+
+  // The DB cascade removed the Document rows; delete their R2 objects only
+  // after the transaction commits so a rollback can't lose files.
+  const keys = stop.documents
+    .map((d) => d.storagePath)
+    .filter((k): k is string => Boolean(k));
+  if (keys.length > 0) {
+    const { deleteFromR2 } = await import("@/lib/r2");
+    await Promise.allSettled(keys.map((k) => deleteFromR2(k)));
+  }
 
   await recalculateItinerary();
 
