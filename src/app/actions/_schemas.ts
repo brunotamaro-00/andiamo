@@ -95,7 +95,10 @@ export const UpdateStopSchema = z.object({
 });
 
 export const TripStartSchema = z.object({
-  tripStartDate: z.string().min(1, "required"),
+  tripStartDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato AAAA-MM-DD")
+    .refine((v) => !Number.isNaN(new Date(v).getTime()), "Fecha inválida"),
 });
 
 export const CreatePoiSchema = z.object({
