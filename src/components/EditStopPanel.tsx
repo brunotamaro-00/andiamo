@@ -75,7 +75,8 @@ function EditModal({
     formData.set("isCandidate", candidateChecked ? "true" : "false");
     formData.set("isTransit", transitChecked ? "true" : "false");
     formData.set("arrivalMode", modeValue);
-    // When not pinned, ensure arrivalDate is not sent so the action clears it
+    // When not pinned, don't send arrivalDate — the action leaves the stored
+    // date untouched and recalculateItinerary overwrites it afterwards.
     if (!pinnedChecked) formData.delete("arrivalDate");
     setMutationError(null);
     startTransition(async () => {
