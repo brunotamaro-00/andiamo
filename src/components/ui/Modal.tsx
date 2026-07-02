@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { IconButton } from "./IconButton";
 
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/* Hydration flag: false on the server snapshot, true on the client */
+const subscribeNoop = () => () => {};
+const getTrue = () => true;
+const getFalse = () => false;
 
 interface ModalProps {
   title: string;
@@ -18,8 +23,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   // Portal requires the DOM — only mount client-side
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
 
   /* Restore focus to the element that opened the modal */
   useEffect(() => {
