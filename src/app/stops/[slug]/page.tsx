@@ -12,7 +12,8 @@ import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
@@ -306,6 +307,9 @@ export default async function StopPage({ params }: Props) {
           )}
         </div>
 
+        {/* City guide */}
+        <GuideCard stopSlug={stop.slug} />
+
         {/* POIs */}
         <div id="pois" className="scroll-mt-20">
           <PoiPanel
@@ -347,6 +351,60 @@ export default async function StopPage({ params }: Props) {
 }
 
 /** Small inline badge for dates/temp ranges */
+/** Card linking a stop to its guide hub, with quick chips per document.
+ *  Extra guides (e.g. Costa Amalfitana from Nápoles) render as small links. */
+function GuideCard({ stopSlug }: { stopSlug: string }) {
+  const [primary, ...extras] = guidesForStop(stopSlug);
+  if (!primary) return null;
+
+  return (
+    <div className="bg-surface rounded-[4px] border-2 border-border card-shadow p-4 animate-fade-in">
+      <Link
+        href={`/guias/${primary.slug}`}
+        className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-[4px]"
+      >
+        <BookOpen size={18} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Guía</p>
+          <p className="font-display uppercase text-[17px] leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
+            {primary.title}
+          </p>
+        </div>
+        <ChevronRight size={15} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
+      </Link>
+
+      {primary.docs.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {primary.docs.map((doc) => (
+            <Link
+              key={doc.slug}
+              href={`/guias/${primary.slug}/${doc.slug}`}
+              className="rounded-full border-2 border-border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            >
+              {doc.title}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {extras.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-border space-y-1">
+          {extras.map((guide) => (
+            <Link
+              key={guide.slug}
+              href={`/guias/${guide.slug}`}
+              className="flex items-center gap-1.5 text-xs font-semibold text-ink-2 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
+            >
+              <ChevronRight size={12} strokeWidth={2} aria-hidden="true" />
+              También cerca: {guide.title}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DateBadge({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-0.5 text-xs bg-surface-2 text-ink-2 rounded-full px-2.5 py-1 border border-border font-medium">

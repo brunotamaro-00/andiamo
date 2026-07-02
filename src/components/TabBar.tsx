@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { List, MapPin, FileText, Search } from "lucide-react";
+import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 
 const TABS = [
   {
@@ -16,6 +16,12 @@ const TABS = [
     label: "Hoy",
     icon: MapPin,
     match: (p: string) => p.startsWith("/stops/"),
+  },
+  {
+    href: "/guias",
+    label: "Guías",
+    icon: BookOpen,
+    match: (p: string) => p.startsWith("/guias"),
   },
   {
     href: "/search",
