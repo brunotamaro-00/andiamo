@@ -22,10 +22,15 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (doc.source === "upload" && doc.storagePath) {
     try {
       const stream = await getFromR2(doc.storagePath);
+      // Sanitize the stored filename: quotes/newlines would corrupt the
+      // header; non-ASCII goes in the RFC 5987 filename* parameter instead.
+      const rawName = doc.fileName ?? id;
+      const asciiName =
+        rawName.replace(/[\r\n"\\]/g, "").replace(/[^\x20-\x7E]/g, "_") || id;
       return new Response(stream, {
         headers: {
           "Content-Type": doc.mimeType ?? "application/octet-stream",
-          "Content-Disposition": `inline; filename="${doc.fileName ?? id}"`,
+          "Content-Disposition": `inline; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(rawName)}`,
           "Cache-Control": "private, max-age=3600",
         },
       });
