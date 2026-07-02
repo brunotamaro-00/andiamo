@@ -7,16 +7,8 @@ import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
 import { shiftOrders, PARKED_ORDER } from "@/lib/stop-order";
 import { recalculateItinerary } from "@/lib/itinerary";
+import { slugify } from "@/lib/slug";
 import { parseForm, CreateStopSchema, UpdateStopSchema, TripStartSchema } from "./_schemas";
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
   let slug = base;
