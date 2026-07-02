@@ -46,6 +46,18 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// Logout asks for a full cache wipe so cached authenticated pages
+// can't be served after the session cookie is gone.
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "CLEAR_ALL_CACHES") return;
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+      .then(() => event.ports[0]?.postMessage({ done: true }))
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);

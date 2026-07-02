@@ -4,8 +4,8 @@ import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, tripDayNumber, daysBetween } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
-import { logout } from "@/app/actions/auth";
 import { AddStopButton } from "@/components/AddStopButton";
+import { LogoutButton } from "@/components/LogoutButton";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
 import { Wordmark } from "@/components/Wordmark";
@@ -54,14 +54,7 @@ export default async function StopsPage() {
             >
               <Search size={17} strokeWidth={1.5} aria-hidden="true" />
             </Link>
-            <form action={logout}>
-              <button
-                type="submit"
-                className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 py-1.5 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-              >
-                Salir
-              </button>
-            </form>
+            <LogoutButton />
           </div>
         </div>
       </header>
