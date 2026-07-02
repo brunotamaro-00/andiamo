@@ -6,8 +6,9 @@ import { SearchBox } from "@/components/SearchBox";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import {
-  ArrowLeft, Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen,
+  ArrowLeft, Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
 } from "lucide-react";
+import { searchGuides } from "@/lib/guides";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Buscar · Andiamo" };
@@ -81,7 +82,9 @@ export default async function SearchPage({ searchParams }: Props) {
       ])
     : [[], [], [], []];
 
-  const total = stops.length + pois.length + notes.length + documents.length;
+  const guideHits = hasQuery ? searchGuides(query) : [];
+
+  const total = stops.length + pois.length + notes.length + documents.length + guideHits.length;
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -144,6 +147,23 @@ export default async function SearchPage({ searchParams }: Props) {
                   title={p.name}
                   subtitle={p.stop.name}
                   badge={p.done ? <Badge variant="success">hecho</Badge> : undefined}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {hasQuery && guideHits.length > 0 && (
+          <section>
+            <ResultHeading icon={BookOpen} label="Guías" count={guideHits.length} />
+            <div className="space-y-1.5">
+              {guideHits.map(({ guide, doc }) => (
+                <ResultRow
+                  key={doc ? `${guide.slug}/${doc.slug}` : guide.slug}
+                  href={doc ? `/guias/${guide.slug}/${doc.slug}` : `/guias/${guide.slug}`}
+                  flag={guide.countryFlag}
+                  title={doc ? doc.title : guide.title}
+                  subtitle={doc ? `Guía de ${guide.title}` : guide.country}
                 />
               ))}
             </div>
