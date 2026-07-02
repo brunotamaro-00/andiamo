@@ -8,6 +8,7 @@ import {
   getGuide,
   getManifest,
   guidesForStop,
+  searchGuides,
 } from "./guides";
 
 /** Every stop slug seeded in prisma/seed.ts. */
@@ -69,6 +70,24 @@ describe("STOP_TO_GUIDES", () => {
   it("resolves guides for a shared-guide stop", () => {
     const guides = guidesForStop("fort-william");
     expect(guides.map((g) => g.slug)).toEqual(["highlands"]);
+  });
+});
+
+describe("searchGuides", () => {
+  it("matches guide titles ignoring diacritics and case", () => {
+    const hits = searchGuides("parís");
+    expect(hits.some((h) => h.guide.slug === "paris" && !h.doc)).toBe(true);
+  });
+
+  it("matches doc and day-trip titles", () => {
+    const hits = searchGuides("versalles");
+    expect(hits.some((h) => h.guide.slug === "paris" && h.doc?.slug === "versalles")).toBe(true);
+  });
+
+  it("requires at least 2 characters and respects the limit", () => {
+    expect(searchGuides("p")).toEqual([]);
+    expect(searchGuides("a", 5)).toEqual([]);
+    expect(searchGuides("actividades", 5).length).toBeLessThanOrEqual(5);
   });
 });
 

@@ -118,3 +118,33 @@ export function stopSlugsForGuide(guideSlug: string): string[] {
     .filter(([, guides]) => guides.includes(guideSlug))
     .map(([stopSlug]) => stopSlug);
 }
+
+function normalize(text: string): string {
+  return text.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
+export interface GuideSearchHit {
+  guide: Guide;
+  /** Absent when the guide itself (not one of its docs) matched. */
+  doc?: GuideDoc;
+}
+
+/** Diacritic-insensitive search over guide, doc and day-trip titles. */
+export function searchGuides(query: string, limit = 12): GuideSearchHit[] {
+  const needle = normalize(query.trim());
+  if (needle.length < 2) return [];
+
+  const hits: GuideSearchHit[] = [];
+  for (const guide of getAllGuides()) {
+    if (normalize(guide.title).includes(needle)) {
+      hits.push({ guide });
+    }
+    for (const doc of [...guide.docs, ...guide.dayTrips]) {
+      if (normalize(doc.title).includes(needle)) {
+        hits.push({ guide, doc });
+      }
+    }
+    if (hits.length >= limit) break;
+  }
+  return hits.slice(0, limit);
+}
