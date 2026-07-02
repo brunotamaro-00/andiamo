@@ -1,0 +1,1540 @@
+{
+  "generatedAt": "2026-07-02T22:53:37.173Z",
+  "countries": [
+    {
+      "order": 1,
+      "slug": "reino-unido",
+      "name": "Reino Unido",
+      "flag": "🇬🇧",
+      "guides": [
+        {
+          "slug": "edimburgo",
+          "title": "Edimburgo",
+          "country": "Reino Unido",
+          "countryFlag": "🇬🇧",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "reino-unido/edimburgo/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "reino-unido/edimburgo/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "reino-unido/edimburgo/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "reino-unido/edimburgo/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "reino-unido/edimburgo/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "reino-unido/edimburgo/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "highlands",
+          "title": "Highlands",
+          "country": "Reino Unido",
+          "countryFlag": "🇬🇧",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "reino-unido/highlands/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "reino-unido/highlands/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "reino-unido/highlands/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "reino-unido/highlands/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "reino-unido/highlands/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "reino-unido/highlands/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "londres",
+          "title": "Londres",
+          "country": "Reino Unido",
+          "countryFlag": "🇬🇧",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "reino-unido/londres/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "reino-unido/londres/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "reino-unido/londres/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "reino-unido/londres/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "reino-unido/londres/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "reino-unido/londres/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "bath",
+              "title": "Day Trip: Bath",
+              "file": "reino-unido/londres/day-trips/bath.md"
+            },
+            {
+              "slug": "cambridge",
+              "title": "Day Trip: Cambridge",
+              "file": "reino-unido/londres/day-trips/cambridge.md"
+            },
+            {
+              "slug": "cotswolds",
+              "title": "Day Trip: Cotswolds",
+              "file": "reino-unido/londres/day-trips/cotswolds.md"
+            },
+            {
+              "slug": "oxford",
+              "title": "Day Trip: Oxford",
+              "file": "reino-unido/londres/day-trips/oxford.md"
+            }
+          ]
+        },
+        {
+          "slug": "york",
+          "title": "York",
+          "country": "Reino Unido",
+          "countryFlag": "🇬🇧",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "reino-unido/york/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "reino-unido/york/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "reino-unido/york/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "reino-unido/york/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "reino-unido/york/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "reino-unido/york/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 2,
+      "slug": "paises-bajos",
+      "name": "Paises Bajos",
+      "flag": "🇳🇱",
+      "guides": [
+        {
+          "slug": "amsterdam",
+          "title": "Amsterdam",
+          "country": "Paises Bajos",
+          "countryFlag": "🇳🇱",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "paises-bajos/amsterdam/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "paises-bajos/amsterdam/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "paises-bajos/amsterdam/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "paises-bajos/amsterdam/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "paises-bajos/amsterdam/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "paises-bajos/amsterdam/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "haarlem",
+              "title": "Day Trip: Haarlem",
+              "file": "paises-bajos/amsterdam/day-trips/haarlem.md"
+            },
+            {
+              "slug": "utrecht",
+              "title": "Day Trip: Utrecht",
+              "file": "paises-bajos/amsterdam/day-trips/utrecht.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 3,
+      "slug": "francia",
+      "name": "Francia",
+      "flag": "🇫🇷",
+      "guides": [
+        {
+          "slug": "colmar",
+          "title": "Colmar",
+          "country": "Francia",
+          "countryFlag": "🇫🇷",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "francia/colmar/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "francia/colmar/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "francia/colmar/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "francia/colmar/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "francia/colmar/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "estrasburgo",
+          "title": "Estrasburgo",
+          "country": "Francia",
+          "countryFlag": "🇫🇷",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "francia/estrasburgo/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "francia/estrasburgo/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "francia/estrasburgo/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "francia/estrasburgo/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "francia/estrasburgo/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "francia/estrasburgo/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "paris",
+          "title": "Paris",
+          "country": "Francia",
+          "countryFlag": "🇫🇷",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "francia/paris/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "francia/paris/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "francia/paris/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "francia/paris/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "francia/paris/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "francia/paris/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "fontainebleau",
+              "title": "Day Trip: Fontainebleau",
+              "file": "francia/paris/day-trips/fontainebleau.md"
+            },
+            {
+              "slug": "versalles",
+              "title": "Day Trip: Versalles",
+              "file": "francia/paris/day-trips/versalles.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 4,
+      "slug": "portugal",
+      "name": "Portugal",
+      "flag": "🇵🇹",
+      "guides": [
+        {
+          "slug": "lisboa",
+          "title": "Lisboa",
+          "country": "Portugal",
+          "countryFlag": "🇵🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "portugal/lisboa/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "portugal/lisboa/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "portugal/lisboa/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "portugal/lisboa/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "portugal/lisboa/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "portugal/lisboa/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "cascais",
+              "title": "Day Trip: Cascais + Cabo da Roca",
+              "file": "portugal/lisboa/day-trips/cascais.md"
+            },
+            {
+              "slug": "obidos",
+              "title": "Day Trip: Óbidos",
+              "file": "portugal/lisboa/day-trips/obidos.md"
+            },
+            {
+              "slug": "setubal-arrabida",
+              "title": "Day Trip: Setúbal / Serra da Arrábida",
+              "file": "portugal/lisboa/day-trips/setubal-arrabida.md"
+            },
+            {
+              "slug": "sintra",
+              "title": "Day Trip: Sintra",
+              "file": "portugal/lisboa/day-trips/sintra.md"
+            }
+          ]
+        },
+        {
+          "slug": "porto",
+          "title": "Porto",
+          "country": "Portugal",
+          "countryFlag": "🇵🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "portugal/porto/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "portugal/porto/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "portugal/porto/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "portugal/porto/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "portugal/porto/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "portugal/porto/contexto-historico.md"
+            },
+            {
+              "slug": "comparacion-hostels-porto-sep2026",
+              "title": "Comparación de hostels en Porto — Sep 2026",
+              "file": "portugal/porto/comparacion-hostels-porto-sep2026.md"
+            },
+            {
+              "slug": "readme",
+              "title": "Portugal — Lisboa + Porto — 8 noches",
+              "file": "portugal/porto/readme.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 5,
+      "slug": "alemania",
+      "name": "Alemania",
+      "flag": "🇩🇪",
+      "guides": [
+        {
+          "slug": "friburgo",
+          "title": "Friburgo",
+          "country": "Alemania",
+          "countryFlag": "🇩🇪",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "alemania/friburgo/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "alemania/friburgo/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "alemania/friburgo/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "alemania/friburgo/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "alemania/friburgo/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "alemania/friburgo/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "belchen-wutachschlucht",
+              "title": "Day Trip: Belchen / Wutachschlucht (trekking)",
+              "file": "alemania/friburgo/day-trips/belchen-wutachschlucht.md"
+            },
+            {
+              "slug": "titisee-feldberg",
+              "title": "Day Trip: Titisee + Feldberg / Feldsee",
+              "file": "alemania/friburgo/day-trips/titisee-feldberg.md"
+            },
+            {
+              "slug": "triberg-gengenbach",
+              "title": "Day Trip: Triberg + Gengenbach",
+              "file": "alemania/friburgo/day-trips/triberg-gengenbach.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 6,
+      "slug": "suiza",
+      "name": "Suiza",
+      "flag": "🇨🇭",
+      "guides": [
+        {
+          "slug": "interlaken-y-alrededores",
+          "title": "Interlaken y alrededores",
+          "country": "Suiza",
+          "countryFlag": "🇨🇭",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "suiza/interlaken-y-alrededores/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "suiza/interlaken-y-alrededores/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "suiza/interlaken-y-alrededores/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "suiza/interlaken-y-alrededores/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "suiza/interlaken-y-alrededores/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "suiza/interlaken-y-alrededores/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 7,
+      "slug": "austria",
+      "name": "Austria",
+      "flag": "🇦🇹",
+      "guides": [
+        {
+          "slug": "innsbruck",
+          "title": "Innsbruck",
+          "country": "Austria",
+          "countryFlag": "🇦🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "austria/innsbruck/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "austria/innsbruck/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "austria/innsbruck/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "austria/innsbruck/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "austria/innsbruck/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "austria/innsbruck/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "viena",
+          "title": "Viena",
+          "country": "Austria",
+          "countryFlag": "🇦🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "austria/viena/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "austria/viena/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "austria/viena/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "austria/viena/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "austria/viena/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "austria/viena/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "bratislava",
+              "title": "Day Trip: Bratislava",
+              "file": "austria/viena/day-trips/bratislava.md"
+            },
+            {
+              "slug": "wachau",
+              "title": "Day Trip: Wachau (Melk + Dürnstein + Danubio)",
+              "file": "austria/viena/day-trips/wachau.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 8,
+      "slug": "chequia",
+      "name": "Chequia",
+      "flag": "🇨🇿",
+      "guides": [
+        {
+          "slug": "praga",
+          "title": "Praga",
+          "country": "Chequia",
+          "countryFlag": "🇨🇿",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "chequia/praga/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "chequia/praga/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "chequia/praga/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "chequia/praga/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "chequia/praga/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "chequia/praga/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "cesky-krumlov",
+              "title": "Day Trip: Český Krumlov",
+              "file": "chequia/praga/day-trips/cesky-krumlov.md"
+            },
+            {
+              "slug": "kutna-hora",
+              "title": "Day Trip: Kutná Hora",
+              "file": "chequia/praga/day-trips/kutna-hora.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 9,
+      "slug": "polonia",
+      "name": "Polonia",
+      "flag": "🇵🇱",
+      "guides": [
+        {
+          "slug": "cracovia",
+          "title": "Cracovia",
+          "country": "Polonia",
+          "countryFlag": "🇵🇱",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "polonia/cracovia/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "polonia/cracovia/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "polonia/cracovia/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "polonia/cracovia/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "polonia/cracovia/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "polonia/cracovia/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "auschwitz",
+              "title": "Day Trip: Auschwitz-Birkenau (Oświęcim)",
+              "file": "polonia/cracovia/day-trips/auschwitz.md"
+            },
+            {
+              "slug": "wieliczka",
+              "title": "Day Trip: Mina de Sal de Wieliczka",
+              "file": "polonia/cracovia/day-trips/wieliczka.md"
+            },
+            {
+              "slug": "zakopane",
+              "title": "Day Trip: Zakopane / Montañas Tatra",
+              "file": "polonia/cracovia/day-trips/zakopane.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 10,
+      "slug": "hungria",
+      "name": "Hungria",
+      "flag": "🇭🇺",
+      "guides": [
+        {
+          "slug": "budapest",
+          "title": "Budapest",
+          "country": "Hungria",
+          "countryFlag": "🇭🇺",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "hungria/budapest/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "hungria/budapest/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "hungria/budapest/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "hungria/budapest/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "hungria/budapest/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "hungria/budapest/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "eger",
+              "title": "Day Trip: Eger",
+              "file": "hungria/budapest/day-trips/eger.md"
+            },
+            {
+              "slug": "godollo",
+              "title": "Day Trip: Gödöllő (Palacio de Sissi)",
+              "file": "hungria/budapest/day-trips/godollo.md"
+            },
+            {
+              "slug": "recodo-del-danubio",
+              "title": "Day Trip: Recodo del Danubio (Visegrád + Esztergom)",
+              "file": "hungria/budapest/day-trips/recodo-del-danubio.md"
+            },
+            {
+              "slug": "szentendre",
+              "title": "Day Trip: Szentendre",
+              "file": "hungria/budapest/day-trips/szentendre.md"
+            }
+          ]
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 11,
+      "slug": "eslovenia",
+      "name": "Eslovenia",
+      "flag": "🇸🇮",
+      "guides": [
+        {
+          "slug": "costa-eslovena-y-trieste",
+          "title": "Costa Eslovena y Trieste",
+          "country": "Eslovenia",
+          "countryFlag": "🇸🇮",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "eslovenia/costa-eslovena-y-trieste/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "eslovenia/costa-eslovena-y-trieste/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "eslovenia/costa-eslovena-y-trieste/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "eslovenia/costa-eslovena-y-trieste/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "eslovenia/costa-eslovena-y-trieste/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "karst-y-cuevas",
+          "title": "Karst y Cuevas",
+          "country": "Eslovenia",
+          "countryFlag": "🇸🇮",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "eslovenia/karst-y-cuevas/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "eslovenia/karst-y-cuevas/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "eslovenia/karst-y-cuevas/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "eslovenia/karst-y-cuevas/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "eslovenia/karst-y-cuevas/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "lagos-alpinos",
+          "title": "Lagos Alpinos",
+          "country": "Eslovenia",
+          "countryFlag": "🇸🇮",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "eslovenia/lagos-alpinos/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "eslovenia/lagos-alpinos/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "eslovenia/lagos-alpinos/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "eslovenia/lagos-alpinos/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "eslovenia/lagos-alpinos/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "liubliana",
+          "title": "Liubliana",
+          "country": "Eslovenia",
+          "countryFlag": "🇸🇮",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "eslovenia/liubliana/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "eslovenia/liubliana/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "eslovenia/liubliana/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "eslovenia/liubliana/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "eslovenia/liubliana/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "eslovenia/liubliana/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "valle-del-soca-y-triglav",
+          "title": "Valle del Soča y Triglav",
+          "country": "Eslovenia",
+          "countryFlag": "🇸🇮",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "eslovenia/valle-del-soca-y-triglav/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "eslovenia/valle-del-soca-y-triglav/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "eslovenia/valle-del-soca-y-triglav/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "eslovenia/valle-del-soca-y-triglav/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "eslovenia/valle-del-soca-y-triglav/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": [
+        {
+          "slug": "readme",
+          "title": "README",
+          "file": "eslovenia/readme.md"
+        }
+      ]
+    },
+    {
+      "order": 12,
+      "slug": "italia",
+      "name": "Italia",
+      "flag": "🇮🇹",
+      "guides": [
+        {
+          "slug": "calabria",
+          "title": "Calabria",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/calabria/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/calabria/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/calabria/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/calabria/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/calabria/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "costa-amalfitana",
+          "title": "Costa Amalfitana",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/costa-amalfitana/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/costa-amalfitana/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/costa-amalfitana/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/costa-amalfitana/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/costa-amalfitana/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "florencia",
+          "title": "Florencia",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/florencia/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "italia/florencia/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/florencia/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/florencia/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/florencia/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/florencia/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "napoles",
+          "title": "Napoles",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/napoles/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "italia/napoles/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/napoles/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/napoles/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/napoles/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/napoles/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "puglia",
+          "title": "Puglia",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/puglia/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "italia/puglia/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/puglia/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/puglia/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/puglia/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/puglia/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "roma",
+          "title": "Roma",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/roma/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "italia/roma/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/roma/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/roma/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/roma/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/roma/contexto-historico.md"
+            }
+          ],
+          "dayTrips": [
+            {
+              "slug": "castelli-romani",
+              "title": "Day Trip: Castelli Romani (Frascati)",
+              "file": "italia/roma/day-trips/castelli-romani.md"
+            },
+            {
+              "slug": "orvieto",
+              "title": "Day Trip: Orvieto",
+              "file": "italia/roma/day-trips/orvieto.md"
+            },
+            {
+              "slug": "ostia-antica",
+              "title": "Day Trip: Ostia Antica",
+              "file": "italia/roma/day-trips/ostia-antica.md"
+            },
+            {
+              "slug": "tivoli",
+              "title": "Day Trip: Tívoli (Villa d'Este + Villa Adriana)",
+              "file": "italia/roma/day-trips/tivoli.md"
+            }
+          ]
+        },
+        {
+          "slug": "sicilia",
+          "title": "Sicilia",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "italia/sicilia/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "italia/sicilia/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "italia/sicilia/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "italia/sicilia/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "italia/sicilia/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "italia/sicilia/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "sur-de-italia",
+          "title": "Sur de Italia",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "readme",
+              "title": "Sur de Italia (29 oct - 8 nov) — Base por definir",
+              "file": "italia/sur-de-italia/readme.md"
+            },
+            {
+              "slug": "sur-de-italia-opciones",
+              "title": "Sur de Italia — Análisis Comparativo de Opciones (Reddit Reality Check)",
+              "file": "italia/sur-de-italia/sur-de-italia-opciones.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": []
+    },
+    {
+      "order": 13,
+      "slug": "espana",
+      "name": "España",
+      "flag": "🇪🇸",
+      "guides": [
+        {
+          "slug": "barcelona",
+          "title": "Barcelona",
+          "country": "España",
+          "countryFlag": "🇪🇸",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "espana/barcelona/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "espana/barcelona/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "espana/barcelona/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "espana/barcelona/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "espana/barcelona/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "espana/barcelona/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "madrid",
+          "title": "Madrid",
+          "country": "España",
+          "countryFlag": "🇪🇸",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "espana/madrid/actividades.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "espana/madrid/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "espana/madrid/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "espana/madrid/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "espana/madrid/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "espana/madrid/contexto-historico.md"
+            }
+          ],
+          "dayTrips": []
+        }
+      ],
+      "countryDocs": []
+    }
+  ],
+  "general": [
+    {
+      "slug": "checklist",
+      "title": "Panel de Control Maestro: Reservas y Preparativos",
+      "file": "_general/checklist.md"
+    },
+    {
+      "slug": "eurail",
+      "title": "Eurail — Tracker Maestro",
+      "file": "_general/eurail.md"
+    },
+    {
+      "slug": "itinerario-general",
+      "title": "Itinerario General - Europa 2026",
+      "file": "_general/itinerario-general.md"
+    },
+    {
+      "slug": "presupuesto",
+      "title": "Presupuesto del Viaje",
+      "file": "_general/presupuesto.md"
+    },
+    {
+      "slug": "readme",
+      "title": "Resumen del viaje",
+      "file": "_general/readme.md"
+    }
+  ],
+  "resources": [
+    {
+      "slug": "apps-utiles",
+      "title": "Apps Útiles para el Viaje",
+      "file": "_recursos/apps-utiles.md"
+    },
+    {
+      "slug": "documentos",
+      "title": "Documentos y Preparativos",
+      "file": "_recursos/documentos.md"
+    },
+    {
+      "slug": "frases-utiles",
+      "title": "Frases Útiles por Idioma",
+      "file": "_recursos/frases-utiles.md"
+    },
+    {
+      "slug": "packing-list",
+      "title": "Lista de Equipaje - Europa 109 días",
+      "file": "_recursos/packing-list.md"
+    }
+  ]
+}
