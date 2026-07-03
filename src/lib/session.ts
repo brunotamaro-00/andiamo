@@ -17,6 +17,18 @@ export function getExpectedToken(): string {
   return createHmac("sha256", getSecret()).update("authenticated").digest("hex");
 }
 
+/** Constant-time string comparison for secrets of unknown length — hashing both
+ *  sides first hides the length difference that a bare `!==` would leak. */
+export function secretsMatch(a: string, b: string): boolean {
+  const ha = createHmac("sha256", getSecret()).update(a).digest("hex");
+  const hb = createHmac("sha256", getSecret()).update(b).digest("hex");
+  let result = 0;
+  for (let i = 0; i < ha.length; i++) {
+    result |= ha.charCodeAt(i) ^ hb.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export function isValidToken(token: string): boolean {
   const expected = getExpectedToken();
   if (token.length !== expected.length) return false;

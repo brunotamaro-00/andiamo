@@ -17,6 +17,8 @@ export async function fetchRates(): Promise<RatesResult | null> {
 
     const data = await res.json();
     const rates: Record<string, number> = data.rates ?? {};
+    // An empty payload would poison the DB fallback — treat it as a failure
+    if (Object.keys(rates).length === 0) throw new Error("Frankfurter empty rates");
 
     // Persist to DB as fallback for when the API is unreachable
     await db.setting.upsert({

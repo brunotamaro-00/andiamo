@@ -23,26 +23,25 @@ const optionalUrl = z
     { message: "La URL debe comenzar con http:// o https://" },
   );
 
-/** Coerce a numeric string. Empty → fallback; malformed input is rejected (never silently coerced). */
-const numericStr = (fallback: number) =>
+/** Non-negative integer — a negative value (e.g. nights) would corrupt the itinerary cursor. */
+const intStr = (fallback: number) =>
   z.string().transform((v, ctx) => {
     const t = v.trim();
     if (!t) return fallback;
-    const n = parseFloat(t);
-    if (!Number.isFinite(n)) {
+    const n = parseInt(t, 10);
+    if (!Number.isFinite(n) || !/^\d+$/.test(t)) {
       ctx.addIssue({ code: "custom", message: "Número inválido" });
       return z.NEVER;
     }
     return n;
   });
 
-const intStr = (fallback: number) =>
+/** Required coordinate within [min, max] — a silent 0,0 default would feed weather/sun for the wrong place. */
+const coordStr = (min: number, max: number) =>
   z.string().transform((v, ctx) => {
-    const t = v.trim();
-    if (!t) return fallback;
-    const n = parseInt(t, 10);
-    if (!Number.isFinite(n)) {
-      ctx.addIssue({ code: "custom", message: "Número inválido" });
+    const n = parseFloat(v.trim());
+    if (!Number.isFinite(n) || n < min || n > max) {
+      ctx.addIssue({ code: "custom", message: "Coordenada inválida" });
       return z.NEVER;
     }
     return n;
@@ -61,9 +60,10 @@ const optionalNumeric = z
 /** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
 const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
 
-/** Optional Date from YYYY-MM-DD string */
+/** Optional Date from YYYY-MM-DD string — rejects malformed dates (Invalid Date would crash Prisma) */
 const optionalDate = z
   .string()
+  .refine((v) => !v || (/^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(new Date(v).getTime())), "Formato AAAA-MM-DD")
   .transform((v) => (v ? new Date(v) : null))
   .nullable()
   .optional();
@@ -74,8 +74,8 @@ export const CreateStopSchema = z.object({
   name: requiredStr,
   country: requiredStr,
   countryCode: z.string().transform((v) => v.trim().toUpperCase()),
-  latitude: numericStr(0),
-  longitude: numericStr(0),
+  latitude: coordStr(-90, 90),
+  longitude: coordStr(-180, 180),
   timezone: z.string().transform((v) => v.trim() || "auto"),
   nights: intStr(0),
   insertAfterOrder: intStr(0),

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db";
+import { db, isRecordMissing } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { parseForm, CreateNoteSchema, UpdateNoteSchema } from "./_schemas";
 
@@ -20,14 +20,19 @@ export async function createNote(formData: FormData) {
   if (!parsed.ok) return { error: parsed.error };
   const { slug, stopId, title: rawTitle, body, pinned } = parsed.data;
 
-  await db.note.create({
-    data: {
-      stopId: stopId ?? null,
-      title: derivedTitle(rawTitle, body),
-      body,
-      pinned,
-    },
-  });
+  try {
+    await db.note.create({
+      data: {
+        stopId: stopId ?? null,
+        title: derivedTitle(rawTitle, body),
+        body,
+        pinned,
+      },
+    });
+  } catch (e) {
+    if (isRecordMissing(e)) return { error: "Parada no encontrada" };
+    throw e;
+  }
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
   revalidatePath("/search");
@@ -43,7 +48,12 @@ export async function toggleNotePin(id: string, path: string) {
 
 export async function deleteNote(id: string, path: string) {
   await requireAuth();
-  await db.note.delete({ where: { id } });
+  try {
+    await db.note.delete({ where: { id } });
+  } catch (e) {
+    // Already gone (double-tap delete) — the desired state holds
+    if (!isRecordMissing(e)) throw e;
+  }
   revalidatePath(path);
   revalidatePath("/search");
 }
@@ -55,13 +65,18 @@ export async function updateNote(id: string, formData: FormData, path: string) {
   if (!parsed.ok) return { error: parsed.error };
   const { title: rawTitle, body } = parsed.data;
 
-  await db.note.update({
-    where: { id },
-    data: {
-      title: derivedTitle(rawTitle, body),
-      body,
-    },
-  });
+  try {
+    await db.note.update({
+      where: { id },
+      data: {
+        title: derivedTitle(rawTitle, body),
+        body,
+      },
+    });
+  } catch (e) {
+    if (isRecordMissing(e)) return { error: "Nota no encontrada" };
+    throw e;
+  }
   revalidatePath(path);
   revalidatePath("/search");
 }

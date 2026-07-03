@@ -136,12 +136,19 @@ export function collectUrgentSections(): Promise<UrgentEntry[]> {
     const entries: UrgentEntry[] = [];
     for (const guide of getAllGuides()) {
       for (const doc of guide.docs) {
-        const section = extractUrgentSection(await readDocMarkdown(doc.file));
+        // A manifest entry whose file is missing on disk must not break the scan
+        const markdown = await readDocMarkdown(doc.file).catch(() => null);
+        if (markdown === null) continue;
+        const section = extractUrgentSection(markdown);
         if (section) entries.push({ guide, doc, ...section });
       }
     }
     return entries;
-  })();
+  })().catch((err) => {
+    // Never cache a rejection — retry the scan on the next call
+    urgentCache = null;
+    throw err;
+  });
   return urgentCache;
 }
 
