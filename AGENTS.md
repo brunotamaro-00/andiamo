@@ -3,7 +3,13 @@
 
 ## What this app is
 
-Personal PWA travel guide for a 26-stop Europe trip (2026) — branded **Andiamo**. Features: stop list + detail pages, POI management, notes, document storage, live weather/currency widgets. Single-user, password-protected.
+Personal PWA travel guide for a ~30-stop Europe trip (Aug–Nov 2026) — branded **Andiamo**. Single-user, password-protected. Main routes (5-tab TabBar):
+
+- `/hoy` — "today" dashboard, default landing (`/` redirects here). Phase-aware hero (countdown before the trip / current stop with weather + sun / in-transit / trip summary), pending POIs with optimistic toggle (`TodayPoiList`), current-stop documents, upcoming urgent reservations, next stop.
+- `/stops` — itinerary timeline with stats, TodayCard, add/edit/reorder stops; `/stops/[slug]` detail: POIs, notes, documents, currency, guide links.
+- `/guias` — markdown guides synced from `~/Desktop/Trip/Itinerary` via `npm run guides:sync` (SSG, no cookies); `/guias/reservas` aggregates "reservas urgentes" sections.
+- `/search` — cross-entity search (stops, POIs, notes, documents, guides).
+- `/general` — trip-wide notes and documents (`stopId: null`).
 
 ## Stack — version-specific gotchas
 
@@ -17,14 +23,21 @@ Personal PWA travel guide for a 26-stop Europe trip (2026) — branded **Andiamo
 
 ## Auth
 
-Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives in `src/proxy.ts` (Next.js 16's middleware convention — the file is named `proxy.ts` and exports a `proxy` function). Its matcher excludes `api/documents`, so those routes validate the cookie themselves. As defense-in-depth, Server Actions and auth-gated pages also call `requireAuth()` from `@/lib/session`. Password is `APP_PASSWORD` env var.
+Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives in `src/proxy.ts` (Next.js 16's middleware convention — the file is named `proxy.ts` and exports a `proxy` function). Its matcher excludes `api/documents`, so those routes validate the cookie themselves. `/api/*` requests with an invalid session get a **401 JSON** response (never a redirect — clients `fetch` these). As defense-in-depth, Server Actions and auth-gated pages also call `requireAuth()` from `@/lib/session`. Password is `APP_PASSWORD` env var, compared constant-time via `secretsMatch()` from `@/lib/session` — never with `!==`.
 
 ## Architecture patterns
 
-- **Mutations** → Server Actions in `src/app/actions/` (marked `"use server"`)
-- **External data** → API routes in `src/app/api/` (geocode, weather, exchange rates, document upload/download)
+- **Mutations** → Server Actions in `src/app/actions/` (marked `"use server"`). Validate FormData with the Zod schemas in `_schemas.ts` (`parseForm` never throws; nights must be ≥ 0, dates `YYYY-MM-DD`, coords required and range-checked — tested in `_schemas.test.ts`).
+- **Action errors** → actions return `{ error: string }` instead of throwing for expected failures (validation, missing records). Catch Prisma P2025/P2003 with `isRecordMissing()` from `@/lib/db`; deletes treat "already gone" as success. Clients MUST check the resolved value — `useOptimisticList` (`mutate`/`run`) already reverts and shows the error banner when a resolved `{ error }` comes back.
+- **External data** → API routes in `src/app/api/` (geocode, places, document upload/download). External fetches (`geocode.ts`, `places.ts`, `rates.ts`, `temp-range.ts`) degrade gracefully (`[]`/`null`/DB fallback) — never let a third-party failure 500 a page. Never persist an empty payload over a good cached fallback (see `rates.ts`).
 - **DB access** → import `db` from `@/lib/db` (Prisma singleton, never instantiate directly)
-- **Revalidation** → Server Actions call `revalidatePath()` — no client state library
+- **Revalidation** → Server Actions call `revalidatePath()` — no client state library. Mutations affecting stops/POIs/documents must also revalidate `"/hoy"`.
+- **Service worker** → `public/sw.js` precaches the shell routes (`/hoy`, `/stops`, `/guias`, `/general`, `/search`). Adding a top-level route = add it to `SHELL_ROUTES` and bump `SHELL_CACHE` version.
+- **Date logic** → always compare `YYYY-MM-DD` strings via helpers in `@/lib/trip` (`todayStr()` anchored to Europe/Madrid); `toLocaleDateString` always with `timeZone: "UTC"`. "Current stop" (`computeCurrentStopSlug`) falls back to first/last stop outside its date range — verify today is inside `[arrival, departure)` before claiming "estás en X".
+
+## Local dev
+
+DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, db `tripguide`) before `npm run dev`. Prisma `ECONNREFUSED` means the container is down, not a code bug.
 
 ## Design system
 
@@ -69,6 +82,7 @@ Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives i
 - `animate-slide-up` — `slideUp 400ms ease-out both` (Y 16px → 0)
 - `stagger-1` … `stagger-6` — animation-delay 60ms…360ms for list items
 - `animate-pulse-skeleton` — for skeleton loaders
+- `prefers-reduced-motion` is handled globally in `globals.css` (entry animations off, smooth scroll off) — new keyframe utilities must be added to that media query; gate hover translates with `motion-reduce:`
 
 ### Fonts
 
@@ -98,4 +112,6 @@ text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 - Transitions: `duration-150`
 - Focus rings: `ring-brick/40`
 - TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick (`text-brick`)
+- Fixed bottom overlays: offset with `env(safe-area-inset-bottom)` so they don't cover the TabBar (see `InstallPrompt`)
+- `Modal` focuses `[autofocus]` first, then the body's first focusable — put `autoFocus` on the primary input; touch targets ≥ 44px (`rowActionBtn`, `min-h-[44px]`)
 <!-- END:nextjs-agent-rules -->
