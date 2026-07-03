@@ -12,10 +12,10 @@ const TABS = [
     match: (p: string) => p === "/stops",
   },
   {
-    href: "/",
+    href: "/hoy",
     label: "Hoy",
     icon: MapPin,
-    match: (p: string) => p.startsWith("/stops/"),
+    match: (p: string) => p === "/hoy",
   },
   {
     href: "/guias",

@@ -1,4 +1,4 @@
-// Andiamo Service Worker v3
+// Andiamo Service Worker v4
 // Strategy summary:
 //   /api/documents/*  GET  → cache-first (offline-capable document files)
 //   Navigation + /_next/static/ → stale-while-revalidate (app shell)
@@ -6,16 +6,17 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v6";   // bumped: /guias added to the shell
+const SHELL_CACHE = "andiamo-shell-v7";   // bumped: /hoy added to the shell
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
-// "/" is intentionally excluded: it always issues a redirect (→ /stops or
+// "/" is intentionally excluded: it always issues a redirect (→ /hoy or
 // /login), and a redirected response cannot be returned to a navigation
 // request — doing so triggers ERR_FAILED.
 const SHELL_ROUTES = [
+  "/hoy",
   "/stops",
   "/guias",
   "/general",
