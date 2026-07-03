@@ -44,7 +44,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F3ECD8",
+  // White to match the sticky header (bg-surface) so the iOS/Android status-bar
+  // strip blends into the header instead of showing a cream seam in the PWA.
+  themeColor: "#FFFFFF",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
