@@ -90,6 +90,18 @@
   color-scheme: light;
 }
 
+/* ── Reduced motion — entry animations start at opacity 0 (fill: both),
+     so they must be disabled entirely, not just shortened ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-pulse-skeleton,
+  .animate-map-pulse {
+    animation: none;
+  }
+}
+
 /* ── Elevation — Panini hard-shadow sticker style ─────── */
 @utility card-shadow {
   box-shadow: 3px 3px 0 var(--color-border);

@@ -58,7 +58,7 @@ export function InstallPrompt() {
     <div
       role="region"
       aria-label="Instalar Andiamo como app"
-      className="fixed bottom-20 inset-x-4 z-50 flex items-center gap-3 bg-surface border-2 border-border card-shadow-lg rounded-[4px] px-4 py-3 animate-slide-up"
+      className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] inset-x-4 z-50 flex items-center gap-3 bg-surface border-2 border-border card-shadow-lg rounded-[4px] px-4 py-3 animate-slide-up"
     >
       <Plane size={22} strokeWidth={1.5} className="shrink-0 text-brick" aria-hidden="true" />
       <div className="flex-1 min-w-0">

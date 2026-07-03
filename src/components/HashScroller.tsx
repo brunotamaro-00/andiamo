@@ -12,26 +12,32 @@ export function HashScroller() {
     const hash = window.location.hash.slice(1);
     if (!hash) return;
 
-    const el = document.getElementById(hash);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Entry animations (animate-fade-in) shift cards for ~400ms — scrolling
+    // during them lands at a slightly wrong offset, so wait them out.
+    const settleDelay = reduceMotion ? 0 : 450;
 
-    // Element not in DOM yet — wait one frame and retry a few times.
     let attempts = 0;
-    const id = setInterval(() => {
-      attempts++;
+    let rafId = 0;
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+
+    function tryScroll() {
       const target = document.getElementById(hash);
       if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        clearInterval(id);
-      } else if (attempts > 20) {
-        clearInterval(id);
+        timerId = setTimeout(() => {
+          target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+        }, settleDelay);
+        return;
       }
-    }, 100);
+      if (attempts++ < 20) rafId = requestAnimationFrame(tryScroll);
+    }
 
-    return () => clearInterval(id);
+    tryScroll();
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (timerId) clearTimeout(timerId);
+    };
   }, []);
 
   return null;

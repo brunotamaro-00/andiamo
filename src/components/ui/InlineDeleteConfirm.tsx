@@ -11,7 +11,9 @@ interface InlineDeleteConfirmProps {
 export function InlineDeleteConfirm({ label, onConfirm, onCancel }: InlineDeleteConfirmProps) {
   return (
     <div className="flex items-center gap-1 shrink-0">
-      <span className="text-xs text-danger mr-1">¿Borrar?</span>
+      {/* Hidden on ultra-narrow screens to avoid horizontal overflow — the
+          buttons keep their aria-labels */}
+      <span className="hidden min-[360px]:inline text-xs text-danger mr-1 whitespace-nowrap">¿Borrar?</span>
       <button
         onClick={onConfirm}
         aria-label={`Confirmar borrado de "${label}"`}

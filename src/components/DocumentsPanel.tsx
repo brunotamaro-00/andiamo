@@ -65,6 +65,10 @@ interface DocumentsPanelProps {
   path: string;
 }
 
+type DocAction =
+  | { type: "delete"; id: string }
+  | { type: "add"; doc: Document };
+
 /** Button that checks the SW cache and offers to save a document offline.
  *  Only rendered for uploaded files (source === "upload"). */
 function OfflineDocButton({ docId }: { docId: string }) {
@@ -134,23 +138,39 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
-  const { items: optimisticDocs, mutate, run, mutationError, isPending } = useOptimisticList(
+  const { items: optimisticDocs, mutate, mutationError, isPending } = useOptimisticList(
     documents,
-    (state, id: string) => state.filter((d) => d.id !== id)
+    (state, action: DocAction) => {
+      switch (action.type) {
+        case "delete":
+          return state.filter((d) => d.id !== action.id);
+        case "add":
+          return [...state, action.doc];
+      }
+    }
   );
 
   function handleDelete(id: string) {
     setConfirmingId(null);
     haptics.warning();
-    mutate(id, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.");
+    mutate({ type: "delete", id }, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.");
   }
 
   function handleAddLink(formData: FormData) {
     if (stopId) formData.set("stopId", stopId);
     if (slug) formData.set("slug", slug);
+    const temp: Document = {
+      id: `temp-${Date.now()}`,
+      label: (formData.get("label") as string) || "—",
+      kind: (formData.get("kind") as string) || "other",
+      source: "link",
+      fileName: null,
+      externalUrl: (formData.get("url") as string) || null,
+      sizeBytes: null,
+    };
     setMode(null);
     haptics.success();
-    run(() => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.");
+    mutate({ type: "add", doc: temp }, () => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.");
   }
 
   return (
