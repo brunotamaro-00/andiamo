@@ -59,7 +59,7 @@ export function EditStopPanel(props: Props) {
 
 function EditModal({
   stopId, name, arrivalDate, departureDate, nights, datesFixed, isCandidate, isTransit, arrivalMode,
-  currentOrder, allStops, onClose,
+  allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -68,7 +68,9 @@ function EditModal({
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
   const [transitChecked, setTransitChecked] = useState(isTransit);
   const [modeValue, setModeValue] = useState<"flight" | "ground">(arrivalMode);
-  const [selectedAfterOrder, setSelectedAfterOrder] = useState(currentOrder - 1);
+  // "keep" sentinel: allStops has order gaps (excludes this stop and flex margins),
+  // so currentOrder - 1 may not match any rendered option
+  const [selectedAfterOrder, setSelectedAfterOrder] = useState("keep");
 
   function handleSave(formData: FormData) {
     formData.set("datesFixed", pinnedChecked ? "true" : "false");
@@ -82,7 +84,7 @@ function EditModal({
     startTransition(async () => {
       try {
         const afterOrder =
-          selectedAfterOrder !== currentOrder - 1 ? selectedAfterOrder : undefined;
+          selectedAfterOrder === "keep" ? undefined : parseInt(selectedAfterOrder, 10);
         const result = await updateStop(stopId, formData, afterOrder);
         if (result?.error) { setMutationError(result.error); return; }
         haptics.success();
@@ -165,9 +167,10 @@ function EditModal({
         <SelectField
           label="Posición en itinerario"
           name="afterOrder"
-          value={String(selectedAfterOrder)}
-          onChange={(e) => setSelectedAfterOrder(parseInt(e.target.value))}
+          value={selectedAfterOrder}
+          onChange={(e) => setSelectedAfterOrder(e.target.value)}
         >
+          <option value="keep">Mantener posición actual</option>
           <option value="0">Al principio</option>
           {allStops.map((s) => (
             <option key={s.id} value={String(s.order)}>

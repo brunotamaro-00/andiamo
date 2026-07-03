@@ -86,7 +86,12 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     fd.set("title", title);
     fd.set("body", body);
     try {
-      await updateNote(id, fd, path);
+      // updateNote resolves { error } on validation failure instead of throwing
+      const result = await updateNote(id, fd, path);
+      if (result?.error) {
+        haptics.error();
+        return "error";
+      }
       haptics.success();
       return "ok";
     } catch {
@@ -200,8 +205,10 @@ function NoteCard({
     dirty.current = true;
     setStatus("saving");
     timer.current = setTimeout(async () => {
-      const result = await onSave(nextTitle.trim(), nextBody);
+      // Clear dirty before awaiting — otherwise closing while this save is in
+      // flight re-triggers onSave with the same content (double write)
       dirty.current = false;
+      const result = await onSave(nextTitle.trim(), nextBody);
       setStatus(result === "ok" ? "saved" : "error");
     }, 700);
   }
@@ -209,9 +216,9 @@ function NoteCard({
   async function closeEditor() {
     if (timer.current) clearTimeout(timer.current);
     if (dirty.current) {
+      dirty.current = false;
       setStatus("saving");
       const result = await onSave(title.trim(), body);
-      dirty.current = false;
       setStatus(result === "ok" ? "saved" : "error");
     }
     setEditing(false);

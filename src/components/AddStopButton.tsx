@@ -64,6 +64,7 @@ function AddStopModal({
   const [selected, setSelected] = useState<GeoResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -80,6 +81,7 @@ function AddStopModal({
       setSearching(true);
       try {
         const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
+        if (!res.ok) throw new Error(`geocode ${res.status}`);
         const data = await res.json();
         setResults(data.results ?? []);
       } catch {
@@ -99,8 +101,15 @@ function AddStopModal({
     formData.set("latitude", selected.latitude.toString());
     formData.set("longitude", selected.longitude.toString());
     formData.set("timezone", selected.timezone);
-    startTransition(() => {
-      createStop(formData);
+    setSubmitError(null);
+    // async callback: keeps isPending true until the action resolves
+    startTransition(async () => {
+      try {
+        const result = await createStop(formData);
+        if (result?.error) setSubmitError(result.error);
+      } catch {
+        setSubmitError("No se pudo agregar la parada. Probá de nuevo.");
+      }
     });
   }
 
@@ -188,6 +197,12 @@ function AddStopModal({
       {/* Form — only visible when a city is selected */}
       {selected && (
         <form action={handleSubmit} className="space-y-3">
+          {submitError && (
+            <p className="text-xs text-danger flex items-center gap-1.5" role="alert">
+              <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+              {submitError}
+            </p>
+          )}
           <Field
             label="Noches"
             name="nights"
