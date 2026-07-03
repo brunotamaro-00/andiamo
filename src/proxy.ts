@@ -17,6 +17,11 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value ?? "";
 
   if (!isValidToken(token)) {
+    // fetch() from client code can't use a redirect-to-login — it would parse
+    // the login HTML as JSON. Fail with a clean 401 instead.
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);

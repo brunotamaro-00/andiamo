@@ -15,10 +15,16 @@ export async function geocodeCity(query: string): Promise<GeoResult[]> {
   url.searchParams.set("language", "es");
   url.searchParams.set("format", "json");
 
-  const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
-  if (!res.ok) return [];
+  let data: { results?: unknown };
+  try {
+    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+    if (!res.ok) return [];
+    data = await res.json();
+  } catch {
+    // Network/parse failure — degrade to no results, same as searchPlaces
+    return [];
+  }
 
-  const data = await res.json();
   const results = (data.results ?? []) as Array<{
     name: string;
     admin1?: string;
