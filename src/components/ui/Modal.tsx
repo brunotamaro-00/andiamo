@@ -22,6 +22,7 @@ interface ModalProps {
 export function Modal({ title, onClose, children }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   // Portal requires the DOM — only mount client-side
   const mounted = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
 
@@ -36,8 +37,13 @@ export function Modal({ title, onClose, children }: ModalProps) {
   useEffect(() => {
     const panel = panelRef.current;
     if (panel) {
-      const first = panel.querySelector<HTMLElement>(FOCUSABLE);
-      first?.focus();
+      // Honor autoFocus first; otherwise focus the body's first focusable —
+      // the panel-wide query would land on the header's close button.
+      const target =
+        panel.querySelector<HTMLElement>("[autofocus]") ??
+        bodyRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
+        panel.querySelector<HTMLElement>(FOCUSABLE);
+      target?.focus();
     }
     const scrollRoot = document.getElementById("scroll-root");
     if (scrollRoot) {
@@ -94,7 +100,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
           <IconButton label="Cerrar" icon={X} onClick={onClose} />
         </div>
         {/* Scrollable body */}
-        <div className="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
+        <div ref={bodyRef} className="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-4 overflow-y-auto overscroll-contain space-y-4 flex-1">
           {children}
         </div>
       </div>

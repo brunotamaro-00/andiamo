@@ -374,6 +374,7 @@ function PlaceSearchField({
       try {
         const url = `/api/places?q=${encodeURIComponent(val)}&lat=${stopLat}&lng=${stopLng}`;
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`places ${res.status}`);
         const data = await res.json();
         // API returns { latitude, longitude } — map to { lat, lng } for local state
         setResults(

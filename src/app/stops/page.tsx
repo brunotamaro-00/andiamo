@@ -234,6 +234,15 @@ function TodayCard({
       ? "after"
       : "during";
 
+  // "current" falls back to first/last stop outside its date range (see
+  // computeCurrentStopSlug) — only trust it when today is actually inside it
+  const inCurrentStop = Boolean(
+    currentStop?.arrivalDate &&
+    currentStop.departureDate &&
+    dateToStr(currentStop.arrivalDate) <= today &&
+    today < dateToStr(currentStop.departureDate),
+  );
+
   let numeral: string;
   let numeralLabel: string;
   let line: React.ReactNode;
@@ -253,7 +262,7 @@ function TodayCard({
         )}
       </>
     );
-  } else if (phase === "during" && currentStop) {
+  } else if (phase === "during" && currentStop && inCurrentStop) {
     const day = tripDayNumber(currentStop.arrivalDate, tripStartDate) ?? daysBetween(firstArrivalStr, today) + 1;
     numeral = day.toString();
     numeralLabel = "día";
@@ -267,11 +276,29 @@ function TodayCard({
         )}
       </>
     );
+  } else if (phase === "during") {
+    // Gap day (flex margin / in transit): no stop covers today
+    const day = daysBetween(firstArrivalStr, today) + 1;
+    const nextStop = stops.find(
+      (s) => !s.isCandidate && !s.isFlexMargin && s.arrivalDate && dateToStr(s.arrivalDate) > today,
+    );
+    numeral = day.toString();
+    numeralLabel = "día";
+    line = (
+      <>
+        En tránsito
+        {nextStop && (
+          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
+            Próxima parada: <span aria-hidden="true">{nextStop.countryFlag}</span> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
+          </span>
+        )}
+      </>
+    );
   } else {
     return null;
   }
 
-  const href = phase === "during" && currentStop ? `/stops/${currentStop.slug}` : null;
+  const href = phase === "during" && currentStop && inCurrentStop ? `/stops/${currentStop.slug}` : null;
 
   const card = (
     <div

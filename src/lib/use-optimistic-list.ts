@@ -26,8 +26,15 @@ export function useOptimisticList<T, A>(
   const [isPending, startTransition] = useTransition();
   const [optimisticItems, applyOptimistic] = useOptimistic(serverItems, reducer);
 
+  /** Server actions signal validation failure by resolving `{ error }` instead of throwing. */
+  function resolvedError(result: unknown): boolean {
+    return typeof result === "object" && result !== null && "error" in result &&
+      Boolean((result as { error?: unknown }).error);
+  }
+
   /** Apply an optimistic update and call `serverAction`.
-   *  On failure, sets `mutationError` and refreshes the page to roll back. */
+   *  On failure (thrown or resolved `{ error }`), sets `mutationError` and
+   *  refreshes the page to roll back. */
   function mutate(
     optimisticAction: A,
     serverAction: () => Promise<unknown>,
@@ -37,7 +44,7 @@ export function useOptimisticList<T, A>(
     startTransition(async () => {
       applyOptimistic(optimisticAction);
       try {
-        await serverAction();
+        if (resolvedError(await serverAction())) throw new Error(errorMsg);
       } catch {
         haptics.error();
         setMutationError(errorMsg);
@@ -52,7 +59,7 @@ export function useOptimisticList<T, A>(
     setMutationError(null);
     startTransition(async () => {
       try {
-        await serverAction();
+        if (resolvedError(await serverAction())) throw new Error(errorMsg);
       } catch {
         haptics.error();
         setMutationError(errorMsg);
