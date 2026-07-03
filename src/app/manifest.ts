@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 
-// Warm cream canvas color — keep in sync with viewport.themeColor in layout.tsx
-const THEME = "#F3ECD8";
+// Warm cream — used for the splash-screen background (branding).
+const CREAM = "#F3ECD8";
+// White status/toolbar color — keep in sync with viewport.themeColor in layout.tsx.
+// Matches the white sticky header so the PWA status-bar strip has no seam.
+const THEME = "#FFFFFF";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -14,7 +17,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "portrait",
     categories: ["travel"],
-    background_color: THEME,
+    background_color: CREAM,
     theme_color: THEME,
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
