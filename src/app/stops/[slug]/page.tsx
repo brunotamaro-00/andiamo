@@ -15,6 +15,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
+import { PageHeader } from "@/components/PageHeader";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
 
@@ -144,24 +145,7 @@ export default async function StopPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-canvas">
-      {/* Top nav */}
-      <header className="sticky top-0 z-[1000] bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Link
-          href="/stops"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
-        >
-          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-          Itinerario
-        </Link>
-        <div className="flex-1 min-w-0 text-center">
-          <p className="font-numeral text-sm text-ink-3 tabular-nums">
-            {String(otherStops.filter((s) => s.order < stop.order && !s.isCandidate).length + (stop.isCandidate ? 0 : 1)).padStart(2, "0")}
-            {" / "}
-            {String(otherStops.filter((s) => !s.isCandidate).length + (stop.isCandidate ? 0 : 1)).padStart(2, "0")}
-          </p>
-        </div>
-        <div className="w-20" />
-      </header>
+      <PageHeader subtitle={stop.name} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />

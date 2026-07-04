@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getAllGuides, getDoc, readDocMarkdown } from "@/lib/guides";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamicParams = false;
 
@@ -43,21 +44,17 @@ export default async function GuideDocPage({
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Link
-          href={`/guias/${found.guide.slug}`}
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
-        >
-          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-          <span className="truncate max-w-24">{found.guide.title}</span>
-        </Link>
-        <h1 className="flex-1 text-sm font-medium text-ink-2 text-center truncate">
-          {found.doc.title}
-        </h1>
-        <div className="w-20" />
-      </header>
+      <PageHeader subtitle={found.doc.title} />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
+        <Link
+          href={`/guias/${found.guide.slug}`}
+          className="inline-flex items-center gap-1 mb-4 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
+        >
+          <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+          <span className="truncate max-w-[16rem]">{found.guide.title}</span>
+        </Link>
+
         <article className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-5 animate-fade-in">
           <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-border">
             <span className="text-2xl leading-none" aria-hidden="true">
