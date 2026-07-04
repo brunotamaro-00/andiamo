@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamicParams = false;
 
@@ -50,19 +51,17 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Link
-          href="/guias"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
-        >
-          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-          Guías
-        </Link>
-        <h1 className="flex-1 text-sm font-medium text-ink-2 text-center truncate">{guide.title}</h1>
-        <div className="w-20" />
-      </header>
+      <PageHeader subtitle={guide.title} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5 pb-24">
+        <Link
+          href="/guias"
+          className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
+        >
+          <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+          Guías
+        </Link>
+
         {/* Title card */}
         <div className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
           <span className="text-4xl leading-none" aria-hidden="true">{guide.countryFlag}</span>

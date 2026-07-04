@@ -11,8 +11,7 @@ import { TRIP_TIMEZONE, todayStr, dateToStr, daysBetween } from "@/lib/trip";
 import { collectUrgentSections, STOP_TO_GUIDES, type UrgentEntry } from "@/lib/guides";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
-import { Wordmark } from "@/components/Wordmark";
-import { LogoutButton } from "@/components/LogoutButton";
+import { PageHeader } from "@/components/PageHeader";
 import { TodayPoiList } from "@/components/TodayPoiList";
 import { Card, SectionHeader } from "@/components/ui/Card";
 
@@ -116,17 +115,7 @@ export default async function HoyPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur-md border-b border-border-strong px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div className="flex flex-col gap-0">
-            <Wordmark size="sm" />
-            <span className="text-[9px] font-display uppercase tracking-[0.14em] text-ink-3 ml-8 -mt-0.5">
-              {todayLabel}
-            </span>
-          </div>
-          <LogoutButton />
-        </div>
-      </header>
+      <PageHeader subtitle={todayLabel} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         {phase === "unplanned" && (

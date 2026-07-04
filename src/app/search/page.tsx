@@ -3,10 +3,11 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { SearchBox } from "@/components/SearchBox";
+import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import {
-  ArrowLeft, Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
+  Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
 } from "lucide-react";
 import { searchGuides } from "@/lib/guides";
 
@@ -88,20 +89,13 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <div className="max-w-lg mx-auto flex items-center gap-2">
-          <Link
-            href="/stops"
-            aria-label="Volver al itinerario"
-            className="h-10 w-10 -ml-1 flex items-center justify-center rounded-lg text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-          >
-            <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" />
-          </Link>
-          <SearchBox initialQuery={query} />
-        </div>
-      </header>
+      <PageHeader subtitle="Buscar" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
+        <div className="animate-fade-in">
+          <SearchBox initialQuery={query} />
+        </div>
+
         {!hasQuery && (
           <EmptyState
             icon={Search}

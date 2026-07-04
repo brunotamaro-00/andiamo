@@ -5,10 +5,9 @@ import { getCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, tripDayNumber, daysBetween } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { AddStopButton } from "@/components/AddStopButton";
-import { LogoutButton } from "@/components/LogoutButton";
+import { PageHeader } from "@/components/PageHeader";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
-import { Wordmark } from "@/components/Wordmark";
 import { ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -40,24 +39,18 @@ export default async function StopsPage() {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur-md border-b border-border-strong px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div className="flex flex-col gap-0">
-            <Wordmark size="sm" />
-            <span className="text-[9px] font-display uppercase tracking-[0.14em] text-ink-3 ml-8 -mt-0.5">Europa 2026</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Link
-              href="/search"
-              aria-label="Buscar en el viaje"
-              className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-            >
-              <Search size={17} strokeWidth={1.5} aria-hidden="true" />
-            </Link>
-            <LogoutButton />
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        subtitle="Europa 2026"
+        actions={
+          <Link
+            href="/search"
+            aria-label="Buscar en el viaje"
+            className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+          >
+            <Search size={17} strokeWidth={1.5} aria-hidden="true" />
+          </Link>
+        }
+      />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         {/* Quick stats */}

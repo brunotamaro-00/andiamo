@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ArrowLeft, BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
+import { AlertTriangle, BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
 import { getManifest } from "@/lib/guides";
+import { PageHeader } from "@/components/PageHeader";
 
 export const metadata: Metadata = { title: "Guías · Andiamo" };
 
@@ -10,17 +11,7 @@ export default function GuidesIndexPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Link
-          href="/stops"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
-        >
-          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-          Itinerario
-        </Link>
-        <h1 className="flex-1 text-sm font-medium text-ink-2 text-center">Guías del viaje</h1>
-        <div className="w-20" />
-      </header>
+      <PageHeader subtitle="Guías del viaje" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
         {/* Urgent reservations shortcut */}

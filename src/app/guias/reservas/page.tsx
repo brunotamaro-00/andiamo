@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { collectUrgentSections, STOP_TO_GUIDES, type UrgentEntry } from "@/lib/guides";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Reservas urgentes · Andiamo" };
@@ -50,19 +51,17 @@ export default async function UrgentReservationsPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface backdrop-blur border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Link
-          href="/guias"
-          className="text-ink-2 hover:text-ink text-sm transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-lg px-1 py-0.5"
-        >
-          <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-          Guías
-        </Link>
-        <h1 className="flex-1 text-sm font-medium text-ink-2 text-center">Reservas urgentes</h1>
-        <div className="w-20" />
-      </header>
+      <PageHeader subtitle="Reservas urgentes" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
+        <Link
+          href="/guias"
+          className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
+        >
+          <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+          Guías
+        </Link>
+
         <div className="flex items-center gap-3 bg-brick-bg border-2 border-brick-border rounded-[4px] px-4 py-3 card-shadow animate-fade-in">
           <AlertTriangle size={20} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
           <p className="text-xs text-brick-ink font-semibold">
