@@ -14,6 +14,7 @@ import { assumedDateWindow } from "@/lib/itinerary";
 import { PageHeader } from "@/components/PageHeader";
 import { TodayPoiList } from "@/components/TodayPoiList";
 import { Card, SectionHeader } from "@/components/ui/Card";
+import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Hoy · Andiamo" };
@@ -135,7 +136,7 @@ export default async function HoyPage() {
             title="Faltan para el despegue"
             subtitle={
               nextStop
-                ? `Primera parada: ${nextStop.countryFlag} ${nextStop.name} · ${formatShortDate(nextStop.arrivalDate!)}`
+                ? `Primera parada: ${nextStop.name} · ${formatShortDate(nextStop.arrivalDate!)}`
                 : undefined
             }
             href={nextStop ? `/stops/${nextStop.slug}` : "/stops"}
@@ -158,7 +159,7 @@ export default async function HoyPage() {
             title="En tránsito"
             subtitle={
               nextStop
-                ? `Próxima parada: ${nextStop.countryFlag} ${nextStop.name} · ${formatShortDate(nextStop.arrivalDate!)}`
+                ? `Próxima parada: ${nextStop.name} · ${formatShortDate(nextStop.arrivalDate!)}`
                 : undefined
             }
             href={nextStop ? `/stops/${nextStop.slug}` : "/stops"}
@@ -242,7 +243,7 @@ export default async function HoyPage() {
                   >
                     <AlertTriangle size={15} strokeWidth={1.5} aria-hidden="true" className="text-brick shrink-0" />
                     <span className="flex-1 min-w-0 truncate text-sm text-ink">
-                      <span aria-hidden="true">{entry.guide.countryFlag}</span> {entry.guide.title}
+                      <Flag flag={entry.guide.countryFlag} /> {entry.guide.title}
                     </span>
                     <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
                       {formatShortDateStr(arrival!)}
@@ -265,7 +266,7 @@ export default async function HoyPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Próxima parada</p>
                 <p className="text-sm font-semibold text-ink mt-0.5 truncate">
-                  <span aria-hidden="true">{nextStop.countryFlag}</span> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
+                  <Flag flag={nextStop.countryFlag} /> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
                 </p>
               </div>
               <ArrowRight size={15} strokeWidth={2} aria-hidden="true" className="text-border-strong shrink-0" />
@@ -362,7 +363,7 @@ function CurrentStopHero({
           )}
         </div>
         <div className="flex items-center gap-3 mt-2">
-          <span className="text-4xl" aria-hidden="true">{stop.countryFlag}</span>
+          <Flag flag={stop.countryFlag} className="text-4xl" />
           <div className="min-w-0">
             <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide truncate">
               {stop.name}

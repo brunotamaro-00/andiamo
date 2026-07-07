@@ -10,6 +10,7 @@ import {
   Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
 } from "lucide-react";
 import { searchGuides } from "@/lib/guides";
+import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Buscar · Andiamo" };
@@ -235,7 +236,7 @@ function ResultRow({
   const inner = (
     <>
       <span className="text-lg shrink-0" aria-hidden="true">
-        {flag ?? (Fallback ? <Fallback size={16} strokeWidth={1.5} className="text-ink-3" /> : "•")}
+        {flag ? <Flag flag={flag} /> : Fallback ? <Fallback size={16} strokeWidth={1.5} className="text-ink-3" /> : "•"}
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">

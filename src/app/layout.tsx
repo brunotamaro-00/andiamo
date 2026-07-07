@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Hanken_Grotesk, Archivo } from "next/font/google";
 import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 import { TabBar } from "@/components/TabBar";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";

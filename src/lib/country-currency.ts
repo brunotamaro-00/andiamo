@@ -33,3 +33,25 @@ export function flagFromCountryCode(countryCode: string): string {
     .toUpperCase()
     .replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
 }
+
+/**
+ * Inverse of {@link flagFromCountryCode}: turns a regional-indicator flag emoji
+ * (e.g. "🇮🇹") back into its lowercase ISO 3166-1 alpha-2 code (e.g. "it").
+ *
+ * Returns null for anything that isn't exactly two regional indicators — plain
+ * emoji like 🌍 or 🎒 (used by the "general"/"recursos" pseudo-guides) fall
+ * through so callers can render them verbatim. Windows lacks flag glyphs in its
+ * system fonts, so callers use the code to render an SVG flag instead.
+ */
+export function countryCodeFromFlag(flag: string | null | undefined): string | null {
+  if (!flag) return null;
+  const cps = Array.from(flag, (ch) => ch.codePointAt(0)!);
+  if (cps.length !== 2) return null;
+  const [a, b] = cps;
+  const A = 0x1f1e6; // 🇦
+  const Z = 0x1f1ff; // 🇿
+  if (a < A || a > Z || b < A || b > Z) return null;
+  return (
+    String.fromCharCode(97 + (a - A)) + String.fromCharCode(97 + (b - A))
+  );
+}

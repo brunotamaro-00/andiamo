@@ -10,6 +10,7 @@ import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
 import { ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Itinerario · Andiamo" };
@@ -135,9 +136,7 @@ export default async function StopsPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl leading-none shrink-0" aria-hidden="true">
-                        {stop.countryFlag}
-                      </span>
+                      <Flag flag={stop.countryFlag} className="text-xl leading-none shrink-0" />
                       <span
                         className={`font-display uppercase text-[17px] leading-tight truncate ${
                           isActive ? "text-brick-ink" : "text-ink"
@@ -250,7 +249,7 @@ function TodayCard({
         Faltan para el despegue
         {firstStop && (
           <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
-            Primera parada: <span aria-hidden="true">{firstStop.countryFlag}</span> {firstStop.name} · {formatShortDate(firstStop.arrivalDate!)}
+            Primera parada: <Flag flag={firstStop.countryFlag} /> {firstStop.name} · {formatShortDate(firstStop.arrivalDate!)}
           </span>
         )}
       </>
@@ -261,7 +260,7 @@ function TodayCard({
     numeralLabel = "día";
     line = (
       <>
-        Estás en <span aria-hidden="true">{currentStop.countryFlag}</span> {currentStop.name}
+        Estás en <Flag flag={currentStop.countryFlag} /> {currentStop.name}
         {currentStop.departureDate && (
           <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
             Hasta el {formatShortDate(currentStop.departureDate)}
@@ -282,7 +281,7 @@ function TodayCard({
         En tránsito
         {nextStop && (
           <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
-            Próxima parada: <span aria-hidden="true">{nextStop.countryFlag}</span> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
+            Próxima parada: <Flag flag={nextStop.countryFlag} /> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
           </span>
         )}
       </>

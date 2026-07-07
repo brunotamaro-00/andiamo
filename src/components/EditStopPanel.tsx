@@ -174,7 +174,7 @@ function EditModal({
           <option value="0">Al principio</option>
           {allStops.map((s) => (
             <option key={s.id} value={String(s.order)}>
-              Después de {s.countryFlag} {s.name}
+              Después de {s.name}
             </option>
           ))}
         </SelectField>

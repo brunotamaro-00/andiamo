@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { getAllGuides, getDoc, readDocMarkdown } from "@/lib/guides";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
 import { PageHeader } from "@/components/PageHeader";
+import { Flag } from "@/components/Flag";
 
 export const dynamicParams = false;
 
@@ -57,9 +58,7 @@ export default async function GuideDocPage({
 
         <article className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-5 animate-fade-in">
           <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-border">
-            <span className="text-2xl leading-none" aria-hidden="true">
-              {found.guide.countryFlag}
-            </span>
+            <Flag flag={found.guide.countryFlag} className="text-2xl leading-none" />
             <h2 className="font-display uppercase text-xl leading-tight text-ink tracking-wide">
               {found.doc.title}
             </h2>

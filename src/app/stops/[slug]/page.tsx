@@ -18,6 +18,7 @@ import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
+import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { name: true, countryFlag: true },
   });
   return {
-    title: stop ? `${stop.countryFlag} ${stop.name} · Andiamo` : "Andiamo",
+    title: stop ? `${stop.name} · Andiamo` : "Andiamo",
   };
 }
 
@@ -160,9 +161,7 @@ export default async function StopPage({ params }: Props) {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-3">
-                <span className="text-4xl" aria-hidden="true">
-                  {stop.countryFlag}
-                </span>
+                <Flag flag={stop.countryFlag} className="text-4xl" />
                 <div>
                   <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide">
                     {stop.name}
@@ -264,7 +263,7 @@ export default async function StopPage({ params }: Props) {
                 .join(" ")}
             >
               <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
-              <span aria-hidden="true">{prevStop.countryFlag}</span>{" "}
+              <Flag flag={prevStop.countryFlag} />{" "}
               {prevStop.name}
             </Link>
           ) : (
@@ -282,7 +281,7 @@ export default async function StopPage({ params }: Props) {
                 .filter(Boolean)
                 .join(" ")}
             >
-              <span aria-hidden="true">{nextStop.countryFlag}</span>{" "}
+              <Flag flag={nextStop.countryFlag} />{" "}
               {nextStop.name}
               <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
             </Link>
