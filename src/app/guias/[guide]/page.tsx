@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
+import { Flag } from "@/components/Flag";
 
 export const dynamicParams = false;
 
@@ -64,7 +65,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
 
         {/* Title card */}
         <div className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
-          <span className="text-4xl leading-none" aria-hidden="true">{guide.countryFlag}</span>
+          <Flag flag={guide.countryFlag} className="text-4xl leading-none" />
           <div className="min-w-0">
             <h2 className="font-display uppercase text-2xl leading-tight text-ink tracking-wide">
               {guide.title}

@@ -220,7 +220,7 @@ function AddStopModal({
             <option value="0">Al principio</option>
             {stops.map((s) => (
               <option key={s.id} value={s.order}>
-                Después de {s.countryFlag} {s.name}
+                Después de {s.name}
               </option>
             ))}
           </SelectField>

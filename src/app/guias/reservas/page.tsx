@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/auth";
 import { collectUrgentSections, STOP_TO_GUIDES, type UrgentEntry } from "@/lib/guides";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
 import { PageHeader } from "@/components/PageHeader";
+import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Reservas urgentes · Andiamo" };
@@ -98,7 +99,7 @@ function UrgentCard({
   return (
     <article className={`bg-surface rounded-[4px] border-2 border-border card-shadow animate-fade-in ${stagger}`}>
       <div className="flex items-center gap-2.5 px-4 py-3 border-b-2 border-border">
-        <span className="text-2xl leading-none shrink-0" aria-hidden="true">{guide.countryFlag}</span>
+        <Flag flag={guide.countryFlag} className="text-2xl leading-none shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="font-display uppercase text-[17px] leading-tight text-ink truncate">
             {isGeneral ? doc.title : guide.title}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AlertTriangle, BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
 import { getManifest } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
+import { Flag } from "@/components/Flag";
 
 export const metadata: Metadata = { title: "Guías · Andiamo" };
 
@@ -54,7 +55,7 @@ export default function GuidesIndexPage() {
             className={`animate-fade-in ${idx < 6 ? `stagger-${idx + 1}` : ""}`}
           >
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
-              <span aria-hidden="true" className="mr-1">{country.flag}</span>
+              <Flag flag={country.flag} className="mr-1" />
               {country.name}
             </p>
             <div className="space-y-2">
