@@ -46,6 +46,22 @@ export function flagFromCountryCode(countryCode: string): string {
 export function countryCodeFromFlag(flag: string | null | undefined): string | null {
   if (!flag) return null;
   const cps = Array.from(flag, (ch) => ch.codePointAt(0)!);
+
+  // Subdivision flags (England 🏴󠁧󠁢󠁥󠁮󠁧󠁿, Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿, Wales …): a waving black flag
+  // followed by ISO 3166-2 tag letters and a cancel-tag terminator. flag-icons
+  // expects the code hyphenated (e.g. "gb-eng").
+  if (cps[0] === 0x1f3f4 && cps[cps.length - 1] === 0xe007f) {
+    let tag = "";
+    for (let i = 1; i < cps.length - 1; i++) {
+      const c = cps[i];
+      if (c < 0xe0061 || c > 0xe007a) return null; // tag latin small a–z
+      tag += String.fromCharCode(c - 0xe0000);
+    }
+    if (tag.length < 3) return null;
+    return `${tag.slice(0, 2)}-${tag.slice(2)}`; // "gbeng" → "gb-eng"
+  }
+
+  // Standard country flags: exactly two regional-indicator symbols.
   if (cps.length !== 2) return null;
   const [a, b] = cps;
   const A = 0x1f1e6; // 🇦
