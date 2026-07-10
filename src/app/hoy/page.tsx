@@ -21,7 +21,7 @@ export const metadata: Metadata = { title: "Hoy · Andiamo" };
 
 const KIND_LABEL: Record<string, string> = {
   checkin: "Check-in", voucher: "Voucher", ticket: "Entrada",
-  carRental: "Auto", insurance: "Seguro", flight: "Vuelo", other: "Otro",
+  carRental: "Auto", train: "Tren", insurance: "Seguro", flight: "Vuelo", other: "Otro",
 };
 
 export default async function HoyPage() {
