@@ -105,6 +105,7 @@ enum DocumentKind {
   voucher
   ticket
   carRental
+  train
   insurance
   flight
   other

@@ -143,7 +143,7 @@ export const CreateDocumentLinkSchema = z.object({
   slug: z.string().nullable().optional(),
   stopId: z.string().transform((v) => v || null).nullable().optional(),
   label: requiredStr,
-  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "insurance", "flight", "other"]).catch("other"),
+  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
   url: z
     .string()
     .min(1, "URL requerida")

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
-  BedDouble, Ticket, Car, ShieldCheck, Plane, FileText,
+  BedDouble, Ticket, Car, TrainFront, ShieldCheck, Plane, FileText,
   ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -36,7 +36,7 @@ interface Document {
 
 const KIND_LABEL: Record<string, string> = {
   checkin: "Check-in", voucher: "Voucher", ticket: "Entrada",
-  carRental: "Auto", insurance: "Seguro", flight: "Vuelo", other: "Otro",
+  carRental: "Auto", train: "Tren", insurance: "Seguro", flight: "Vuelo", other: "Otro",
 };
 
 const KIND_ICON: Record<string, LucideIcon> = {
@@ -44,6 +44,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
   voucher:   Ticket,
   ticket:    Ticket,
   carRental: Car,
+  train:     TrainFront,
   insurance: ShieldCheck,
   flight:    Plane,
   other:     FileText,
