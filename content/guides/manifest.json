@@ -184,7 +184,18 @@
           "dayTrips": []
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres-escocia",
+          "title": "Costumbres en Escocia (Edimburgo y Highlands)",
+          "file": "reino-unido/costumbres-escocia.md"
+        },
+        {
+          "slug": "costumbres-inglaterra",
+          "title": "Costumbres en Inglaterra (Londres y York)",
+          "file": "reino-unido/costumbres-inglaterra.md"
+        }
+      ]
     },
     {
       "order": 2,
@@ -243,7 +254,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Países Bajos",
+          "file": "paises-bajos/costumbres.md"
+        }
+      ]
     },
     {
       "order": 3,
@@ -281,6 +298,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "francia/colmar/contexto-historico.md"
+            },
+            {
+              "slug": "bici-route-des-vins",
+              "title": "En bici por la Route des Vins d'Alsace desde Colmar",
+              "file": "francia/colmar/bici-route-des-vins.md"
             }
           ],
           "dayTrips": []
@@ -375,7 +397,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Francia",
+          "file": "francia/costumbres.md"
+        }
+      ]
     },
     {
       "order": 4,
@@ -478,22 +506,18 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "portugal/porto/contexto-historico.md"
-            },
-            {
-              "slug": "comparacion-hostels-porto-sep2026",
-              "title": "Comparación de hostels en Porto — Sep 2026",
-              "file": "portugal/porto/comparacion-hostels-porto-sep2026.md"
-            },
-            {
-              "slug": "readme",
-              "title": "Portugal — Lisboa + Porto — 8 noches",
-              "file": "portugal/porto/readme.md"
             }
           ],
           "dayTrips": []
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Portugal",
+          "file": "portugal/costumbres.md"
+        }
+      ]
     },
     {
       "order": 5,
@@ -540,6 +564,11 @@
           ],
           "dayTrips": [
             {
+              "slug": "bici-selva-negra",
+              "title": "Day Trip en bici: Selva Negra desde Friburgo",
+              "file": "alemania/friburgo/day-trips/bici-selva-negra.md"
+            },
+            {
               "slug": "belchen-wutachschlucht",
               "title": "Day Trip: Belchen / Wutachschlucht (trekking)",
               "file": "alemania/friburgo/day-trips/belchen-wutachschlucht.md"
@@ -557,7 +586,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Alemania",
+          "file": "alemania/costumbres.md"
+        }
+      ]
     },
     {
       "order": 6,
@@ -566,46 +601,119 @@
       "flag": "🇨🇭",
       "guides": [
         {
-          "slug": "interlaken-y-alrededores",
-          "title": "Interlaken y alrededores",
+          "slug": "grindelwald",
+          "title": "Grindelwald",
           "country": "Suiza",
           "countryFlag": "🇨🇭",
           "docs": [
             {
               "slug": "actividades",
               "title": "Actividades",
-              "file": "suiza/interlaken-y-alrededores/actividades.md"
-            },
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "suiza/interlaken-y-alrededores/gastronomia.md"
+              "file": "suiza/grindelwald/actividades.md"
             },
             {
               "slug": "alojamiento",
               "title": "Alojamiento",
-              "file": "suiza/interlaken-y-alrededores/alojamiento.md"
+              "file": "suiza/grindelwald/alojamiento.md"
             },
             {
               "slug": "transporte",
               "title": "Transporte",
-              "file": "suiza/interlaken-y-alrededores/transporte.md"
+              "file": "suiza/grindelwald/transporte.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "interlaken",
+          "title": "Interlaken",
+          "country": "Suiza",
+          "countryFlag": "🇨🇭",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "suiza/interlaken/actividades.md"
             },
             {
-              "slug": "desvios-cercanos",
-              "title": "Desvíos cercanos",
-              "file": "suiza/interlaken-y-alrededores/desvios-cercanos.md"
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "suiza/interlaken/alojamiento.md"
             },
             {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "suiza/interlaken-y-alrededores/contexto-historico.md"
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "suiza/interlaken/transporte.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "lauterbrunnen",
+          "title": "Lauterbrunnen",
+          "country": "Suiza",
+          "countryFlag": "🇨🇭",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "suiza/lauterbrunnen/actividades.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "suiza/lauterbrunnen/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "suiza/lauterbrunnen/transporte.md"
+            }
+          ],
+          "dayTrips": []
+        },
+        {
+          "slug": "lucerna",
+          "title": "Lucerna",
+          "country": "Suiza",
+          "countryFlag": "🇨🇭",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "suiza/lucerna/actividades.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "suiza/lucerna/transporte.md"
             }
           ],
           "dayTrips": []
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "readme",
+          "title": "Suiza — Región Jungfrau (Berner Oberland)",
+          "file": "suiza/readme.md"
+        },
+        {
+          "slug": "contexto-historico",
+          "title": "Contexto histórico",
+          "file": "suiza/contexto-historico.md"
+        },
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Suiza",
+          "file": "suiza/costumbres.md"
+        },
+        {
+          "slug": "gastronomia",
+          "title": "Gastronomía",
+          "file": "suiza/gastronomia.md"
+        }
+      ]
     },
     {
       "order": 7,
@@ -703,7 +811,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Austria",
+          "file": "austria/costumbres.md"
+        }
+      ]
     },
     {
       "order": 8,
@@ -762,7 +876,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Chequia",
+          "file": "chequia/costumbres.md"
+        }
+      ]
     },
     {
       "order": 9,
@@ -826,7 +946,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Polonia",
+          "file": "polonia/costumbres.md"
+        }
+      ]
     },
     {
       "order": 10,
@@ -895,7 +1021,13 @@
           ]
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Hungría",
+          "file": "hungria/costumbres.md"
+        }
+      ]
     },
     {
       "order": 11,
@@ -1084,6 +1216,11 @@
           "slug": "readme",
           "title": "README",
           "file": "eslovenia/readme.md"
+        },
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en Eslovenia",
+          "file": "eslovenia/costumbres.md"
         }
       ]
     },
