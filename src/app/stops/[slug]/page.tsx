@@ -19,7 +19,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
 import { Flag } from "@/components/Flag";
-import StopSpendChip from "@/components/StopSpendChip";
+import StopSpendPanel, { SpendPanelSkeleton } from "@/components/StopSpendPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -330,9 +330,9 @@ export default async function StopPage({ params }: Props) {
           <CurrencySection currencyCode={stop.currencyCode} />
         </Suspense>
 
-        {/* Spend chip — fed by Botardo; renders nothing if unreachable */}
-        <Suspense fallback={null}>
-          <StopSpendChip slug={stop.slug} />
+        {/* Spend panel — fed by Spitwise; degrades silently if unreachable */}
+        <Suspense fallback={<SpendPanelSkeleton />}>
+          <StopSpendPanel slug={stop.slug} arrivalDate={stop.arrivalDate} />
         </Suspense>
       </main>
     </div>

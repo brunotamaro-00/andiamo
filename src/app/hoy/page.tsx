@@ -11,8 +11,10 @@ import { TRIP_TIMEZONE, todayStr, dateToStr, daysBetween } from "@/lib/trip";
 import { collectUrgentSections, STOP_TO_GUIDES, type UrgentEntry } from "@/lib/guides";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
+import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { TodayPoiList } from "@/components/TodayPoiList";
+import TripSpendStrip from "@/components/TripSpendStrip";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Flag } from "@/components/Flag";
 
@@ -174,6 +176,13 @@ export default async function HoyPage() {
             subtitle={`${confirmed.length} paradas · ${[...new Set(confirmed.map((s) => s.country))].length} países`}
             href="/stops"
           />
+        )}
+
+        {/* Trip-total spend (Spitwise) — silent when unreachable or empty */}
+        {(phase === "during" || phase === "after") && (
+          <Suspense fallback={null}>
+            <TripSpendStrip />
+          </Suspense>
         )}
 
         {/* Pending POIs at the current stop */}
