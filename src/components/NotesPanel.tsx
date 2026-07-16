@@ -174,8 +174,20 @@ function NoteCard({
   const [title, setTitle] = useState(note.title);
   const [body, setBody] = useState(note.body);
   const [status, setStatus] = useState<SaveStatus>("idle");
+  const [expanded, setExpanded] = useState(false);
+  const [clamped, setClamped] = useState(false);
+  const bodyRef = useRef<HTMLParagraphElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
+
+  /* Detect whether the collapsed body actually overflows its 2-line clamp,
+     so the "Ver más" hint only shows on long notes. */
+  useEffect(() => {
+    if (editing || expanded) return;
+    const el = bodyRef.current;
+    if (!el) return;
+    setClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [note.body, editing, expanded]);
 
   /* Seed the editable fields from the latest note when entering edit mode.
      We intentionally gate on `editing` rather than note values to avoid
@@ -246,7 +258,7 @@ function NoteCard({
           }}
           aria-label="Cuerpo de la nota"
           placeholder="Detalles..."
-          rows={3}
+          rows={Math.min(12, Math.max(3, body.split("\n").length + 1))}
           className="w-full bg-transparent text-xs text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
         />
         <div className="flex items-center justify-between pt-1">
@@ -291,9 +303,14 @@ function NoteCard({
     >
       <div className="flex items-start justify-between gap-1">
         <button
-          onClick={() => setEditing(true)}
+          onClick={() => (note.body ? setExpanded((v) => !v) : setEditing(true))}
+          aria-expanded={note.body ? expanded : undefined}
           className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-          aria-label={`Editar nota "${note.title}"`}
+          aria-label={
+            note.body
+              ? `${expanded ? "Colapsar" : "Expandir"} nota "${note.title}"`
+              : `Editar nota "${note.title}"`
+          }
         >
           <div className="flex items-center gap-1.5">
             {note.pinned && (
@@ -307,9 +324,19 @@ function NoteCard({
             <span className="text-sm font-medium text-ink">{note.title}</span>
           </div>
           {note.body && (
-            <p className="text-xs text-ink-2 mt-1 whitespace-pre-wrap">
+            <p
+              ref={bodyRef}
+              className={`text-xs text-ink-2 mt-1 whitespace-pre-wrap ${
+                expanded ? "" : "line-clamp-2"
+              }`}
+            >
               {note.body}
             </p>
+          )}
+          {note.body && (clamped || expanded) && (
+            <span className="mt-1 inline-block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+              {expanded ? "Ver menos" : "Ver más"}
+            </span>
           )}
         </button>
 
