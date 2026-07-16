@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { db } from "@/lib/db";
+import { notifyStopsChanged } from "@/lib/spitwise";
 import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
 import { shiftOrders, PARKED_ORDER } from "@/lib/stop-order";
@@ -10,6 +12,9 @@ import { recalculateItinerary } from "@/lib/itinerary";
 import { slugify } from "@/lib/slug";
 import { parseForm, CreateStopSchema, UpdateStopSchema, TripStartSchema } from "./_schemas";
 
+// INVARIANT: a stop's slug is set once at creation and never changes —
+// Spitwise joins expenses to stops by slug. If slug editing is ever
+// added, treat it as delete + create (the archive semantics handle that).
 async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
   let slug = base;
   let i = 2;
@@ -61,6 +66,8 @@ export async function createStop(formData: FormData) {
   });
 
   await recalculateItinerary();
+  // Registered before redirect() (which throws NEXT_REDIRECT); runs post-response.
+  after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
   revalidatePath("/hoy");
@@ -121,6 +128,7 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
   }
 
   await recalculateItinerary();
+  after(() => notifyStopsChanged());
 
   revalidatePath(`/stops/${current.slug}`);
   revalidatePath("/stops");
@@ -153,6 +161,7 @@ export async function deleteStop(id: string) {
   }
 
   await recalculateItinerary();
+  after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
   revalidatePath("/hoy");
@@ -173,6 +182,7 @@ export async function setTripStart(formData: FormData): Promise<{ error?: string
   });
 
   await recalculateItinerary();
+  after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
   revalidatePath("/hoy");
