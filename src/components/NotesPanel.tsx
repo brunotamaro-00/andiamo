@@ -301,6 +301,8 @@ function NoteCard({
           : "border-border bg-surface-2/30"
       }`}
     >
+      {/* Header row: only the title shares width with the action buttons —
+          the body renders below at full card width. */}
       <div className="flex items-start justify-between gap-1">
         <button
           onClick={() => (note.body ? setExpanded((v) => !v) : setEditing(true))}
@@ -323,21 +325,6 @@ function NoteCard({
             )}
             <span className="text-sm font-medium text-ink">{note.title}</span>
           </div>
-          {note.body && (
-            <p
-              ref={bodyRef}
-              className={`text-xs text-ink-2 mt-1 whitespace-pre-wrap ${
-                expanded ? "" : "line-clamp-2"
-              }`}
-            >
-              {note.body}
-            </p>
-          )}
-          {note.body && (clamped || expanded) && (
-            <span className="mt-1 inline-block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-              {expanded ? "Ver menos" : "Ver más"}
-            </span>
-          )}
         </button>
 
         {confirming ? (
@@ -377,6 +364,29 @@ function NoteCard({
           </div>
         )}
       </div>
+
+      {note.body && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-label={`${expanded ? "Colapsar" : "Expandir"} nota "${note.title}"`}
+          className="block w-full text-left rounded-lg -mx-1 -mb-1 px-1 pb-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+        >
+          <p
+            ref={bodyRef}
+            className={`text-xs text-ink-2 mt-1 whitespace-pre-wrap ${
+              expanded ? "" : "line-clamp-2"
+            }`}
+          >
+            {note.body}
+          </p>
+          {(clamped || expanded) && (
+            <span className="mt-1 inline-block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+              {expanded ? "Ver menos" : "Ver más"}
+            </span>
+          )}
+        </button>
+      )}
     </div>
   );
 }
