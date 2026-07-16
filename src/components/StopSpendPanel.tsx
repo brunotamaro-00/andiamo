@@ -1,5 +1,6 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
+import { categoryIcon } from "@/lib/categoryIcons";
 import { spitwisePublicUrl, fetchStopSpendDetail } from "@/lib/spitwise";
 import { todayStr, dateToStr } from "@/lib/trip";
 
@@ -67,11 +68,12 @@ export default async function StopSpendPanel({
           {detail.by_category.map((cat) => {
             const value = Number(cat.total_usd);
             const pct = total > 0 ? Math.max((value / total) * 100, 2) : 0;
+            const Icon = categoryIcon(cat.name);
             return (
               <li key={cat.category_id ?? "otros"}>
                 <div className="flex items-baseline justify-between gap-2 mb-0.5">
-                  <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 truncate">
-                    {cat.icon ? `${cat.icon} ` : ""}
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 truncate min-w-0">
+                    <Icon size={12} strokeWidth={2} className="shrink-0 text-gold" aria-hidden="true" />
                     {cat.name ?? "Otros"}
                   </span>
                   <span className="font-tabular text-[12px] font-bold text-ink shrink-0">
