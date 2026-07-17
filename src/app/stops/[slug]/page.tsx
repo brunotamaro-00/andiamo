@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { computeCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
+import { todayStr, dateToStr, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { Suspense } from "react";
 import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
@@ -121,10 +121,6 @@ export default async function StopPage({ params }: Props) {
       ? "after"
       : "during";
 
-  // Days remaining at this stop
-  const depStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
-  const daysLeft = depStr ? Math.max(0, daysBetween(today, depStr)) : null;
-
   // Stay window — own dates, or the assumed gap between dated neighbors
   const stayWindow = assumedDateWindow(stop, allStopsRaw);
 
@@ -176,31 +172,6 @@ export default async function StopPage({ params }: Props) {
                   <MapPin size={18} strokeWidth={1.5} aria-hidden="true" />
                 </a>
               </div>
-
-              <div className="flex flex-wrap gap-2 mt-3">
-                {stop.arrivalDate ? (
-                  <DateBadge>
-                    {formatDate(stop.arrivalDate)} –{" "}
-                    {stop.departureDate
-                      ? formatDate(stop.departureDate)
-                      : stayWindow
-                      ? `≈${formatDate(stayWindow.departure)}`
-                      : "?"}
-                  </DateBadge>
-                ) : (
-                  stayWindow && (
-                    <DateBadge>
-                      ≈{formatDate(stayWindow.arrival)} – {formatDate(stayWindow.departure)}
-                    </DateBadge>
-                  )
-                )}
-                {stop.tempRange && (
-                  <DateBadge>
-                    <Thermometer size={11} strokeWidth={1.5} aria-hidden="true" className="inline mr-1" />
-                    ≈{stop.tempRange}
-                  </DateBadge>
-                )}
-              </div>
             </div>
 
             <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
@@ -221,28 +192,41 @@ export default async function StopPage({ params }: Props) {
             </div>
           </div>
 
-          {((stop.arrivalDate && tripDay !== null) || sunTimes) && (
-            <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap items-center gap-3 text-xs text-ink-3">
-              {stop.arrivalDate && tripDay !== null && (
-                <>
-                  <span>Día {tripDay} del viaje</span>
-                  {isActive && tripPhase === "during" && daysLeft !== null && (
-                    <span className="text-brick">
-                      {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
-                    </span>
-                  )}
-                </>
-              )}
-              {sunTimes && (
-                <span className="ml-auto flex items-center gap-1.5 tabular-nums">
-                  <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
-                  {sunTimes.sunrise}
-                  <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="ml-1.5" />
-                  {sunTimes.sunset}
-                </span>
-              )}
-            </div>
-          )}
+          {(() => {
+            const dateRange = stop.arrivalDate
+              ? `${formatDate(stop.arrivalDate)} – ${
+                  stop.departureDate
+                    ? formatDate(stop.departureDate)
+                    : stayWindow
+                    ? `≈${formatDate(stayWindow.departure)}`
+                    : "?"
+                }`
+              : stayWindow
+              ? `≈${formatDate(stayWindow.arrival)} – ${formatDate(stayWindow.departure)}`
+              : null;
+            const hasMeta = dateRange || tripDay !== null || stop.tempRange || sunTimes;
+            if (!hasMeta) return null;
+            return (
+              <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
+                {dateRange && <span className="text-ink-2 font-medium">{dateRange}</span>}
+                {stop.arrivalDate && tripDay !== null && <span>Día {tripDay} del viaje</span>}
+                {stop.tempRange && (
+                  <span className="flex items-center gap-1">
+                    <Thermometer size={13} strokeWidth={1.5} aria-hidden="true" />
+                    ≈{stop.tempRange}
+                  </span>
+                )}
+                {sunTimes && (
+                  <span className="ml-auto flex items-center gap-1.5 tabular-nums">
+                    <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
+                    {sunTimes.sunrise}
+                    <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="ml-1.5" />
+                    {sunTimes.sunset}
+                  </span>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Prev / Next navigation */}
@@ -393,14 +377,6 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
         </div>
       )}
     </div>
-  );
-}
-
-function DateBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <Badge variant="default" className="gap-0.5 px-2.5 py-1">
-      {children}
-    </Badge>
   );
 }
 

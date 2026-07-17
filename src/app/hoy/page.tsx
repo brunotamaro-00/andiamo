@@ -84,7 +84,7 @@ export default async function HoyPage() {
           where: { id: currentStop.id },
           select: {
             pois: {
-              where: { done: false },
+              where: { done: false, reservationRequired: true },
               orderBy: { createdAt: "asc" },
               select: { id: true, name: true, type: true, done: true, reservationRequired: true },
             },
@@ -190,45 +190,9 @@ export default async function HoyPage() {
           </Suspense>
         )}
 
-        {/* Pending POIs at the current stop — the "+" adds one without
-            navigating to the stop detail */}
-        {showStopSections && details && (
-          <Card className="animate-fade-in stagger-1">
-            <SectionHeader
-              title="Pendientes acá"
-              count={details.pois.length > 0 ? details.pois.length : undefined}
-              action={
-                <>
-                  {details.pois.length > 0 && (
-                    <Link
-                      href={`/stops/${currentStop!.slug}#pois`}
-                      className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
-                    >
-                      Ver todos
-                    </Link>
-                  )}
-                  <QuickAddPoi
-                    stopId={currentStop!.id}
-                    slug={currentStop!.slug}
-                    stopLat={currentStop!.latitude}
-                    stopLng={currentStop!.longitude}
-                  />
-                </>
-              }
-            />
-            {details.pois.length > 0 ? (
-              <TodayPoiList slug={currentStop!.slug} pois={details.pois} />
-            ) : (
-              <p className="text-sm text-ink-2">
-                Nada pendiente acá. Anotá un lugar con el «+».
-              </p>
-            )}
-          </Card>
-        )}
-
-        {/* Documents at the current stop */}
+        {/* Documents at the current stop — go before reservations */}
         {showStopSections && details && details.documents.length > 0 && (
-          <Card className="animate-fade-in stagger-2">
+          <Card className="animate-fade-in stagger-1">
             <SectionHeader title="Documentos de la parada" count={details.documents.length} />
             <ul className="space-y-1">
               {details.documents.map((doc) => (
@@ -248,6 +212,34 @@ export default async function HoyPage() {
                 </li>
               ))}
             </ul>
+          </Card>
+        )}
+
+        {/* Reservations to make at the current stop — only POIs marked
+            "Reservar"; the card hides entirely when there are none. */}
+        {showStopSections && details && details.pois.length > 0 && (
+          <Card className="animate-fade-in stagger-2">
+            <SectionHeader
+              title="Reservar acá"
+              count={details.pois.length}
+              action={
+                <>
+                  <Link
+                    href={`/stops/${currentStop!.slug}#pois`}
+                    className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
+                  >
+                    Ver todos
+                  </Link>
+                  <QuickAddPoi
+                    stopId={currentStop!.id}
+                    slug={currentStop!.slug}
+                    stopLat={currentStop!.latitude}
+                    stopLng={currentStop!.longitude}
+                  />
+                </>
+              }
+            />
+            <TodayPoiList slug={currentStop!.slug} pois={details.pois} />
           </Card>
         )}
 
