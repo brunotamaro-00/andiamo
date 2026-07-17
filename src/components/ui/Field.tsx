@@ -29,9 +29,10 @@ interface FieldProps {
   accept?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
+  hint?: string;
 }
 
-export function Field({ label, name, type = "text", ...rest }: FieldProps) {
+export function Field({ label, name, type = "text", hint, ...rest }: FieldProps) {
   const id = useId();
   return (
     <div>
@@ -39,6 +40,7 @@ export function Field({ label, name, type = "text", ...rest }: FieldProps) {
         {label}
       </label>
       <input id={id} name={name} type={type} className={inputClass} {...rest} />
+      {hint && <p className="text-[11px] text-ink-faint mt-1">{hint}</p>}
     </div>
   );
 }

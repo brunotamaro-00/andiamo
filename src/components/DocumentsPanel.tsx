@@ -13,7 +13,7 @@ import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField } from "@/components/ui/Field";
+import { Field, SelectField, inputClass } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
@@ -332,7 +332,14 @@ function LinkForm({
             </option>
           ))}
         </SelectField>
-        <Field label="URL" name="url" type="url" required placeholder="https://..." />
+        <Field
+          label="URL"
+          name="url"
+          type="url"
+          required
+          placeholder="https://..."
+          hint="Link al voucher, reserva o check-in online"
+        />
         <div className="flex gap-2 pt-1">
           <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
             Cancelar
@@ -483,7 +490,7 @@ function UploadForm({
             accept={ACCEPT}
             onChange={handleFileChange}
             disabled={uploading}
-            className="mt-1 w-full text-sm text-ink-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-border file:text-ink hover:file:bg-border-strong cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick rounded-xl disabled:opacity-50"
+            className={`${inputClass} h-[42px] py-0 flex items-center cursor-pointer file:mr-3 file:my-0 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-border file:text-ink hover:file:bg-border-strong`}
           />
           <p className="text-[11px] text-ink-faint mt-1">
             PDF, JPG, PNG o WebP · máximo 20 MB

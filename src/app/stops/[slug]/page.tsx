@@ -13,7 +13,6 @@ import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, MapPin, Thermometer, Sunrise, Sunset } from "lucide-react";
-import { SectionNav } from "@/components/SectionNav";
 import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
@@ -126,12 +125,6 @@ export default async function StopPage({ params }: Props) {
   const depStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
   const daysLeft = depStr ? Math.max(0, daysBetween(today, depStr)) : null;
 
-  // Days until trip starts (only relevant when before the trip)
-  const daysToStart =
-    tripPhase === "before" && firstArrivalStr
-      ? Math.max(0, daysBetween(today, firstArrivalStr))
-      : null;
-
   // Stay window — own dates, or the assumed gap between dated neighbors
   const stayWindow = assumedDateWindow(stop, allStopsRaw);
 
@@ -154,17 +147,6 @@ export default async function StopPage({ params }: Props) {
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
-
-        {/* Sticky section chips — the page is long; jump without scrolling */}
-        <SectionNav
-          items={[
-            { id: "pois", label: "Lugares" },
-            { id: "notas", label: "Notas" },
-            { id: "docs", label: "Docs" },
-            { id: "moneda", label: "Moneda" },
-            { id: "gastos", label: "Gastos" },
-          ]}
-        />
 
         {/* City header card */}
         <div
@@ -254,11 +236,6 @@ export default async function StopPage({ params }: Props) {
                       {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes aquí
                     </span>
                   )}
-                  {isActive && tripPhase === "before" && daysToStart !== null && (
-                    <span className="text-brick">
-                      Faltan {daysToStart} {daysToStart === 1 ? "día" : "días"} para el inicio
-                    </span>
-                  )}
                 </>
               )}
               {sunTimes && (
@@ -318,14 +295,15 @@ export default async function StopPage({ params }: Props) {
         {/* City guide */}
         <GuideCard stopSlug={stop.slug} />
 
-        {/* POIs */}
-        <div id="pois" className="scroll-mt-20">
-          <PoiPanel
+        {/* Documents */}
+        <div id="docs" className="scroll-mt-20">
+          <DocumentsPanel
             stopId={stop.id}
             slug={stop.slug}
-            stopLat={stop.latitude}
-            stopLng={stop.longitude}
-            pois={stop.pois as Parameters<typeof PoiPanel>[0]["pois"]}
+            documents={
+              stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
+            }
+            path={path}
           />
         </div>
 
@@ -339,15 +317,14 @@ export default async function StopPage({ params }: Props) {
           />
         </div>
 
-        {/* Documents */}
-        <div id="docs" className="scroll-mt-20">
-          <DocumentsPanel
+        {/* POIs */}
+        <div id="pois" className="scroll-mt-20">
+          <PoiPanel
             stopId={stop.id}
             slug={stop.slug}
-            documents={
-              stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
-            }
-            path={path}
+            stopLat={stop.latitude}
+            stopLng={stop.longitude}
+            pois={stop.pois as Parameters<typeof PoiPanel>[0]["pois"]}
           />
         </div>
 
