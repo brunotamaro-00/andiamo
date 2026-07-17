@@ -3,6 +3,8 @@
  *  Env: SPITWISE_URL (falls back to the legacy BOTARDO_URL until the
  *  Railway variable is renamed) + TRIP_SHARED_API_KEY. */
 
+import type { PersonView } from "@/lib/person";
+
 export type SpendDetailCategory = {
   category_id: number | null;
   name: string | null;
@@ -76,12 +78,26 @@ export async function fetchStopSpend(
   }
 }
 
-export async function fetchStopSpendDetail(slug: string): Promise<SpendDetail | null> {
+/** `?user=` makes Spitwise return that person's share (half of a shared
+ *  expense, all of their own private one) and drop the other's private
+ *  expenses. Omitted for `null` ("ambos") => household gross totals.
+ *  The param is part of the URL, so Next's fetch cache keys each person's
+ *  view separately — one is never served the other's cached response. */
+function withUser(params: Record<string, string>, person: PersonView): string {
+  const q = new URLSearchParams(params);
+  if (person) q.set("user", person);
+  return q.toString();
+}
+
+export async function fetchStopSpendDetail(
+  slug: string,
+  person: PersonView = null,
+): Promise<SpendDetail | null> {
   const cfg = env();
   if (!cfg) return null;
   try {
     const res = await fetch(
-      `${cfg.base}/api/v1/cities/spend-detail?slug=${encodeURIComponent(slug)}&limit=5`,
+      `${cfg.base}/api/v1/cities/spend-detail?${withUser({ slug, limit: "5" }, person)}`,
       {
         headers: { "X-Api-Key": cfg.key },
         next: { revalidate: 120 },
@@ -94,11 +110,11 @@ export async function fetchStopSpendDetail(slug: string): Promise<SpendDetail | 
   }
 }
 
-export async function fetchTripSpend(): Promise<TripSpend | null> {
+export async function fetchTripSpend(person: PersonView = null): Promise<TripSpend | null> {
   const cfg = env();
   if (!cfg) return null;
   try {
-    const res = await fetch(`${cfg.base}/api/v1/trip/spend`, {
+    const res = await fetch(`${cfg.base}/api/v1/trip/spend?${withUser({}, person)}`, {
       headers: { "X-Api-Key": cfg.key },
       next: { revalidate: 300 },
     });

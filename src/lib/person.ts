@@ -1,0 +1,30 @@
+/** Who is looking at the expenses. This is a *view preference*, not auth:
+ *  the app has a single shared APP_PASSWORD and anyone who knows it can switch
+ *  person freely. It exists so each of us sees our own share of the Spitwise
+ *  ledger, and it must never gate anything else — every other surface (stops,
+ *  POIs, notes, documents, guides) shows both of us exactly the same thing. */
+
+export const PERSON_COOKIE_NAME = "trip_person";
+export const PERSON_MAX_AGE = 60 * 60 * 24 * 365;
+
+/** Usernames as they exist in Spitwise's `users` table — they are the join key
+ *  for `?user=` on its API, so these strings must match it exactly. */
+export const PEOPLE = ["bruno", "katia"] as const;
+
+export type Person = (typeof PEOPLE)[number];
+
+/** `null` means "ambos": household totals, the pre-selector behaviour. It is a
+ *  real state, not just a fallback — a session from before this feature has no
+ *  cookie and must keep working instead of guessing a person. */
+export type PersonView = Person | null;
+
+export function isPerson(value: string | undefined | null): value is Person {
+  return PEOPLE.includes(value as Person);
+}
+
+export function personLabel(person: PersonView): string {
+  return person === null ? "Ambos" : person.charAt(0).toUpperCase() + person.slice(1);
+}
+
+/* Reading the cookie lives in person-server.ts: PersonSwitcher is a client
+ * component and imports this module, so it must stay free of next/headers. */

@@ -5,7 +5,9 @@ import { LogoutButton } from "@/components/LogoutButton";
 interface PageHeaderProps {
   /** Gray uppercase label under the wordmark. Omit when a page needs no context line. */
   subtitle?: string;
-  /** Extra actions rendered to the left of the Salir button (e.g. search shortcut). */
+  /** Extra actions rendered to the left of the Salir button (e.g. search
+   *  shortcut, PersonSwitcher). Kept as a slot rather than reading cookies here:
+   *  /guias renders this header and must stay SSG. */
   actions?: ReactNode;
 }
 

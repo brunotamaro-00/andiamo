@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { login } from "@/app/actions/auth";
 import { Wordmark } from "@/components/Wordmark";
+import { PEOPLE, personLabel } from "@/lib/person";
 
 export const metadata: Metadata = { title: "Acceder · Andiamo" };
 
@@ -47,6 +48,31 @@ export default async function LoginPage({ searchParams }: Props) {
             required
           />
         </div>
+
+        {/* Only decides whose share of los gastos se muestra — todo lo demás
+            del viaje es idéntico para los dos. */}
+        <fieldset>
+          <legend className="block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
+            ¿Quién sos?
+          </legend>
+          <div className="grid grid-cols-2 gap-2">
+            {PEOPLE.map((p) => (
+              <label
+                key={p}
+                className="relative flex items-center justify-center min-h-[44px] px-3 bg-surface-2 border-2 border-border rounded-lg text-sm font-extrabold uppercase tracking-[0.08em] text-ink-2 cursor-pointer transition-colors duration-150 hover:border-border-strong has-[:checked]:bg-brick-bg has-[:checked]:border-brick has-[:checked]:text-brick-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brick/40"
+              >
+                <input
+                  type="radio"
+                  name="person"
+                  value={p}
+                  required
+                  className="absolute opacity-0 w-0 h-0"
+                />
+                {personLabel(p)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         {params.error && (
           <p className="text-danger text-xs font-semibold uppercase tracking-wide">

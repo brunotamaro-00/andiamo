@@ -13,6 +13,8 @@ import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
+import { PersonSwitcher } from "@/components/PersonSwitcher";
+import { getPerson } from "@/lib/person-server";
 import { TodayPoiList } from "@/components/TodayPoiList";
 import TripSpendStrip from "@/components/TripSpendStrip";
 import { Card, SectionHeader } from "@/components/ui/Card";
@@ -118,7 +120,7 @@ export default async function HoyPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <PageHeader subtitle={todayLabel} />
+      <PageHeader subtitle={todayLabel} actions={<PersonSwitcher person={await getPerson()} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         {phase === "unplanned" && (
