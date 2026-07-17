@@ -59,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}>
       <body className="h-full bg-canvas text-ink antialiased font-sans flex flex-col overflow-hidden">
         <Providers>
-          <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain">
+          <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
             {children}
           </main>
           <TabBar />
