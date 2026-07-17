@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, Loader2 } from "lucide-react";
+import { addRecentSearch } from "@/lib/recent-searches";
 
 export function SearchBox({ initialQuery }: { initialQuery: string }) {
   const router = useRouter();
@@ -15,6 +16,7 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       const trimmed = next.trim();
+      if (trimmed.length >= 2) addRecentSearch(trimmed);
       startTransition(() => {
         router.replace(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
       });
@@ -52,7 +54,7 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
         <button
           onClick={() => update("")}
           aria-label="Limpiar búsqueda"
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-xl text-ink-3 hover:text-ink hover:bg-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
         >
           <X size={14} strokeWidth={1.5} aria-hidden="true" />
         </button>

@@ -62,6 +62,11 @@
   to   { opacity: 0.8; }
 }
 
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -100,29 +105,57 @@
   .animate-map-pulse {
     animation: none;
   }
+  .skeleton-shimmer::after {
+    animation: none;
+    content: none;
+  }
 }
 
-/* ── Elevation — Panini hard-shadow sticker style ─────── */
+/* ── Elevation — sobered sticker style: small hard offset + warm diffuse ── */
 @utility card-shadow {
-  box-shadow: 3px 3px 0 var(--color-border);
+  box-shadow: 2px 2px 0 var(--color-border), 0 4px 14px rgb(27 26 23 / 0.05);
 }
 
 @utility card-shadow-lg {
-  box-shadow: 5px 5px 0 var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-ink), 0 10px 28px rgb(27 26 23 / 0.10);
 }
 
 @utility hard-shadow-ink {
-  box-shadow: 3px 3px 0 var(--color-ink);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+/* Hover lifts — tokenized (never inline hex shadows) */
+@utility hover-shadow-brick {
+  box-shadow: 4px 4px 0 var(--color-brick), 0 10px 28px rgb(27 26 23 / 0.08);
+}
+@utility hover-shadow-ink {
+  box-shadow: 4px 4px 0 var(--color-ink), 0 10px 28px rgb(27 26 23 / 0.08);
 }
 
 /* Keep compat aliases */
-@utility shadow-soft    { box-shadow: 3px 3px 0 var(--color-border); }
-@utility shadow-soft-lg { box-shadow: 5px 5px 0 var(--color-ink); }
+@utility shadow-soft    { box-shadow: 2px 2px 0 var(--color-border), 0 4px 14px rgb(27 26 23 / 0.05); }
+@utility shadow-soft-lg { box-shadow: 4px 4px 0 var(--color-ink), 0 10px 28px rgb(27 26 23 / 0.10); }
 
 /* ── Animation utilities ─────────────────────────────── */
 @utility animate-fade-in    { animation: fadeIn  400ms ease-out both; }
 @utility animate-slide-up   { animation: slideUp 400ms ease-out both; }
 @utility animate-pulse-skeleton { animation: pulseGlow 1.5s ease-in-out infinite alternate; }
+
+/* Diagonal shimmer sweep for skeletons — pair with `relative overflow-hidden` */
+@utility skeleton-shimmer {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.45) 50%,
+      transparent 70%
+    );
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+}
 
 @utility stagger-1 { animation-delay: 60ms; }
 @utility stagger-2 { animation-delay: 120ms; }
@@ -145,6 +178,12 @@
 /* ── Card hover — sticker shift ──────────────────────── */
 @utility card-hover {
   transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+/* ── Hide scrollbar on horizontal chip rows ──────────── */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 /* ── Tabular nums for data ───────────────────────────── */

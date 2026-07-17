@@ -3,6 +3,7 @@ import { Anton, Hanken_Grotesk, Archivo } from "next/font/google";
 import "./globals.css";
 import "flag-icons/css/flag-icons.min.css";
 import { TabBar } from "@/components/TabBar";
+import { Providers } from "@/components/Providers";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -57,10 +58,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}>
       <body className="h-full bg-canvas text-ink antialiased font-sans flex flex-col overflow-hidden">
-        <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain">
-          {children}
-        </main>
-        <TabBar />
+        <Providers>
+          <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain">
+            {children}
+          </main>
+          <TabBar />
+        </Providers>
         <OfflineBanner />
         <InstallPrompt />
         <ServiceWorkerRegister />

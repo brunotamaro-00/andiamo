@@ -3,8 +3,10 @@
 import { useState, useRef } from "react";
 import {
   BedDouble, Landmark, Target, UtensilsCrossed, Binoculars,
-  TrainFront, MapPin, Check, Trash2, ExternalLink, Plus, Pencil, X, Search,
+  TrainFront, MapPin, Trash2, ExternalLink, Plus, Pencil, X, Search, Copy,
 } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { PoiCheck } from "@/components/ui/PoiCheck";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
@@ -15,8 +17,10 @@ import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField } from "@/components/ui/Field";
+import { Field, SelectField, inputClass } from "@/components/ui/Field";
+import { Label } from "@/components/ui/Label";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useToast } from "@/components/ui/Toast";
 
 const POI_TYPES = [
   "hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro",
@@ -68,6 +72,7 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
   const [open, setOpen] = useState(false);
   const [editingPoi, setEditingPoi] = useState<Poi | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const { items: optimisticPois, mutate, run, mutationError, isPending } = useOptimisticList(
     pois,
@@ -93,7 +98,7 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
   function handleDelete(id: string) {
     setConfirmingId(null);
     haptics.warning();
-    mutate({ type: "delete", id }, () => deletePoi(id, slug), "No se pudo borrar. Reintentá.");
+    mutate({ type: "delete", id }, () => deletePoi(id, slug), "No se pudo borrar. Reintentá.", () => toast("Punto borrado"));
   }
 
   function handleAdd(formData: FormData) {
@@ -115,13 +120,13 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
     };
     setOpen(false);
     haptics.success();
-    mutate({ type: "add", poi: temp }, () => createPoi(formData), "No se pudo agregar el punto de interés. Reintentá.");
+    mutate({ type: "add", poi: temp }, () => createPoi(formData), "No se pudo agregar el punto de interés. Reintentá.", () => toast("Punto agregado"));
   }
 
   function handleEdit(formData: FormData, id: string) {
     formData.set("slug", slug);
     setEditingPoi(null);
-    run(() => updatePoi(id, formData), "No se pudo guardar los cambios. Reintentá.");
+    run(() => updatePoi(id, formData), "No se pudo guardar los cambios. Reintentá.", () => toast("Cambios guardados"));
   }
 
   const pending = optimisticPois.filter((p) => !p.done);
@@ -210,6 +215,18 @@ function PoiItem({
 }) {
   const Icon = TYPE_ICON[poi.type] ?? MapPin;
   const hasCoords = poi.latitude != null && poi.longitude != null;
+  const { toast } = useToast();
+
+  async function copyAddress() {
+    if (!poi.address) return;
+    try {
+      await navigator.clipboard.writeText(poi.address);
+      haptics.tap();
+      toast("Dirección copiada");
+    } catch {
+      toast("No se pudo copiar", "error");
+    }
+  }
 
   return (
     <li
@@ -228,16 +245,7 @@ function PoiItem({
         }
         className="group mt-0.5 h-11 w-11 flex items-center justify-center rounded-full shrink-0 transition-transform active:scale-90 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
       >
-        <span
-          className={[
-            "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
-            poi.done
-              ? "bg-success border-success/60 text-success-bg"
-              : "border-ink-3 group-hover:border-brick",
-          ].join(" ")}
-        >
-          {poi.done && <Check size={11} strokeWidth={2.5} aria-hidden="true" />}
-        </span>
+        <PoiCheck done={poi.done} hover />
       </button>
 
       {/* Content */}
@@ -257,9 +265,7 @@ function PoiItem({
             {poi.name}
           </span>
           {poi.reservationRequired && !poi.done && (
-            <span className="text-[10px] bg-danger-bg text-danger rounded-lg px-1.5 py-0.5 border border-danger/30">
-              reservar
-            </span>
+            <Badge variant="danger">Reservar</Badge>
           )}
         </div>
         {poi.address && (
@@ -293,6 +299,15 @@ function PoiItem({
         </div>
       ) : (
         <div className="flex items-center pt-1.5 shrink-0">
+          {poi.address && (
+            <button
+              onClick={copyAddress}
+              aria-label={`Copiar dirección de "${poi.name}"`}
+              className={`${actionBtn} text-ink-3 hover:text-ink-2 hover:bg-surface-2`}
+            >
+              <Copy size={15} strokeWidth={1.5} aria-hidden="true" />
+            </button>
+          )}
           {hasCoords ? (
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${poi.latitude},${poi.longitude}`}
@@ -409,14 +424,9 @@ function PlaceSearchField({
     onClear();
   }
 
-  const inputClass =
-    "mt-1 w-full bg-surface-2 border border-border-strong rounded-xl px-3 py-2.5 text-sm text-ink " +
-    "placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick " +
-    "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors";
-
   return (
     <div>
-      <span className="text-xs font-medium text-ink-2">Ubicación (opcional)</span>
+      <Label as="span">Ubicación (opcional)</Label>
 
       {/* Hidden coord inputs always present — empty string if no selection */}
       <input type="hidden" name="latitude" value={selected?.lat ?? ""} />
@@ -424,14 +434,14 @@ function PlaceSearchField({
 
       {selected ? (
         /* Chip showing selected place */
-        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-[4px]">
+        <div className="mt-1 flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-lg">
           <MapPin size={13} strokeWidth={1.5} aria-hidden="true" className="text-brick shrink-0" />
           <span className="text-sm text-brick-ink flex-1 truncate">{selectedLabel}</span>
           <button
             type="button"
             onClick={handleClear}
             aria-label="Quitar ubicación seleccionada"
-            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+            className="h-11 w-11 -my-2 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           >
             <X size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -478,7 +488,7 @@ function PlaceSearchField({
                   key={i}
                   type="button"
                   onClick={() => handleSelect(r)}
-                  className="w-full text-left px-3 py-2 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+                  className="w-full text-left px-3 py-2 rounded-lg bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
                 >
                   <p className="text-sm font-medium text-ink truncate">{r.name}</p>
                   <p className="text-xs text-ink-3 truncate">{r.address}</p>
@@ -494,7 +504,7 @@ function PlaceSearchField({
 
 /* ─── PoiForm ─────────────────────────────────────────────────────────────── */
 
-function PoiForm({
+export function PoiForm({
   defaults,
   stopLat,
   stopLng,

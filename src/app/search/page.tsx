@@ -3,6 +3,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { SearchBox } from "@/components/SearchBox";
+import { RecentSearches } from "@/components/RecentSearches";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -98,11 +99,14 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
 
         {!hasQuery && (
-          <EmptyState
-            icon={Search}
-            title="Buscá en todo el viaje"
-            description="Encontrá ciudades, puntos de interés y notas. Escribí al menos 2 letras."
-          />
+          <>
+            <RecentSearches />
+            <EmptyState
+              icon={Search}
+              title="Buscá en todo el viaje"
+              description="Encontrá ciudades, puntos de interés y notas. Escribí al menos 2 letras."
+            />
+          </>
         )}
 
         {hasQuery && total === 0 && (
@@ -212,7 +216,7 @@ function ResultHeading({
   icon: typeof MapPin; label: string; count: number;
 }) {
   return (
-    <h2 className="flex items-center gap-1.5 text-xs font-semibold text-ink-2 uppercase tracking-wider mb-2">
+    <h2 className="flex items-center gap-1.5 text-xs font-semibold text-ink-2 uppercase tracking-[0.08em] mb-2">
       <Icon size={13} strokeWidth={1.5} aria-hidden="true" />
       {label}
       <span className="text-ink-faint normal-case font-normal">({count})</span>
@@ -231,7 +235,7 @@ function ResultRow({
   badge?: React.ReactNode;
   external?: boolean;
 }) {
-  const className = "flex items-center gap-3 px-3 py-3 rounded-[4px] border-2 border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
+  const className = "flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
 
   const inner = (
     <>

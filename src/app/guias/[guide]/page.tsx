@@ -64,7 +64,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         </Link>
 
         {/* Title card */}
-        <div className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
+        <div className="bg-surface rounded-xl border border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
           <Flag flag={guide.countryFlag} className="text-4xl leading-none" />
           <div className="min-w-0">
             <h2 className="font-display uppercase text-2xl leading-tight text-ink tracking-wide">
@@ -88,7 +88,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
                 <Link
                   key={doc.slug}
                   href={`/guias/${guide.slug}/${doc.slug}`}
-                  className="flex flex-col gap-2 bg-surface rounded-[4px] border-2 border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#1B1A17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+                  className="flex flex-col gap-2 bg-surface rounded-xl border border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
                 >
                   <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
                   <span className="text-[13px] font-extrabold text-ink leading-snug">
@@ -106,7 +106,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
               Day trips
             </p>
-            <div className="bg-surface rounded-[4px] border-2 border-border card-shadow divide-y divide-border">
+            <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
               {guide.dayTrips.map((doc) => (
                 <Link
                   key={doc.slug}

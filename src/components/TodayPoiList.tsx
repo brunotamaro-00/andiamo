@@ -2,13 +2,15 @@
 
 import {
   BedDouble, Landmark, Target, UtensilsCrossed, Binoculars,
-  TrainFront, MapPin, Check,
+  TrainFront, MapPin,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { togglePoiDone } from "@/app/actions/pois";
 import { haptics } from "@/lib/haptics";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
+import { Badge } from "@/components/ui/Badge";
+import { PoiCheck } from "@/components/ui/PoiCheck";
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   hospedaje:  BedDouble,
@@ -52,17 +54,9 @@ export function TodayPoiList({ slug, pois }: { slug: string; pois: TodayPoi[] })
               <button
                 onClick={() => handleToggle(poi)}
                 aria-pressed={poi.done}
-                className="w-full flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-[4px] text-left transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                className="w-full flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-lg text-left transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
               >
-                <span
-                  aria-hidden="true"
-                  className={[
-                    "w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors duration-150",
-                    poi.done ? "bg-success border-success text-surface" : "border-border-strong",
-                  ].join(" ")}
-                >
-                  {poi.done && <Check size={12} strokeWidth={3} />}
-                </span>
+                <PoiCheck done={poi.done} />
                 <Icon size={15} strokeWidth={1.5} aria-hidden="true" className="text-ink-3 shrink-0" />
                 <span
                   className={`flex-1 min-w-0 truncate text-sm ${
@@ -72,9 +66,7 @@ export function TodayPoiList({ slug, pois }: { slug: string; pois: TodayPoi[] })
                   {poi.name}
                 </span>
                 {poi.reservationRequired && !poi.done && (
-                  <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.08em] text-brick-ink bg-brick-bg border border-brick-border/50 rounded-full px-2 py-0.5">
-                    Reservar
-                  </span>
+                  <Badge variant="danger">Reservar</Badge>
                 )}
               </button>
             </li>

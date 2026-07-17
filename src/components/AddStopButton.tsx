@@ -5,7 +5,8 @@ import { Plus, X, AlertCircle } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField } from "@/components/ui/Field";
+import { Field, SelectField, inputClass } from "@/components/ui/Field";
+import { Label } from "@/components/ui/Label";
 
 interface GeoResult {
   name: string;
@@ -36,7 +37,7 @@ export function AddStopButton({ stops }: Props) {
       <button
         onClick={() => setOpen(true)}
         className={[
-          "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-[4px]",
+          "mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl",
           "border border-dashed border-border-strong bg-surface/50 text-sm text-ink-3",
           "hover:border-brick-border/50 hover:bg-surface hover:text-ink transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
@@ -119,7 +120,7 @@ function AddStopModal({
     <Modal title="Agregar ciudad" onClose={onClose}>
       {/* City search */}
       <div>
-        <label className="block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none">Buscar ciudad</label>
+        <Label>Buscar ciudad</Label>
         <input
           type="text"
           value={query}
@@ -127,7 +128,7 @@ function AddStopModal({
           placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
           autoFocus
           aria-label="Buscar ciudad"
-          className="w-full bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:border-brick focus-visible:bg-surface focus-visible:ring-offset-0 transition-colors duration-150 hover:border-border-strong"
+          className={inputClass}
         />
         {searching && (
           <p className="text-xs text-ink-3 mt-1">Buscando...</p>
@@ -161,7 +162,7 @@ function AddStopModal({
                 setResults([]);
                 setQuery(r.name);
               }}
-              className="w-full text-left px-3 py-2.5 rounded-[4px] bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+              className="w-full text-left px-3 py-2.5 rounded-lg bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             >
               <p className="text-sm font-medium text-ink">
                 {r.name}{r.admin1 ? `, ${r.admin1}` : ""}
@@ -176,7 +177,7 @@ function AddStopModal({
 
       {/* Selected city chip */}
       {selected && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-[4px]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-lg">
           <span className="text-sm font-medium text-brick-ink flex-1">
             {selected.name}
           </span>
@@ -187,7 +188,7 @@ function AddStopModal({
               setQuery("");
             }}
             aria-label="Quitar ciudad seleccionada"
-            className="p-1 rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+            className="h-11 w-11 -my-2 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           >
             <X size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -207,6 +208,7 @@ function AddStopModal({
             label="Noches"
             name="nights"
             type="number"
+            inputMode="numeric"
             defaultValue={3}
             min={0}
             required

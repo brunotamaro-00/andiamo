@@ -56,7 +56,7 @@ export default async function GuideDocPage({
           <span className="truncate max-w-[16rem]">{found.guide.title}</span>
         </Link>
 
-        <article className="bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-5 animate-fade-in">
+        <article className="bg-surface rounded-xl border border-border card-shadow px-4 py-5 animate-fade-in">
           <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-border">
             <Flag flag={found.guide.countryFlag} className="text-2xl leading-none" />
             <h2 className="font-display uppercase text-xl leading-tight text-ink tracking-wide">

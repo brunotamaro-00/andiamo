@@ -63,7 +63,7 @@ export default async function UrgentReservationsPage() {
           Guías
         </Link>
 
-        <div className="flex items-center gap-3 bg-brick-bg border-2 border-brick-border rounded-[4px] px-4 py-3 card-shadow animate-fade-in">
+        <div className="flex items-center gap-3 bg-brick-bg border border-brick-border rounded-xl px-4 py-3 card-shadow animate-fade-in">
           <AlertTriangle size={20} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
           <p className="text-xs text-brick-ink font-semibold">
             Todo lo que conviene reservar con anticipación, extraído de las guías y ordenado por
@@ -97,7 +97,7 @@ function UrgentCard({
   const isGeneral = guide.country === "General";
 
   return (
-    <article className={`bg-surface rounded-[4px] border-2 border-border card-shadow animate-fade-in ${stagger}`}>
+    <article className={`bg-surface rounded-xl border border-border card-shadow animate-fade-in ${stagger}`}>
       <div className="flex items-center gap-2.5 px-4 py-3 border-b-2 border-border">
         <Flag flag={guide.countryFlag} className="text-2xl leading-none shrink-0" />
         <div className="flex-1 min-w-0">

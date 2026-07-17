@@ -69,22 +69,33 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 | `danger` / `danger-bg` | Error / destructive |
 | `special` / `special-bg` | Candidate / special states `#7C3AED` |
 
-### Elevation (Panini hard sticker style)
+### Elevation (sobered sticker style: small hard offset + warm diffuse)
 
-- `card-shadow` — `3px 3px 0 #D8CFB4` — use on all cards
-- `card-shadow-lg` — `5px 5px 0 #1B1A17` — modals/overlays
-- `hard-shadow-ink` — `3px 3px 0 #1B1A17` — CTA buttons
+- `card-shadow` — `2px 2px 0 border + 0 4px 14px ink/5%` — use on all cards
+- `card-shadow-lg` — `4px 4px 0 ink + 0 10px 28px ink/10%` — modals/overlays
+- `hard-shadow-ink` — `2px 2px 0 ink` — CTA buttons
+- `hover-shadow-brick` / `hover-shadow-ink` — hover lifts; NEVER inline hex shadows
 - `card-hover` — transition for hover states
 - Aliases: `shadow-soft` = `card-shadow`, `shadow-soft-lg` = `card-shadow-lg`
-- CTA active state: `active:translate-x-[3px] active:translate-y-[3px] active:shadow-none` — sticker press effect
+- CTA active state: `active:translate-x-[2px] active:translate-y-[2px] active:shadow-none` — sticker press effect
 
 ### Animations
 
+- **`motion` (motion/react)** for interactive animation — springs by default, only in `"use client"` components. `MotionConfig reducedMotion="user"` lives in `Providers.tsx` (mounted in `layout.tsx`); pages stay RSC.
+- Canonical springs: sheet/Modal `{stiffness:420, damping:38}` · nav/segmented pill `{stiffness:480, damping:36}` · toast `{stiffness:500, damping:32}`
+- Page transition = `src/app/template.tsx` (fade + rise 0.22s, ease `[0.22,1,0.36,1]`) — do NOT add `animate-fade-in` at page-container level (double animation); per-card `animate-fade-in` + `stagger-*` is fine
 - `animate-fade-in` — `fadeIn 400ms ease-out both` (Y 8px → 0, opacity 0→1)
 - `animate-slide-up` — `slideUp 400ms ease-out both` (Y 16px → 0)
 - `stagger-1` … `stagger-6` — animation-delay 60ms…360ms for list items
-- `animate-pulse-skeleton` — for skeleton loaders
-- `prefers-reduced-motion` is handled globally in `globals.css` (entry animations off, smooth scroll off) — new keyframe utilities must be added to that media query; gate hover translates with `motion-reduce:`
+- `animate-pulse-skeleton` + `skeleton-shimmer` — skeleton loaders (Skeleton component has both)
+- `prefers-reduced-motion` is handled globally in `globals.css` (entry animations off, smooth scroll off) — new keyframe utilities must be added to that media query; gate hover translates with `motion-reduce:`; motion springs are covered by `MotionConfig reducedMotion="user"` + `useReducedMotion` where imperative
+
+### Feedback (toasts / errors / deletes)
+
+- Success confirmation → `useToast()` from `@/components/ui/Toast` (pill over the TabBar, one at a time). Wire via the optional `onSuccess` callback of `useOptimisticList`'s `mutate`/`run`.
+- Expected mutation errors → `MutationErrorBanner` (inline, persistent) — never a toast.
+- Delete policy: individual row (POI/nota/doc) = `InlineDeleteConfirm`; entity with children or expensive data (stop) = `ConfirmDialog` (`@/components/ui/ConfirmDialog`, `busy` locks the sheet).
+- POI toggle: haptics only, no toast.
 
 ### Fonts
 
@@ -102,18 +113,23 @@ text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 
 ### Wordmark
 
-`<Wordmark size="sm" | "lg" />` — inline SVG hand logo in `#C44428` (brick) + "Andiamo" in Anton, `text-ink`, uppercase, scaleY stretched. Required in every page header.
+`<Wordmark size="sm" | "lg" />` — inline SVG hand logo in `#C44428` (brick) + "Andiamo" in Anton, `text-ink`, uppercase, `tracking-tight` (no transform distortion). Required in every page header.
 
 ### Style conventions
 
-- Cards: `rounded-[4px]` + `border-2 border-border` + `card-shadow`
-- Modals: `rounded-[6px]` + `border-2 border-border` + `card-shadow-lg`
-- Buttons primary: `rounded-[2px]` + `hard-shadow-ink` + `font-display uppercase` — sticker CTA style
+- Cards: `rounded-xl` + `border border-border` + `card-shadow`. `border-2` is reserved as signature for: city header card (stop detail), gold TodayCards, selection chips (login/PersonSwitcher) and secondary buttons.
+- Modals/sheets: `rounded-t-2xl sm:rounded-2xl` + `border border-border` (Modal component handles it)
+- Inner rows / nested boxes: `rounded-lg`
+- Buttons primary: `rounded-[6px]` + `hard-shadow-ink` + `font-display uppercase` — sticker CTA style
 - Buttons secondary/ghost: `rounded-full` + `border-2 border-ink`
-- Inputs: `rounded-xl` — keep rounded for usability
+- Inputs: `rounded-xl` — use `Field`/`inputClass`/`Label` from `ui/`, never reimplement inline
+- Type floor: **11px** — never `text-[9px]`/`text-[10px]`
+- Touch targets: **44px minimum everywhere** (`min-h-[44px]`, `rowActionBtn`, `h-11 w-11`; use negative margins to keep visual density)
 - Transitions: `duration-150`
 - Focus rings: `ring-brick/40`
-- TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick (`text-brick`)
+- TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick (`text-brick`); active pill = `motion.span layoutId="tab-pill"`
 - Fixed bottom overlays: offset with `env(safe-area-inset-bottom)` so they don't cover the TabBar (see `InstallPrompt`)
-- `Modal` focuses `[autofocus]` first, then the body's first focusable — put `autoFocus` on the primary input; touch targets ≥ 44px (`rowActionBtn`, `min-h-[44px]`)
+- `Modal` focuses `[autofocus]` first, then the body's first focusable — put `autoFocus` on the primary input. On mobile it's a bottom sheet with drag-to-dismiss (handle + header zone); `locked` blocks all close paths during mutations.
+- `loading.tsx` skeletons must mirror the real layout (use `HeaderSkeleton` + `rounded-xl` cards) — no shape jumps on hydrate
+- Segmented choices (2–4 options): `SegmentedControl` from `ui/` instead of adjacent buttons or a select
 <!-- END:nextjs-agent-rules -->

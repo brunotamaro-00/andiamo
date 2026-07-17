@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
+import { useToast } from "@/components/ui/Toast";
 
 interface Note {
   id: string;
@@ -37,6 +38,7 @@ type OptimisticAction =
 export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   const [open, setOpen] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const { items: optimisticNotes, mutate, mutationError, isPending } = useOptimisticList(
     notes,
@@ -62,7 +64,7 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   function handleDelete(id: string) {
     setConfirmingId(null);
     haptics.warning();
-    mutate({ type: "delete", id }, () => deleteNote(id, path), "No se pudo borrar la nota. Reintentá.");
+    mutate({ type: "delete", id }, () => deleteNote(id, path), "No se pudo borrar la nota. Reintentá.", () => toast("Nota borrada"));
   }
 
   function handleAdd(formData: FormData) {
@@ -78,7 +80,7 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     };
     setOpen(false);
     haptics.success();
-    mutate({ type: "add", note: temp }, () => createNote(formData), "No se pudo agregar la nota. Reintentá.");
+    mutate({ type: "add", note: temp }, () => createNote(formData), "No se pudo agregar la nota. Reintentá.", () => toast("Nota agregada"));
   }
 
   async function handleSave(id: string, title: string, body: string): Promise<"ok" | "error"> {
@@ -238,7 +240,7 @@ function NoteCard({
 
   if (editing) {
     return (
-      <div className="p-3 rounded-[4px] border border-brick-border/40 bg-surface-2/40 space-y-2">
+      <div className="p-3 rounded-lg border border-brick-border/40 bg-surface-2/40 space-y-2">
         <input
           value={title}
           onChange={(e) => {
@@ -295,7 +297,7 @@ function NoteCard({
 
   return (
     <div
-      className={`p-3 rounded-[4px] border transition-colors ${
+      className={`p-3 rounded-lg border transition-colors ${
         note.pinned
           ? "border-warning/30 bg-warning-bg/40"
           : "border-border bg-surface-2/30"

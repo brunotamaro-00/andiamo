@@ -8,7 +8,7 @@ export function Card({ children, className, hover = false }: CardProps) {
   return (
     <div
       className={[
-        "bg-surface rounded-[4px] border-2 border-border p-4 card-shadow",
+        "bg-surface rounded-xl border border-border p-4 card-shadow",
         hover && "card-hover hover:card-shadow-lg",
         className,
       ]

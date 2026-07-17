@@ -106,7 +106,7 @@ const components: Components = {
     );
   },
   pre: ({ children }) => (
-    <pre className="bg-surface-2 border-2 border-border rounded-[4px] p-3 overflow-x-auto text-xs">
+    <pre className="bg-surface-2 border border-border rounded-lg p-3 overflow-x-auto text-xs">
       {children}
     </pre>
   ),
@@ -137,13 +137,13 @@ const components: Components = {
     </blockquote>
   ),
   table: ({ children }) => (
-    <div className="overflow-x-auto border-2 border-border rounded-[4px]">
+    <div className="overflow-x-auto border border-border rounded-lg">
       <table className="w-full text-xs border-collapse">{children}</table>
     </div>
   ),
   thead: ({ children }) => <thead className="bg-surface-2">{children}</thead>,
   th: ({ children }) => (
-    <th className="text-left px-2.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3 border-b-2 border-border whitespace-nowrap">
+    <th className="text-left px-2.5 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 border-b-2 border-border whitespace-nowrap">
       {children}
     </th>
   ),

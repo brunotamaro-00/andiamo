@@ -17,6 +17,9 @@ import { Field, SelectField } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { useToast } from "@/components/ui/Toast";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 /* Keep in sync with the server route validation. */
@@ -138,6 +141,7 @@ function OfflineDocButton({ docId }: { docId: string }) {
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const { items: optimisticDocs, mutate, mutationError, isPending } = useOptimisticList(
     documents,
@@ -154,7 +158,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   function handleDelete(id: string) {
     setConfirmingId(null);
     haptics.warning();
-    mutate({ type: "delete", id }, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.");
+    mutate({ type: "delete", id }, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.", () => toast("Documento borrado"));
   }
 
   function handleAddLink(formData: FormData) {
@@ -171,7 +175,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     };
     setMode(null);
     haptics.success();
-    mutate({ type: "add", doc: temp }, () => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.");
+    mutate({ type: "add", doc: temp }, () => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.", () => toast("Link agregado"));
   }
 
   return (
@@ -180,16 +184,10 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         title="Documentos"
         count={optimisticDocs.length > 0 ? optimisticDocs.length : undefined}
         action={
-          <>
-            <Button variant="ghost" size="sm" onClick={() => setMode("link")}>
-              <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
-              Link
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setMode("upload")}>
-              <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
-              Subir
-            </Button>
-          </>
+          <Button variant="ghost" size="sm" onClick={() => setMode("upload")}>
+            <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
+            Agregar
+          </Button>
         }
       />
 
@@ -201,16 +199,10 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           title="Sin documentos"
           description="Guardá vouchers, entradas y seguros. Subí PDFs/imágenes o pegá un link."
           action={
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setMode("link")}>
-                <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
-                Link
-              </Button>
-              <Button variant="primary" size="sm" onClick={() => setMode("upload")}>
-                <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
-                Subir archivo
-              </Button>
-            </div>
+            <Button variant="primary" size="sm" onClick={() => setMode("upload")}>
+              <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
+              Agregar documento
+            </Button>
           }
         />
       ) : (
@@ -223,7 +215,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
             return (
               <div
                 key={doc.id}
-                className="flex items-center gap-2 p-2.5 rounded-[4px] bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
+                className="flex items-center gap-2 p-2.5 rounded-lg bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
               >
                 <Icon
                   size={18}
@@ -274,25 +266,59 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         </div>
       )}
 
-      {mode === "link" && (
-        <AddLinkModal onSubmit={handleAddLink} onClose={() => setMode(null)} />
-      )}
-      {mode === "upload" && (
-        <UploadModal stopId={stopId} onClose={() => setMode(null)} />
+      {mode !== null && (
+        <AddDocumentModal
+          initialMode={mode}
+          stopId={stopId}
+          onSubmitLink={handleAddLink}
+          onClose={() => setMode(null)}
+        />
       )}
     </Card>
   );
 }
 
-function AddLinkModal({
+/** One "Agregar" modal for both sources; a segmented control switches
+ *  between subir archivo y pegar link. */
+function AddDocumentModal({
+  initialMode, stopId, onSubmitLink, onClose,
+}: {
+  initialMode: "link" | "upload";
+  stopId: string | null;
+  onSubmitLink: (formData: FormData) => void;
+  onClose: () => void;
+}) {
+  const [mode, setMode] = useState<"link" | "upload">(initialMode);
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <Modal title="Agregar documento" onClose={onClose} locked={busy}>
+      <SegmentedControl
+        label="Tipo de documento"
+        value={mode}
+        onChange={(v) => { if (!busy) setMode(v); }}
+        options={[
+          { value: "upload", label: "Archivo" },
+          { value: "link", label: "Link" },
+        ]}
+      />
+      {mode === "link" ? (
+        <LinkForm onSubmit={onSubmitLink} onClose={onClose} />
+      ) : (
+        <UploadForm stopId={stopId} onClose={onClose} onBusyChange={setBusy} />
+      )}
+    </Modal>
+  );
+}
+
+function LinkForm({
   onSubmit, onClose,
 }: {
   onSubmit: (formData: FormData) => void;
   onClose: () => void;
 }) {
   return (
-    <Modal title="Agregar link" onClose={onClose}>
-      <form action={onSubmit} className="space-y-3">
+    <form action={onSubmit} className="space-y-3">
         <Field
           label="Etiqueta"
           name="label"
@@ -315,8 +341,7 @@ function AddLinkModal({
             Guardar
           </Button>
         </div>
-      </form>
-    </Modal>
+    </form>
   );
 }
 
@@ -341,14 +366,19 @@ function uploadWithProgress(
   });
 }
 
-function UploadModal({
-  stopId, onClose,
+function UploadForm({
+  stopId, onClose, onBusyChange,
 }: {
-  stopId: string | null; onClose: () => void;
+  stopId: string | null; onClose: () => void; onBusyChange: (busy: boolean) => void;
 }) {
   const router = useRouter();
   const fileInputId = useId();
-  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+  const [uploading, setUploadingState] = useState(false);
+  const setUploading = (v: boolean) => {
+    setUploadingState(v);
+    onBusyChange(v);
+  };
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState("");
@@ -413,6 +443,7 @@ function UploadModal({
         return;
       }
       haptics.success();
+      toast("Documento subido");
       router.refresh();
       onClose();
     } catch {
@@ -423,7 +454,6 @@ function UploadModal({
   }
 
   return (
-    <Modal title="Subir documento" onClose={onClose}>
       <div className="space-y-3">
         <Field
           label="Etiqueta"
@@ -473,12 +503,7 @@ function UploadModal({
               <span>Subiendo {fileName ?? ""}</span>
               <span>{progress}%</span>
             </div>
-            <div className="h-1.5 rounded-full bg-border overflow-hidden">
-              <div
-                className="h-full bg-brick transition-all duration-150"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+            <ProgressBar value={progress} fillClass="bg-brick" />
           </div>
         )}
 
@@ -509,6 +534,5 @@ function UploadModal({
           </Button>
         </div>
       </div>
-    </Modal>
   );
 }

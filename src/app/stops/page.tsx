@@ -11,6 +11,7 @@ import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
 import { ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
@@ -47,7 +48,7 @@ export default async function StopsPage() {
           <Link
             href="/search"
             aria-label="Buscar en el viaje"
-            className="h-9 w-9 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            className="h-11 w-11 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
           >
             <Search size={17} strokeWidth={1.5} aria-hidden="true" />
           </Link>
@@ -106,17 +107,17 @@ export default async function StopsPage() {
                   id={isActive ? "current" : undefined}
                   href={`/stops/${stop.slug}`}
                   className={[
-                    "flex items-center gap-3 px-4 py-3.5 rounded-[4px] border-2 transition-all duration-150 animate-fade-in",
+                    "flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all duration-150 animate-fade-in",
                     stagger,
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive
-                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#C44428]"
+                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-brick"
                       : isCandidate
                       ? "bg-surface/60 border-dashed border-border/50 opacity-60"
                       : isPast
                       ? "bg-surface/40 border-border/40 opacity-45"
-                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#1B1A17]",
+                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -299,7 +300,7 @@ function TodayCard({
   const card = (
     <div
       className={[
-        "flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-[4px] px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150",
+        "flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-xl px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150",
         href ? "hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0" : "",
       ]
         .filter(Boolean)
@@ -307,7 +308,7 @@ function TodayCard({
     >
       <div className="text-center shrink-0">
         <p className="text-4xl font-numeral leading-none text-gold-ink">{numeral}</p>
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">{numeralLabel}</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">{numeralLabel}</p>
       </div>
       <div className="min-w-0">
         <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70">Hoy</p>
@@ -323,7 +324,7 @@ function TodayCard({
   return (
     <Link
       href={href}
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[4px]"
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl"
     >
       {card}
     </Link>
@@ -331,10 +332,13 @@ function TodayCard({
 }
 
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  const numeric = /^\d+$/.test(value) ? Number(value) : null;
   return (
-    <div className="bg-surface rounded-[4px] px-3 py-3 text-center border-2 border-border card-shadow">
-      <p className={`text-4xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>{value}</p>
-      <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-1">{label}</p>
+    <div className="bg-surface rounded-xl px-3 py-3 text-center border border-border card-shadow">
+      <p className={`text-4xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>
+        {numeric !== null ? <AnimatedNumber value={numeric} /> : value}
+      </p>
+      <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-1">{label}</p>
     </div>
   );
 }

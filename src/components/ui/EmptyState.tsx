@@ -23,7 +23,7 @@ export function EmptyState({
       ].join(" ")}
     >
       <div
-        className="flex items-center justify-center w-12 h-12 rounded-full bg-surface-2 border border-border mb-4"
+        className="flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-2 border border-border mb-4"
         aria-hidden="true"
       >
         <Icon size={20} strokeWidth={1.5} className="text-ink-3" />

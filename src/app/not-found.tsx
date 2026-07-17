@@ -20,7 +20,7 @@ export default function NotFound() {
 
       <Link
         href="/stops"
-        className="px-5 py-2.5 bg-brick text-surface text-sm font-display uppercase tracking-wide rounded-[2px] hard-shadow-ink active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all duration-150"
+        className="px-5 py-2.5 bg-brick text-surface text-sm font-display uppercase tracking-wide rounded-[6px] hard-shadow-ink active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150"
       >
         Ver itinerario
       </Link>

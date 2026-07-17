@@ -1,5 +1,6 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { categoryIcon } from "@/lib/categoryIcons";
 import { spitwisePublicUrl, fetchStopSpendDetail } from "@/lib/spitwise";
 import { personLabel } from "@/lib/person";
@@ -28,7 +29,7 @@ export default async function StopSpendPanel({
     // Future stops with no expenses: no dead UI. Current/past: friendly hint.
     if (isFuture || !cityUrl) return null;
     return (
-      <div className="bg-surface rounded-[4px] border-2 border-border card-shadow p-4 animate-fade-in">
+      <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
         <div className="flex items-center gap-3">
           <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
@@ -45,7 +46,7 @@ export default async function StopSpendPanel({
 
   const total = Number(detail.total_usd);
   return (
-    <div className="bg-surface rounded-[4px] border-2 border-border card-shadow p-4 animate-fade-in space-y-4">
+    <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in space-y-4">
       {/* Header */}
       <div className="flex items-start gap-3">
         <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0 mt-1" aria-hidden="true" />
@@ -84,9 +85,7 @@ export default async function StopSpendPanel({
                     USD {cat.total_usd}
                   </span>
                 </div>
-                <div className="h-1.5 bg-surface-2 rounded-none overflow-hidden">
-                  <div className="h-full bg-gold" style={{ width: `${pct}%` }} />
-                </div>
+                <ProgressBar value={pct} />
               </li>
             );
           })}
@@ -135,7 +134,7 @@ function SpitwiseLink({ href }: { href: string }) {
       href={href}
       target="_blank"
       rel="noopener"
-      className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink shrink-0 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink shrink-0 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
     >
       Spitwise
       <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
@@ -145,11 +144,11 @@ function SpitwiseLink({ href }: { href: string }) {
 
 export function SpendPanelSkeleton() {
   return (
-    <div className="bg-surface rounded-[4px] border-2 border-border card-shadow p-4 space-y-3 animate-pulse-skeleton">
-      <div className="h-3 w-16 bg-surface-2 rounded-[2px]" />
-      <div className="h-6 w-32 bg-surface-2 rounded-[2px]" />
-      <div className="h-1.5 w-full bg-surface-2" />
-      <div className="h-1.5 w-3/4 bg-surface-2" />
+    <div className="bg-surface rounded-xl border border-border card-shadow p-4 space-y-3 animate-pulse-skeleton">
+      <div className="h-3 w-16 bg-surface-2 rounded" />
+      <div className="h-6 w-32 bg-surface-2 rounded" />
+      <div className="h-1.5 w-full bg-surface-2 rounded-full" />
+      <div className="h-1.5 w-3/4 bg-surface-2 rounded-full" />
     </div>
   );
 }
