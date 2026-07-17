@@ -24,7 +24,7 @@ interface StopInput {
   isCandidate?: boolean;
 }
 
-const STOPS: StopInput[] = [
+export const STOPS: StopInput[] = [
   {
     order: 1, country: "Reino Unido", countryFlag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "Londres", slug: "londres",
     category: "Ciudad", priceLevel: "$$$",
@@ -401,6 +401,10 @@ async function main() {
   console.log("\nDone! ✈️");
 }
 
-main()
-  .catch((e) => { console.error(e); process.exit(1); })
-  .finally(() => prisma.$disconnect());
+// Only auto-run when executed directly (not when imported by seed-dev.ts).
+import { pathToFileURL } from "node:url";
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .catch((e) => { console.error(e); process.exit(1); })
+    .finally(() => prisma.$disconnect());
+}
