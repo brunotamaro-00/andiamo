@@ -230,27 +230,29 @@ function PoiItem({
 
   return (
     <li
-      className={`flex items-start gap-1 py-1.5 border-b border-border last:border-0 ${
+      className={`py-1.5 border-b border-border last:border-0 ${
         poi.done ? "opacity-50" : ""
       }`}
     >
-      {/* Done toggle — 44px touch target */}
-      <button
-        onClick={onToggle}
-        aria-pressed={poi.done}
-        aria-label={
-          poi.done
-            ? `Marcar "${poi.name}" como pendiente`
-            : `Marcar "${poi.name}" como hecho`
-        }
-        className="group mt-0.5 h-11 w-11 flex items-center justify-center rounded-full shrink-0 transition-transform active:scale-90 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-      >
-        <PoiCheck done={poi.done} hover />
-      </button>
+      {/* Header row: only the name shares width with the action buttons —
+          address/notes/link render below at full row width. */}
+      <div className="flex items-center gap-1">
+        {/* Done toggle — 44px touch target */}
+        <button
+          onClick={onToggle}
+          aria-pressed={poi.done}
+          aria-label={
+            poi.done
+              ? `Marcar "${poi.name}" como pendiente`
+              : `Marcar "${poi.name}" como hecho`
+          }
+          className="group h-11 w-11 flex items-center justify-center rounded-full shrink-0 transition-transform active:scale-90 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+        >
+          <PoiCheck done={poi.done} hover />
+        </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0 pt-2">
-        <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Name — the only content sharing width with the actions */}
+        <div className="flex-1 min-w-0 flex items-center gap-1.5">
           <Icon
             size={13}
             strokeWidth={1.5}
@@ -265,28 +267,9 @@ function PoiItem({
             {poi.name}
           </span>
           {poi.reservationRequired && !poi.done && (
-            <Badge variant="danger">Reservar</Badge>
+            <Badge variant="danger" className="shrink-0">Reservar</Badge>
           )}
         </div>
-        {poi.address && (
-          <p className="text-xs text-ink-3 mt-0.5 truncate">{poi.address}</p>
-        )}
-        {poi.notes && (
-          <p className="text-xs text-ink-3 mt-0.5">{poi.notes}</p>
-        )}
-        {poi.url && (
-          <a
-            href={poi.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-brick hover:text-brick-hover inline-flex items-center gap-0.5 mt-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brick rounded"
-            aria-label={`Ver ${poi.name} (abre en nueva pestaña)`}
-          >
-            Ver
-            <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
-          </a>
-        )}
-      </div>
 
       {/* Actions / inline delete confirmation */}
       {confirming ? (
@@ -337,6 +320,30 @@ function PoiItem({
           >
             <Trash2 size={16} strokeWidth={1.5} aria-hidden="true" />
           </button>
+        </div>
+      )}
+      </div>
+
+      {(poi.address || poi.notes || poi.url) && (
+        <div className="pl-11 pr-1">
+          {poi.address && (
+            <p className="text-xs text-ink-3 truncate">{poi.address}</p>
+          )}
+          {poi.notes && (
+            <p className="text-xs text-ink-3 mt-0.5">{poi.notes}</p>
+          )}
+          {poi.url && (
+            <a
+              href={poi.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-brick hover:text-brick-hover inline-flex items-center gap-0.5 mt-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brick rounded"
+              aria-label={`Ver ${poi.name} (abre en nueva pestaña)`}
+            >
+              Ver
+              <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
+            </a>
+          )}
         </div>
       )}
     </li>
