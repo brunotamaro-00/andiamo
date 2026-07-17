@@ -249,7 +249,7 @@ function NoteCard({
           }}
           aria-label="Título de la nota"
           placeholder="Título"
-          className="w-full bg-transparent text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none"
+          className="w-full bg-transparent text-base font-medium text-ink placeholder:text-ink-faint focus:outline-none"
           autoFocus
         />
         <textarea
@@ -261,7 +261,7 @@ function NoteCard({
           aria-label="Cuerpo de la nota"
           placeholder="Detalles..."
           rows={Math.min(12, Math.max(3, body.split("\n").length + 1))}
-          className="w-full bg-transparent text-xs text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
+          className="w-full bg-transparent text-base text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
         />
         <div className="flex items-center justify-between pt-1">
           <span className="text-[11px] text-ink-3 flex items-center gap-1" aria-live="polite">

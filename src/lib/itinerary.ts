@@ -8,8 +8,6 @@ interface StopInput {
   id: string;
   order: number;
   nights: number;
-  datesFixed: boolean;
-  arrivalDate: Date | null;
   isCandidate: boolean;
 }
 
@@ -23,7 +21,7 @@ interface DateResult {
  *
  * Rules:
  * - Normal stop: arrival = cursor, departure = arrival + nights. Cursor advances.
- * - Pinned stop (datesFixed && arrivalDate set): re-anchors cursor to its stored arrivalDate.
+ *   A stop with 0 nights is a transit stop — it lands on the cursor day without advancing it.
  * - Candidate stop: gets tentative dates at cursor position but does NOT advance cursor.
  * - If no tripStartStr: all dates are null.
  */
@@ -49,18 +47,8 @@ export function computeItinerary(
         arrival: strToDate(cursor),
         departure: dep ? strToDate(dep) : null,
       });
-    } else if (stop.datesFixed && stop.arrivalDate) {
-      // Re-anchor: this stop has a fixed date (e.g. a booked flight)
-      const anchorStr = dateToStr(stop.arrivalDate);
-      cursor = anchorStr;
-      const dep = stop.nights > 0 ? addDaysStr(cursor, stop.nights) : null;
-      result.set(stop.id, {
-        arrival: strToDate(cursor),
-        departure: dep ? strToDate(dep) : null,
-      });
-      if (dep) cursor = dep;
     } else {
-      // Normal: derive from cursor
+      // Normal: derive from cursor. 0 nights = transit, lands without advancing.
       const dep = stop.nights > 0 ? addDaysStr(cursor, stop.nights) : null;
       result.set(stop.id, {
         arrival: strToDate(cursor),
@@ -119,7 +107,7 @@ export function assumedDateWindow(
  * and persists any that changed. The tempRange refresh (HTTP to Open-Meteo)
  * is deferred with `after()` so mutations respond without waiting on it.
  *
- * Call this after every mutation that affects order, nights, datesFixed, or the anchor.
+ * Call this after every mutation that affects order, nights, or the anchor.
  * Safe to call outside a Prisma transaction — it manages its own batch update.
  */
 export async function recalculateItinerary(): Promise<void> {
@@ -132,7 +120,6 @@ export async function recalculateItinerary(): Promise<void> {
         slug: true,
         order: true,
         nights: true,
-        datesFixed: true,
         arrivalDate: true,
         departureDate: true,
         isCandidate: true,

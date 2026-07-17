@@ -7,9 +7,9 @@ vi.mock("@/lib/db", () => ({
         {
           slug: "londres", order: 1, name: "Londres", country: "Reino Unido",
           countryFlag: "🇬🇧", arrivalDate: new Date("2026-08-05"),
-          departureDate: new Date("2026-08-13"), nights: 8, datesFixed: true,
+          departureDate: new Date("2026-08-13"), nights: 8,
           currencyCode: "GBP", timezone: "Europe/London",
-          isTransit: false, isCandidate: false, isFlexMargin: false,
+          isCandidate: false, isFlexMargin: false,
         },
       ]),
     },

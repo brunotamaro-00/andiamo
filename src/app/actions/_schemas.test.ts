@@ -59,29 +59,24 @@ describe("CreateStopSchema", () => {
 const validUpdate = {
   name: "Brujas",
   nights: "2",
-  arrivalDate: "2026-07-10",
-  datesFixed: "true",
   isCandidate: "false",
-  isTransit: "false",
-  arrivalMode: "ground",
 };
 
 describe("UpdateStopSchema", () => {
-  it("accepts a valid YYYY-MM-DD arrival date", () => {
+  it("accepts a valid update", () => {
     const result = parseForm(fd(validUpdate), UpdateStopSchema);
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.arrivalDate?.toISOString()).toBe("2026-07-10T00:00:00.000Z");
+    if (result.ok) {
+      expect(result.data.name).toBe("Brujas");
+      expect(result.data.nights).toBe(2);
+      expect(result.data.isCandidate).toBe(false);
+    }
   });
 
-  it("empty arrival date becomes null", () => {
-    const result = parseForm(fd({ ...validUpdate, arrivalDate: "" }), UpdateStopSchema);
+  it("treats an absent isCandidate checkbox as false", () => {
+    const result = parseForm(fd({ name: "Brujas", nights: "2" }), UpdateStopSchema);
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.arrivalDate).toBeNull();
-  });
-
-  it("rejects a malformed arrival date — Invalid Date would crash Prisma", () => {
-    expect(parseForm(fd({ ...validUpdate, arrivalDate: "garbage" }), UpdateStopSchema).ok).toBe(false);
-    expect(parseForm(fd({ ...validUpdate, arrivalDate: "10/07/2026" }), UpdateStopSchema).ok).toBe(false);
+    if (result.ok) expect(result.data.isCandidate).toBe(false);
   });
 
   it("rejects negative nights", () => {

@@ -1,18 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pencil, Pin } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { updateStop, deleteStop } from "@/app/actions/stops";
 import { haptics } from "@/lib/haptics";
-import { dateToStr } from "@/lib/trip";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, SelectField } from "@/components/ui/Field";
-import { Label } from "@/components/ui/Label";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 interface StopOption {
   id: string;
@@ -28,17 +25,9 @@ interface Props {
   arrivalDate: Date | null;
   departureDate: Date | null;
   nights: number;
-  datesFixed: boolean;
   isCandidate: boolean;
-  isTransit: boolean;
-  arrivalMode: "flight" | "ground";
   currentOrder: number;
   allStops: StopOption[];
-}
-
-function toDateInput(d: Date | null): string {
-  if (!d) return "";
-  return dateToStr(new Date(d));
 }
 
 function formatDateDisplay(d: Date | null): string {
@@ -62,29 +51,20 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, departureDate, nights, datesFixed, isCandidate, isTransit, arrivalMode,
+  stopId, name, arrivalDate, departureDate, nights, isCandidate,
   allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
-  const [pinnedChecked, setPinnedChecked] = useState(datesFixed);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
-  const [transitChecked, setTransitChecked] = useState(isTransit);
-  const [modeValue, setModeValue] = useState<"flight" | "ground">(arrivalMode);
   // "keep" sentinel: allStops has order gaps (excludes this stop and flex margins),
   // so currentOrder - 1 may not match any rendered option
   const [selectedAfterOrder, setSelectedAfterOrder] = useState("keep");
 
   function handleSave(formData: FormData) {
-    formData.set("datesFixed", pinnedChecked ? "true" : "false");
     formData.set("isCandidate", candidateChecked ? "true" : "false");
-    formData.set("isTransit", transitChecked ? "true" : "false");
-    formData.set("arrivalMode", modeValue);
-    // When not pinned, don't send arrivalDate — the action leaves the stored
-    // date untouched and recalculateItinerary overwrites it afterwards.
-    if (!pinnedChecked) formData.delete("arrivalDate");
     setMutationError(null);
     startTransition(async () => {
       try {
@@ -130,42 +110,18 @@ function EditModal({
           min={0}
         />
 
-        {/* Arrival date — read-only display when not pinned; editable input when pinned */}
-        <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5 space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 leading-none mb-1">
-                Llegada
-              </p>
-              {!pinnedChecked && (
-                <p className="text-sm text-ink">
-                  {formatDateDisplay(arrivalDate)}
-                  {departureDate && (
-                    <span className="text-ink-3"> → {formatDateDisplay(departureDate)}</span>
-                  )}
-                  <span className="ml-1.5 text-xs text-ink-3">· calculada</span>
-                </p>
-              )}
-            </div>
-            <label className="flex items-center gap-1.5 text-xs text-ink-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={pinnedChecked}
-                onChange={(e) => setPinnedChecked(e.target.checked)}
-                className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-              />
-              <Pin size={11} strokeWidth={2} aria-hidden="true" />
-              Fijar fecha
-            </label>
-          </div>
-          {pinnedChecked && (
-            <Field
-              label=""
-              name="arrivalDate"
-              type="date"
-              defaultValue={toDateInput(arrivalDate)}
-            />
-          )}
+        {/* Arrival — always calculated from trip start + nights + order */}
+        <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 leading-none mb-1">
+            Llegada
+          </p>
+          <p className="text-sm text-ink">
+            {formatDateDisplay(arrivalDate)}
+            {departureDate && (
+              <span className="text-ink-3"> → {formatDateDisplay(departureDate)}</span>
+            )}
+            <span className="ml-1.5 text-xs text-ink-3">· calculada</span>
+          </p>
         </div>
 
         <SelectField
@@ -183,39 +139,15 @@ function EditModal({
           ))}
         </SelectField>
 
-        <div>
-          <Label as="span">Cómo llegás</Label>
-          <SegmentedControl
-            label="Cómo llegás"
-            value={modeValue}
-            onChange={setModeValue}
-            options={[
-              { value: "ground", label: "Auto / Tren" },
-              { value: "flight", label: "Avión" },
-            ]}
+        <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={candidateChecked}
+            onChange={(e) => setCandidateChecked(e.target.checked)}
+            className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={candidateChecked}
-              onChange={(e) => setCandidateChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-            />
-            Candidata (sin decidir)
-          </label>
-          <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={transitChecked}
-              onChange={(e) => setTransitChecked(e.target.checked)}
-              className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-            />
-            Tránsito (solo de paso)
-          </label>
-        </div>
+          Tentativa (sin decidir)
+        </label>
 
         <div className="flex gap-2">
           <Button

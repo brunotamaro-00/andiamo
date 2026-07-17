@@ -97,7 +97,7 @@ export async function fetchStopSpendDetail(
   if (!cfg) return null;
   try {
     const res = await fetch(
-      `${cfg.base}/api/v1/cities/spend-detail?${withUser({ slug, limit: "5" }, person)}`,
+      `${cfg.base}/api/v1/cities/spend-detail?${withUser({ slug }, person)}`,
       {
         headers: { "X-Api-Key": cfg.key },
         next: { revalidate: 120 },
