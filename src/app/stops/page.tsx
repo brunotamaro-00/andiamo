@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr, tripDayNumber, daysBetween } from "@/lib/trip";
+import { todayStr, dateToStr } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { AddStopButton } from "@/components/AddStopButton";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
-import { ChevronRight, MapPin, Search } from "lucide-react";
+import { Check, ChevronRight, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Flag } from "@/components/Flag";
@@ -54,8 +54,9 @@ export default async function StopsPage() {
           </Link>
         }
       />
-      {/* Logo → /stops#current: center the active stop card once the list paints */}
-      <HashScroller block="center" />
+      {/* Auto-center the current stop on load (and when the logo links to
+          /stops#current), so the itinerary opens on "today" instead of the top. */}
+      <HashScroller block="center" fallbackId="current" />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         {/* Quick stats */}
@@ -74,15 +75,6 @@ export default async function StopsPage() {
             value={[...new Set(stops.map((s) => s.country))].length.toString()}
           />
         </div>
-
-        {/* Today context */}
-        <TodayCard
-          stops={stops}
-          currentSlug={currentSlug}
-          today={today}
-          tripStartDate={tripStartDate}
-          tripEndDate={tripEndDate}
-        />
 
         {/* Timeline */}
         <div className="space-y-3">
@@ -122,20 +114,25 @@ export default async function StopsPage() {
                     .filter(Boolean)
                     .join(" ")}
                 >
-                  {/* Order indicator */}
+                  {/* Order indicator — past (visited) stops show a check
+                      instead of the number to tell them apart from tentativas */}
                   <div
                     className={[
-                      "w-7 shrink-0 font-numeral text-sm text-center",
+                      "w-7 shrink-0 font-numeral text-sm text-center flex items-center justify-center",
                       isActive
                         ? "text-brick-ink"
-                        : isPast
-                        ? "text-ink-faint"
+                        : isPast && !isCandidate
+                        ? "text-success"
                         : "text-ink-3",
                     ]
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    {idx + 1}
+                    {isPast && !isActive && !isCandidate ? (
+                      <Check size={16} strokeWidth={2.5} aria-label="Visitada" />
+                    ) : (
+                      idx + 1
+                    )}
                   </div>
 
                   {/* Info */}
@@ -193,139 +190,6 @@ export default async function StopsPage() {
 
       </main>
     </div>
-  );
-}
-
-interface TodayCardStop {
-  slug: string;
-  name: string;
-  countryFlag: string;
-  arrivalDate: Date | null;
-  departureDate: Date | null;
-  isCandidate: boolean;
-  isFlexMargin: boolean;
-}
-
-/** Answers "¿dónde estoy hoy?" at a glance — gold-accented context card above the timeline. */
-function TodayCard({
-  stops, currentSlug, today, tripStartDate, tripEndDate,
-}: {
-  stops: TodayCardStop[];
-  currentSlug: string | null;
-  today: string;
-  tripStartDate: Date | null;
-  tripEndDate: Date | null;
-}) {
-  if (!tripStartDate) return null;
-
-  const firstArrivalStr = dateToStr(tripStartDate);
-  const lastDepartureStr = tripEndDate ? dateToStr(tripEndDate) : null;
-  const currentStop = stops.find((s) => s.slug === currentSlug) ?? null;
-
-  const phase: "before" | "during" | "after" =
-    today < firstArrivalStr
-      ? "before"
-      : lastDepartureStr && today >= lastDepartureStr
-      ? "after"
-      : "during";
-
-  // "current" falls back to first/last stop outside its date range (see
-  // computeCurrentStopSlug) — only trust it when today is actually inside it
-  const inCurrentStop = Boolean(
-    currentStop?.arrivalDate &&
-    currentStop.departureDate &&
-    dateToStr(currentStop.arrivalDate) <= today &&
-    today < dateToStr(currentStop.departureDate),
-  );
-
-  let numeral: string;
-  let numeralLabel: string;
-  let line: React.ReactNode;
-
-  if (phase === "before") {
-    const daysToStart = Math.max(0, daysBetween(today, firstArrivalStr));
-    const firstStop = stops.find((s) => !s.isCandidate && !s.isFlexMargin && s.arrivalDate);
-    numeral = daysToStart.toString();
-    numeralLabel = daysToStart === 1 ? "día" : "días";
-    line = (
-      <>
-        Faltan para el despegue
-        {firstStop && (
-          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
-            Primera parada: <Flag flag={firstStop.countryFlag} /> {firstStop.name} · {formatShortDate(firstStop.arrivalDate!)}
-          </span>
-        )}
-      </>
-    );
-  } else if (phase === "during" && currentStop && inCurrentStop) {
-    const day = tripDayNumber(currentStop.arrivalDate, tripStartDate) ?? daysBetween(firstArrivalStr, today) + 1;
-    numeral = day.toString();
-    numeralLabel = "día";
-    line = (
-      <>
-        Estás en <Flag flag={currentStop.countryFlag} /> {currentStop.name}
-        {currentStop.departureDate && (
-          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
-            Hasta el {formatShortDate(currentStop.departureDate)}
-          </span>
-        )}
-      </>
-    );
-  } else if (phase === "during") {
-    // Gap day (flex margin / in transit): no stop covers today
-    const day = daysBetween(firstArrivalStr, today) + 1;
-    const nextStop = stops.find(
-      (s) => !s.isCandidate && !s.isFlexMargin && s.arrivalDate && dateToStr(s.arrivalDate) > today,
-    );
-    numeral = day.toString();
-    numeralLabel = "día";
-    line = (
-      <>
-        En tránsito
-        {nextStop && (
-          <span className="block text-xs text-ink-2 font-normal normal-case tracking-normal mt-0.5">
-            Próxima parada: <Flag flag={nextStop.countryFlag} /> {nextStop.name} · {formatShortDate(nextStop.arrivalDate!)}
-          </span>
-        )}
-      </>
-    );
-  } else {
-    return null;
-  }
-
-  const href = phase === "during" && currentStop && inCurrentStop ? `/stops/${currentStop.slug}` : null;
-
-  const card = (
-    <div
-      className={[
-        "flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-xl px-4 py-3 card-shadow mb-5 animate-fade-in transition-all duration-150",
-        href ? "hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div className="text-center shrink-0">
-        <p className="text-4xl font-numeral leading-none text-gold-ink">{numeral}</p>
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">{numeralLabel}</p>
-      </div>
-      <div className="min-w-0">
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70">Hoy</p>
-        <p className="text-sm font-semibold text-ink mt-0.5">{line}</p>
-      </div>
-      {href && (
-        <ChevronRight size={16} strokeWidth={2} aria-hidden="true" className="ml-auto shrink-0 text-gold-ink/60" />
-      )}
-    </div>
-  );
-
-  if (!href) return card;
-  return (
-    <Link
-      href={href}
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl"
-    >
-      {card}
-    </Link>
   );
 }
 

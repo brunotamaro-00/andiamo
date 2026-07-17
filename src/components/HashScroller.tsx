@@ -6,14 +6,18 @@ interface HashScrollerProps {
   /** scrollIntoView block alignment. Default "start" (sections). Use "center"
    *  to focus a timeline card in the middle of the viewport. */
   block?: ScrollLogicalPosition;
+  /** Element id to center when the URL has no hash — used to auto-focus the
+   *  current stop on the itinerary. Fallback scrolls instantly (not smooth). */
+  fallbackId?: string;
 }
 
 /**
  * Reads the URL hash on mount (and on hashchange) and scrolls to the matching
  * element. Needed because Next.js App Router renders Server Components async —
- * the browser fires the native hash scroll before the DOM is ready.
+ * the browser fires the native hash scroll before the DOM is ready. When there
+ * is no hash and `fallbackId` is set, it centers that element instead.
  */
-export function HashScroller({ block = "start" }: HashScrollerProps) {
+export function HashScroller({ block = "start", fallbackId }: HashScrollerProps) {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Entry animations (animate-fade-in) shift cards for ~400ms — scrolling
@@ -35,13 +39,17 @@ export function HashScroller({ block = "start" }: HashScrollerProps) {
 
     function tryScroll() {
       const hash = window.location.hash.slice(1);
-      if (!hash) return;
+      const id = hash || fallbackId;
+      if (!id) return;
+      // No hash → landing on the fallback: jump instantly, don't animate a long
+      // scroll down a big list.
+      const smooth = Boolean(hash) && !reduceMotion;
 
-      const target = document.getElementById(hash);
+      const target = document.getElementById(id);
       if (target) {
         timerId = setTimeout(() => {
           target.scrollIntoView({
-            behavior: reduceMotion ? "auto" : "smooth",
+            behavior: smooth ? "smooth" : "auto",
             block,
           });
         }, settleDelay);
@@ -62,7 +70,7 @@ export function HashScroller({ block = "start" }: HashScrollerProps) {
       clearPending();
       window.removeEventListener("hashchange", onHashChange);
     };
-  }, [block]);
+  }, [block, fallbackId]);
 
   return null;
 }

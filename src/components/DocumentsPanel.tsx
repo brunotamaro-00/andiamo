@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, TrainFront, ShieldCheck, Plane, FileText,
-  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download, Pencil, ChevronRight,
+  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download, Pencil,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, updateDocument, deleteDocument } from "@/app/actions/documents";
@@ -240,35 +240,33 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                 key={doc.id}
                 className="flex items-center gap-1 p-2.5 rounded-lg bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
               >
-                {/* Logo opens the document; the rest of the row opens the detail sheet. */}
+                {/* Tapping the card opens the detail sheet (edit/delete). */}
+                <button
+                  onClick={() => setOpenId(doc.id)}
+                  className="flex-1 min-w-0 flex items-center gap-2.5 text-left rounded-lg px-1 py-1 -my-1 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+                  aria-label={`Ver detalle de "${doc.label}"`}
+                >
+                  <Icon size={18} strokeWidth={1.5} aria-hidden="true" className="text-ink-3 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-ink truncate">
+                      {doc.label}
+                    </p>
+                    <p className="text-xs text-ink-2">
+                      {KIND_LABEL[doc.kind] ?? doc.kind}
+                      {size ? ` · ${size}` : ""}
+                    </p>
+                  </div>
+                </button>
+                {/* Explicit open icon — opens the document directly in one tap. */}
                 <a
                   href={`/api/documents/${doc.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Abrir ${doc.label}`}
-                  className={`${actionBtn} text-ink-3 hover:text-brick hover:bg-surface-2 shrink-0`}
+                  className={`${actionBtn} text-brick hover:text-brick-hover hover:bg-surface-2 shrink-0`}
                 >
-                  <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
+                  <ArrowUpRight size={18} strokeWidth={1.5} aria-hidden="true" />
                 </a>
-                <button
-                  onClick={() => setOpenId(doc.id)}
-                  className="flex-1 min-w-0 text-left rounded-lg px-1.5 py-1 -my-1 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-                  aria-label={`Ver detalle de "${doc.label}"`}
-                >
-                  <p className="text-sm font-medium text-ink truncate">
-                    {doc.label}
-                  </p>
-                  <p className="text-xs text-ink-2">
-                    {KIND_LABEL[doc.kind] ?? doc.kind}
-                    {size ? ` · ${size}` : ""}
-                  </p>
-                </button>
-                <ChevronRight
-                  size={15}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  className="text-border-strong shrink-0 mr-1"
-                />
               </div>
             );
           })}
