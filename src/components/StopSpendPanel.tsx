@@ -2,11 +2,14 @@ import { ExternalLink, Wallet } from "lucide-react";
 
 import { categoryIcon } from "@/lib/categoryIcons";
 import { spitwisePublicUrl, fetchStopSpendDetail } from "@/lib/spitwise";
+import { personLabel } from "@/lib/person";
+import { getPerson } from "@/lib/person-server";
 import { todayStr, dateToStr } from "@/lib/trip";
 
 /** Rich spend panel fed by Spitwise: total, per-category bars and
  *  last movements. Degrades silently — Spitwise down or future stop with no
- *  data renders nothing; current/past stop with no data shows a slim hint. */
+ *  data renders nothing; current/past stop with no data shows a slim hint.
+ *  Scoped to the current viewer (see lib/person.ts). */
 export default async function StopSpendPanel({
   slug,
   arrivalDate,
@@ -14,7 +17,8 @@ export default async function StopSpendPanel({
   slug: string;
   arrivalDate: Date | null;
 }) {
-  const detail = await fetchStopSpendDetail(slug);
+  const person = await getPerson();
+  const detail = await fetchStopSpendDetail(slug, person);
   const spitwiseUrl = spitwisePublicUrl();
   const cityUrl = spitwiseUrl ? `${spitwiseUrl}/ciudades?c=${encodeURIComponent(slug)}` : null;
   const isFuture = arrivalDate !== null && todayStr() < dateToStr(arrivalDate);
@@ -29,7 +33,7 @@ export default async function StopSpendPanel({
           <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-              Gastos
+              {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
             </p>
             <p className="text-sm text-ink-2">Sin gastos todavía</p>
           </div>
@@ -47,7 +51,7 @@ export default async function StopSpendPanel({
         <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0 mt-1" aria-hidden="true" />
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-            Gastos
+            {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
           </p>
           <p className="font-display uppercase text-[22px] leading-tight text-ink font-tabular">
             USD {detail.total_usd}

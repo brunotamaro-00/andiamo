@@ -1,12 +1,15 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
 import { spitwisePublicUrl, fetchTripSpend } from "@/lib/spitwise";
+import { personLabel } from "@/lib/person";
+import { getPerson } from "@/lib/person-server";
 
 /** Trip-total spend strip for /hoy, fed by Spitwise. Links to the
  *  Spitwise dashboard. Renders nothing when Spitwise is unreachable or there
- *  are no expenses yet. */
+ *  are no expenses yet. Scoped to the current viewer (see lib/person.ts). */
 export default async function TripSpendStrip() {
-  const spend = await fetchTripSpend();
+  const person = await getPerson();
+  const spend = await fetchTripSpend(person);
   const spitwiseUrl = spitwisePublicUrl();
   if (!spend || !spitwiseUrl || spend.movement_count === 0) return null;
 
@@ -21,7 +24,7 @@ export default async function TripSpendStrip() {
         <Wallet size={16} strokeWidth={1.5} aria-hidden="true" className="text-gold shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-            Gastos del viaje
+            {person ? `Gastos · ${personLabel(person)}` : "Gastos del viaje"}
           </p>
           <p className="text-sm font-semibold text-ink mt-0.5 font-tabular">
             USD {spend.total_usd}
