@@ -5,6 +5,7 @@ import { getCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, tripDayNumber, daysBetween } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { AddStopButton } from "@/components/AddStopButton";
+import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
@@ -52,6 +53,8 @@ export default async function StopsPage() {
           </Link>
         }
       />
+      {/* Logo → /stops#current: center the active stop card once the list paints */}
+      <HashScroller block="center" />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         {/* Quick stats */}
@@ -100,6 +103,7 @@ export default async function StopsPage() {
               return (
                 <Link
                   key={stop.id}
+                  id={isActive ? "current" : undefined}
                   href={`/stops/${stop.slug}`}
                   className={[
                     "flex items-center gap-3 px-4 py-3.5 rounded-[4px] border-2 transition-all duration-150 animate-fade-in",
