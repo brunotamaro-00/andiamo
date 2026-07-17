@@ -23,7 +23,7 @@ const MAP: Record<string, LucideIcon> = {
   Transporte: Bus,
   Actividades: Ticket,
   Compras: ShoppingBag,
-  "Bebidas/Salidas": Wine,
+  Salidas: Wine,
   Regalos: Gift,
   Salud: HeartPulse,
   Otros: Tag,
