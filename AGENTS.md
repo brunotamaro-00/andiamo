@@ -41,6 +41,8 @@ Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives i
 
 DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, db `tripguide`) before `npm run dev`. Prisma `ECONNREFUSED` means the container is down, not a code bug.
 
+**Seeds:** `npm run db:seed` loads the real itinerary (Aug–Nov 2026 dates, real POIs/notes). `npm run db:seed:dev` (`prisma/seed-dev.ts`) loads **dummy data for local testing**: it reuses the exported `STOPS` from `seed.ts` but rebases every date around *today* so the trip appears at its midpoint (currently "in Viena", arrived 2 days ago) — this is what activates the `during` phase of `/hoy`. It also **wipes and regenerates** all POIs/notes/documents: past stops fully done, current stop mixed (only alojamiento done), future stops pending; docs are `source:"link"` placeholders (no real files/addresses). Destructive to child tables — re-run `db:seed` to restore production data.
+
 ## Design system
 
 **Andiamo** uses a warm cream light theme inspired by the **Panini editorial aesthetic** (7a0.com.br) — hex palette, hard sticker shadows, Anton display type, uppercase labels, stagger animations. Tokens live in `src/app/globals.css` under `@theme {}`. Do NOT use arbitrary Tailwind values for colors.
