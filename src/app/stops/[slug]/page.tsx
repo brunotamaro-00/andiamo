@@ -206,9 +206,7 @@ export default async function StopPage({ params }: Props) {
             <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
               {isActive && tripPhase === "during" && <Badge variant="active">Aquí ahora</Badge>}
               {isActive && tripPhase === "before" && <Badge variant="special">Próxima parada</Badge>}
-              {stop.datesFixed && <Badge variant="warning">fecha fija</Badge>}
-              {stop.isTransit && <Badge variant="muted">tránsito</Badge>}
-              {stop.isCandidate && <Badge variant="special">candidata</Badge>}
+              {stop.isCandidate && <Badge variant="special">tentativa</Badge>}
               <EditStopPanel
                 stopId={stop.id}
                 slug={stop.slug}
@@ -216,10 +214,7 @@ export default async function StopPage({ params }: Props) {
                 arrivalDate={stop.arrivalDate}
                 departureDate={stop.departureDate}
                 nights={stop.nights}
-                datesFixed={stop.datesFixed}
                 isCandidate={stop.isCandidate}
-                isTransit={stop.isTransit}
-                arrivalMode={stop.arrivalMode as "flight" | "ground"}
                 currentOrder={stop.order}
                 allStops={allStops}
               />

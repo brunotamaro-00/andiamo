@@ -71,7 +71,7 @@ type OptimisticAction =
 export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps) {
   const [open, setOpen] = useState(false);
   const [editingPoi, setEditingPoi] = useState<Poi | null>(null);
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { items: optimisticPois, mutate, run, mutationError, isPending } = useOptimisticList(
@@ -95,8 +95,10 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
     mutate({ type: "toggle", id: poi.id }, () => togglePoiDone(poi.id, slug), "No se pudo guardar el cambio. Reintentá.");
   }
 
+  const detailPoi = detailId ? optimisticPois.find((p) => p.id === detailId) ?? null : null;
+
   function handleDelete(id: string) {
-    setConfirmingId(null);
+    setDetailId(null);
     haptics.warning();
     mutate({ type: "delete", id }, () => deletePoi(id, slug), "No se pudo borrar. Reintentá.", () => toast("Punto borrado"));
   }
@@ -169,12 +171,8 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
             <PoiItem
               key={poi.id}
               poi={poi}
-              confirming={confirmingId === poi.id}
               onToggle={() => handleToggle(poi)}
-              onEdit={() => setEditingPoi(poi)}
-              onRequestDelete={() => setConfirmingId(poi.id)}
-              onCancelDelete={() => setConfirmingId(null)}
-              onConfirmDelete={() => handleDelete(poi.id)}
+              onOpen={() => setDetailId(poi.id)}
             />
           ))}
         </ul>
@@ -198,35 +196,32 @@ export function PoiPanel({ stopId, slug, stopLat, stopLng, pois }: PoiPanelProps
           onClose={() => setEditingPoi(null)}
         />
       )}
+
+      {detailPoi && (
+        <PoiDetailModal
+          poi={detailPoi}
+          onEdit={() => {
+            const p = detailPoi;
+            setDetailId(null);
+            setEditingPoi(p);
+          }}
+          onDelete={() => handleDelete(detailPoi.id)}
+          onClose={() => setDetailId(null)}
+        />
+      )}
     </Card>
   );
 }
 
 function PoiItem({
-  poi, confirming, onToggle, onEdit, onRequestDelete, onCancelDelete, onConfirmDelete,
+  poi, onToggle, onOpen,
 }: {
   poi: Poi;
-  confirming: boolean;
   onToggle: () => void;
-  onEdit: () => void;
-  onRequestDelete: () => void;
-  onCancelDelete: () => void;
-  onConfirmDelete: () => void;
+  onOpen: () => void;
 }) {
   const Icon = TYPE_ICON[poi.type] ?? MapPin;
   const hasCoords = poi.latitude != null && poi.longitude != null;
-  const { toast } = useToast();
-
-  async function copyAddress() {
-    if (!poi.address) return;
-    try {
-      await navigator.clipboard.writeText(poi.address);
-      haptics.tap();
-      toast("Dirección copiada");
-    } catch {
-      toast("No se pudo copiar", "error");
-    }
-  }
 
   return (
     <li
@@ -234,8 +229,7 @@ function PoiItem({
         poi.done ? "opacity-50" : ""
       }`}
     >
-      {/* Header row: only the name shares width with the action buttons —
-          address/notes/link render below at full row width. */}
+      {/* Only the maps pin stays inline; tapping the name opens the detail sheet. */}
       <div className="flex items-center gap-1">
         {/* Done toggle — 44px touch target */}
         <button
@@ -251,8 +245,12 @@ function PoiItem({
           <PoiCheck done={poi.done} hover />
         </button>
 
-        {/* Name — the only content sharing width with the actions */}
-        <div className="flex-1 min-w-0 flex items-center gap-1.5">
+        {/* Name — opens the detail sheet */}
+        <button
+          onClick={onOpen}
+          aria-label={`Ver detalle de "${poi.name}"`}
+          className="flex-1 min-w-0 flex items-center gap-1.5 text-left rounded-lg px-1 py-1.5 -my-1.5 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+        >
           <Icon
             size={13}
             strokeWidth={1.5}
@@ -260,7 +258,7 @@ function PoiItem({
             className="text-ink-3 shrink-0"
           />
           <span
-            className={`text-sm font-medium ${
+            className={`text-sm font-medium truncate ${
               poi.done ? "line-through text-ink-faint" : "text-ink"
             }`}
           >
@@ -269,28 +267,9 @@ function PoiItem({
           {poi.reservationRequired && !poi.done && (
             <Badge variant="danger" className="shrink-0">Reservar</Badge>
           )}
-        </div>
+        </button>
 
-      {/* Actions / inline delete confirmation */}
-      {confirming ? (
-        <div className="pt-1.5">
-          <InlineDeleteConfirm
-            label={poi.name}
-            onConfirm={onConfirmDelete}
-            onCancel={onCancelDelete}
-          />
-        </div>
-      ) : (
-        <div className="flex items-center pt-1.5 shrink-0">
-          {poi.address && (
-            <button
-              onClick={copyAddress}
-              aria-label={`Copiar dirección de "${poi.name}"`}
-              className={`${actionBtn} text-ink-3 hover:text-ink-2 hover:bg-surface-2`}
-            >
-              <Copy size={15} strokeWidth={1.5} aria-hidden="true" />
-            </button>
-          )}
+        <div className="flex items-center shrink-0">
           {hasCoords ? (
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${poi.latitude},${poi.longitude}`}
@@ -306,47 +285,123 @@ function PoiItem({
               <MapPin size={16} strokeWidth={1.5} />
             </span>
           )}
-          <button
-            onClick={onEdit}
-            aria-label={`Editar "${poi.name}"`}
-            className={`${actionBtn} text-ink-3 hover:text-brick hover:bg-surface-2`}
-          >
-            <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            onClick={onRequestDelete}
-            aria-label={`Borrar "${poi.name}"`}
-            className={`${actionBtn} text-ink-3 hover:text-danger hover:bg-danger-bg`}
-          >
-            <Trash2 size={16} strokeWidth={1.5} aria-hidden="true" />
-          </button>
         </div>
-      )}
       </div>
 
-      {(poi.address || poi.notes || poi.url) && (
-        <div className="pl-11 pr-1">
+      {(poi.address || poi.notes) && (
+        <div className="pl-12 pr-1">
           {poi.address && (
             <p className="text-xs text-ink-3 truncate">{poi.address}</p>
           )}
           {poi.notes && (
             <p className="text-xs text-ink-3 mt-0.5">{poi.notes}</p>
           )}
+        </div>
+      )}
+    </li>
+  );
+}
+
+/** Per-POI detail sheet: copy address, open link, edit or delete. Keeps the
+ *  row itself minimal (name + maps pin). */
+function PoiDetailModal({
+  poi, onEdit, onDelete, onClose,
+}: {
+  poi: Poi;
+  onEdit: () => void;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const { toast } = useToast();
+  const Icon = TYPE_ICON[poi.type] ?? MapPin;
+  const hasCoords = poi.latitude != null && poi.longitude != null;
+
+  async function copyAddress() {
+    if (!poi.address) return;
+    try {
+      await navigator.clipboard.writeText(poi.address);
+      haptics.tap();
+      toast("Dirección copiada");
+    } catch {
+      toast("No se pudo copiar", "error");
+    }
+  }
+
+  return (
+    <Modal title="Punto de interés" onClose={onClose}>
+      <div className="space-y-4">
+        <div className="flex items-start gap-3">
+          <span className="grid place-items-center h-11 w-11 rounded-lg bg-surface-2 text-ink-3 shrink-0">
+            <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-ink">{poi.name}</p>
+            <p className="text-xs text-ink-2">
+              {TYPE_LABEL[poi.type] ?? poi.type}
+              {poi.reservationRequired ? " · Requiere reserva" : ""}
+            </p>
+          </div>
+        </div>
+
+        {(poi.address || poi.notes) && (
+          <div className="space-y-1">
+            {poi.address && <p className="text-sm text-ink-2">{poi.address}</p>}
+            {poi.notes && <p className="text-sm text-ink-3">{poi.notes}</p>}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          {hasCoords && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${poi.latitude},${poi.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            >
+              <MapPin size={13} strokeWidth={2} aria-hidden="true" />
+              Maps
+            </a>
+          )}
           {poi.url && (
             <a
               href={poi.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-brick hover:text-brick-hover inline-flex items-center gap-0.5 mt-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brick rounded"
-              aria-label={`Ver ${poi.name} (abre en nueva pestaña)`}
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
             >
-              Ver
-              <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
+              <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />
+              Link
             </a>
           )}
+          {poi.address && (
+            <button
+              type="button"
+              onClick={copyAddress}
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            >
+              <Copy size={13} strokeWidth={2} aria-hidden="true" />
+              Copiar
+            </button>
+          )}
         </div>
-      )}
-    </li>
+
+        {confirming ? (
+          <InlineDeleteConfirm label={poi.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
+        ) : (
+          <div className="flex gap-2 border-t border-border pt-3">
+            <Button type="button" variant="secondary" className="flex-1" onClick={onEdit}>
+              <Pencil size={14} strokeWidth={1.5} aria-hidden="true" />
+              Editar
+            </Button>
+            <Button type="button" variant="danger" className="flex-1" onClick={() => setConfirming(true)}>
+              <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
+              Borrar
+            </Button>
+          </div>
+        )}
+      </div>
+    </Modal>
   );
 }
 

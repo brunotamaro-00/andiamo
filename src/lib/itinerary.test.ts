@@ -12,15 +12,13 @@ import { computeItinerary, assumedDateWindow } from "./itinerary";
 interface StopOverrides {
   id: string;
   nights?: number;
-  datesFixed?: boolean;
-  arrivalDate?: Date | null;
   isCandidate?: boolean;
 }
 
 let orderCounter = 0;
 
-function stop({ id, nights = 0, datesFixed = false, arrivalDate = null, isCandidate = false }: StopOverrides) {
-  return { id, order: ++orderCounter, nights, datesFixed, arrivalDate, isCandidate };
+function stop({ id, nights = 0, isCandidate = false }: StopOverrides) {
+  return { id, order: ++orderCounter, nights, isCandidate };
 }
 
 function iso(result: { arrival: Date | null; departure: Date | null }) {
@@ -53,33 +51,11 @@ describe("computeItinerary", () => {
   });
 
   it("sorts stops by order before chaining", () => {
-    const b = { id: "b", order: 2, nights: 3, datesFixed: false, arrivalDate: null, isCandidate: false };
-    const a = { id: "a", order: 1, nights: 2, datesFixed: false, arrivalDate: null, isCandidate: false };
+    const b = { id: "b", order: 2, nights: 3, isCandidate: false };
+    const a = { id: "a", order: 1, nights: 2, isCandidate: false };
     const result = computeItinerary([b, a], "2026-06-01");
     expect(iso(result.get("a")!)).toEqual({ arrival: "2026-06-01", departure: "2026-06-03" });
     expect(iso(result.get("b")!)).toEqual({ arrival: "2026-06-03", departure: "2026-06-06" });
-  });
-
-  it("re-anchors the cursor at a pinned stop's fixed arrival date", () => {
-    const stops = [
-      stop({ id: "a", nights: 2 }),
-      stop({ id: "pinned", nights: 2, datesFixed: true, arrivalDate: new Date("2026-06-10T00:00:00.000Z") }),
-      stop({ id: "c", nights: 1 }),
-    ];
-    const result = computeItinerary(stops, "2026-06-01");
-    expect(iso(result.get("a")!)).toEqual({ arrival: "2026-06-01", departure: "2026-06-03" });
-    expect(iso(result.get("pinned")!)).toEqual({ arrival: "2026-06-10", departure: "2026-06-12" });
-    expect(iso(result.get("c")!)).toEqual({ arrival: "2026-06-12", departure: "2026-06-13" });
-  });
-
-  it("ignores arrivalDate of a stop that is not pinned", () => {
-    const stops = [
-      stop({ id: "a", nights: 2, arrivalDate: new Date("2026-08-20T00:00:00.000Z") }),
-      stop({ id: "b", nights: 1 }),
-    ];
-    const result = computeItinerary(stops, "2026-06-01");
-    expect(iso(result.get("a")!)).toEqual({ arrival: "2026-06-01", departure: "2026-06-03" });
-    expect(iso(result.get("b")!)).toEqual({ arrival: "2026-06-03", departure: "2026-06-04" });
   });
 
   it("gives candidates tentative dates without advancing the cursor", () => {

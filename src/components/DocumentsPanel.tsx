@@ -4,10 +4,10 @@ import { useState, useRef, useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, TrainFront, ShieldCheck, Plane, FileText,
-  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download,
+  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download, Pencil, ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { createDocumentLink, deleteDocument } from "@/app/actions/documents";
+import { createDocumentLink, updateDocument, deleteDocument } from "@/app/actions/documents";
 import { haptics } from "@/lib/haptics";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
@@ -71,7 +71,8 @@ interface DocumentsPanelProps {
 
 type DocAction =
   | { type: "delete"; id: string }
-  | { type: "add"; doc: Document };
+  | { type: "add"; doc: Document }
+  | { type: "update"; doc: Document };
 
 /** Button that checks the SW cache and offers to save a document offline.
  *  Only rendered for uploaded files (source === "upload"). */
@@ -140,7 +141,7 @@ function OfflineDocButton({ docId }: { docId: string }) {
 
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { items: optimisticDocs, mutate, mutationError, isPending } = useOptimisticList(
@@ -151,14 +152,36 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           return state.filter((d) => d.id !== action.id);
         case "add":
           return [...state, action.doc];
+        case "update":
+          return state.map((d) => (d.id === action.doc.id ? action.doc : d));
       }
     }
   );
 
+  const openDoc = openId ? optimisticDocs.find((d) => d.id === openId) ?? null : null;
+
   function handleDelete(id: string) {
-    setConfirmingId(null);
+    setOpenId(null);
     haptics.warning();
     mutate({ type: "delete", id }, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.", () => toast("Documento borrado"));
+  }
+
+  function handleUpdate(doc: Document, formData: FormData) {
+    const updated: Document = {
+      ...doc,
+      label: (formData.get("label") as string)?.trim() || doc.label,
+      kind: (formData.get("kind") as string) || doc.kind,
+      externalUrl:
+        doc.source === "link" ? (formData.get("url") as string) || doc.externalUrl : doc.externalUrl,
+    };
+    setOpenId(null);
+    haptics.success();
+    mutate(
+      { type: "update", doc: updated },
+      () => updateDocument(doc.id, formData, path),
+      "No se pudo guardar el documento. Reintentá.",
+      () => toast("Documento actualizado"),
+    );
   }
 
   function handleAddLink(formData: FormData) {
@@ -215,15 +238,23 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
             return (
               <div
                 key={doc.id}
-                className="flex items-center gap-2 p-2.5 rounded-lg bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
+                className="flex items-center gap-1 p-2.5 rounded-lg bg-surface-2/40 border border-border transition-colors hover:border-border-strong"
               >
-                <Icon
-                  size={18}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                  className="text-ink-3 shrink-0"
-                />
-                <div className="flex-1 min-w-0">
+                {/* Logo opens the document; the rest of the row opens the detail sheet. */}
+                <a
+                  href={`/api/documents/${doc.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Abrir ${doc.label}`}
+                  className={`${actionBtn} text-ink-3 hover:text-brick hover:bg-surface-2 shrink-0`}
+                >
+                  <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
+                </a>
+                <button
+                  onClick={() => setOpenId(doc.id)}
+                  className="flex-1 min-w-0 text-left rounded-lg px-1.5 py-1 -my-1 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+                  aria-label={`Ver detalle de "${doc.label}"`}
+                >
                   <p className="text-sm font-medium text-ink truncate">
                     {doc.label}
                   </p>
@@ -231,35 +262,13 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                     {KIND_LABEL[doc.kind] ?? doc.kind}
                     {size ? ` · ${size}` : ""}
                   </p>
-                </div>
-
-                {confirmingId === doc.id ? (
-                  <InlineDeleteConfirm
-                    label={doc.label}
-                    onConfirm={() => handleDelete(doc.id)}
-                    onCancel={() => setConfirmingId(null)}
-                  />
-                ) : (
-                  <div className="flex items-center shrink-0">
-                    {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
-                    <a
-                      href={`/api/documents/${doc.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${actionBtn} text-brick hover:text-brick-hover hover:bg-surface-2`}
-                      aria-label={`Abrir ${doc.label} en nueva pestaña`}
-                    >
-                      <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />
-                    </a>
-                    <button
-                      onClick={() => setConfirmingId(doc.id)}
-                      aria-label={`Borrar documento "${doc.label}"`}
-                      className={`${actionBtn} text-border-strong hover:text-danger hover:bg-danger-bg`}
-                    >
-                      <Trash2 size={16} strokeWidth={1.5} aria-hidden="true" />
-                    </button>
-                  </div>
-                )}
+                </button>
+                <ChevronRight
+                  size={15}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  className="text-border-strong shrink-0 mr-1"
+                />
               </div>
             );
           })}
@@ -274,7 +283,114 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           onClose={() => setMode(null)}
         />
       )}
+
+      {openDoc && (
+        <DocDetailModal
+          doc={openDoc}
+          onSave={(fd) => handleUpdate(openDoc, fd)}
+          onDelete={() => handleDelete(openDoc.id)}
+          onClose={() => setOpenId(null)}
+        />
+      )}
     </Card>
+  );
+}
+
+/** Per-document detail sheet: open/download the file, or switch to an inline
+ *  edit form, or delete. Replaces the old row action icons. */
+function DocDetailModal({
+  doc, onSave, onDelete, onClose,
+}: {
+  doc: Document;
+  onSave: (formData: FormData) => void;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const Icon = KIND_ICON[doc.kind] ?? FileText;
+  const size = formatSize(doc.sizeBytes);
+
+  if (editing) {
+    return (
+      <Modal title="Editar documento" onClose={onClose}>
+        <form action={onSave} className="space-y-3">
+          <Field label="Etiqueta" name="label" required defaultValue={doc.label} autoFocus />
+          <SelectField label="Tipo" name="kind" defaultValue={doc.kind}>
+            {DOCUMENT_KINDS.map((k) => (
+              <option key={k} value={k}>
+                {KIND_LABEL[k]}
+              </option>
+            ))}
+          </SelectField>
+          {doc.source === "link" && (
+            <Field
+              label="URL"
+              name="url"
+              type="url"
+              required
+              defaultValue={doc.externalUrl ?? ""}
+              placeholder="https://..."
+            />
+          )}
+          <div className="flex gap-2 pt-1">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setEditing(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" className="flex-1">
+              Guardar
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal title="Documento" onClose={onClose}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="grid place-items-center h-11 w-11 rounded-lg bg-surface-2 text-ink-3 shrink-0">
+            <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-ink truncate">{doc.label}</p>
+            <p className="text-xs text-ink-2">
+              {KIND_LABEL[doc.kind] ?? doc.kind}
+              {size ? ` · ${size}` : ""}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
+          <a
+            href={`/api/documents/${doc.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+          >
+            Abrir
+            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
+          </a>
+        </div>
+
+        {confirming ? (
+          <InlineDeleteConfirm label={doc.label} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
+        ) : (
+          <div className="flex gap-2 border-t border-border pt-3">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setEditing(true)}>
+              <Pencil size={14} strokeWidth={1.5} aria-hidden="true" />
+              Editar
+            </Button>
+            <Button type="button" variant="danger" className="flex-1" onClick={() => setConfirming(true)}>
+              <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
+              Borrar
+            </Button>
+          </div>
+        )}
+      </div>
+    </Modal>
   );
 }
 

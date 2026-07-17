@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db, isRecordMissing } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { DocumentKind } from "@/generated/prisma/enums";
-import { parseForm, CreateDocumentLinkSchema } from "./_schemas";
+import { parseForm, CreateDocumentLinkSchema, UpdateDocumentSchema } from "./_schemas";
 
 export async function createDocumentLink(formData: FormData) {
   await requireAuth();
@@ -29,6 +29,32 @@ export async function createDocumentLink(formData: FormData) {
   }
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
+  revalidatePath("/hoy");
+}
+
+export async function updateDocument(id: string, formData: FormData, path: string) {
+  await requireAuth();
+
+  const parsed = parseForm(formData, UpdateDocumentSchema);
+  if (!parsed.ok) return { error: parsed.error };
+  const { label, kind, url } = parsed.data;
+
+  try {
+    await db.document.update({
+      where: { id },
+      data: {
+        label,
+        kind: (kind as DocumentKind) ?? "other",
+        // Only link documents send a URL; uploads omit it and keep their file.
+        ...(url !== undefined ? { externalUrl: url } : {}),
+      },
+    });
+  } catch (e) {
+    if (isRecordMissing(e)) return { error: "Documento no encontrado" };
+    throw e;
+  }
+
+  revalidatePath(path);
   revalidatePath("/hoy");
 }
 

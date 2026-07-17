@@ -19,16 +19,13 @@ model Stop {
   arrivalDate   DateTime? @db.Date
   departureDate DateTime? @db.Date
   nights        Int        @default(0)
-  datesFixed    Boolean    @default(false)
   latitude      Float
   longitude     Float
   timezone      String?
   currencyCode  String
   tempRange     String?
-  isTransit     Boolean       @default(false)
-  isCandidate   Boolean       @default(false)
-  isFlexMargin  Boolean       @default(false)
-  arrivalMode   TransportMode @default(ground)
+  isCandidate   Boolean    @default(false)
+  isFlexMargin  Boolean    @default(false)
   pois          Poi[]
   notes         Note[]
   documents     Document[]
@@ -53,11 +50,6 @@ model Poi {
   updatedAt           DateTime @updatedAt
 
   @@index([stopId])
-}
-
-enum TransportMode {
-  flight
-  ground
 }
 
 enum PoiType {

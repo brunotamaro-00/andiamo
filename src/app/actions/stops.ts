@@ -55,10 +55,8 @@ export async function createStop(formData: FormData) {
         nights,
         arrivalDate: null,
         departureDate: null,
-        datesFixed: false,
         isCandidate: false,
         isFlexMargin: false,
-        isTransit: false,
         category: "Ciudad",
         priceLevel: "$$",
       },
@@ -104,8 +102,7 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
 
   const parsed = parseForm(formData, UpdateStopSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { name, nights, arrivalDate, datesFixed, isCandidate, isTransit, arrivalMode } =
-    parsed.data;
+  const { name, nights, isCandidate } = parsed.data;
 
   const current = await db.stop.findUnique({
     where: { id },
@@ -113,14 +110,9 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
   });
   if (!current) return { error: "Parada no encontrada" };
 
-  // For pinned stops, persist the user-supplied arrivalDate as the chain anchor.
-  // For normal stops, leave arrivalDate untouched — recalculateItinerary will overwrite it.
-  // Clearing it here would remove the bootstrap fallback before recalc can read existing dates.
-  const extraFields = datesFixed ? { arrivalDate: arrivalDate ?? null, departureDate: null } : {};
-
   await db.stop.update({
     where: { id },
-    data: { name, nights, datesFixed, isCandidate, isTransit, arrivalMode, ...extraFields },
+    data: { name, nights, isCandidate },
   });
 
   if (afterOrder !== undefined) {

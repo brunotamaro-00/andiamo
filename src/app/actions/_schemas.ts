@@ -60,14 +60,6 @@ const optionalNumeric = z
 /** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
 const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
 
-/** Optional Date from YYYY-MM-DD string — rejects malformed dates (Invalid Date would crash Prisma) */
-const optionalDate = z
-  .string()
-  .refine((v) => !v || (/^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(new Date(v).getTime())), "Formato AAAA-MM-DD")
-  .transform((v) => (v ? new Date(v) : null))
-  .nullable()
-  .optional();
-
 // ── Schemas ──────────────────────────────────────────────────────────────────
 
 export const CreateStopSchema = z.object({
@@ -84,14 +76,7 @@ export const CreateStopSchema = z.object({
 export const UpdateStopSchema = z.object({
   name: requiredStr,
   nights: intStr(0),
-  arrivalDate: optionalDate,
-  datesFixed: boolStr,
   isCandidate: boolStr,
-  isTransit: boolStr,
-  arrivalMode: z
-    .string()
-    .transform((v) => (v === "flight" ? "flight" : "ground"))
-    .pipe(z.enum(["flight", "ground"])),
 });
 
 export const TripStartSchema = z.object({
@@ -151,6 +136,14 @@ export const CreateDocumentLinkSchema = z.object({
       (v) => /^https?:\/\//i.test(v),
       { message: "La URL debe comenzar con http:// o https://" },
     ),
+});
+
+/** Edit an existing document. `url` is optional — only link documents carry it;
+ *  uploads leave it absent and keep their stored file. */
+export const UpdateDocumentSchema = z.object({
+  label: requiredStr,
+  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
+  url: optionalUrl,
 });
 
 // ── Parser ───────────────────────────────────────────────────────────────────

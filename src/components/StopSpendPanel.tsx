@@ -7,10 +7,10 @@ import { personLabel } from "@/lib/person";
 import { getPerson } from "@/lib/person-server";
 import { todayStr, dateToStr } from "@/lib/trip";
 
-/** Rich spend panel fed by Spitwise: total, per-category bars and
- *  last movements. Degrades silently — Spitwise down or future stop with no
- *  data renders nothing; current/past stop with no data shows a slim hint.
- *  Scoped to the current viewer (see lib/person.ts). */
+/** Rich spend panel fed by Spitwise: total and per-category bars. Per-movement
+ *  detail lives in Spitwise itself. Degrades silently — Spitwise down or future
+ *  stop with no data renders nothing; current/past stop with no data shows a
+ *  slim hint. Scoped to the current viewer (see lib/person.ts). */
 export default async function StopSpendPanel({
   slug,
   arrivalDate,
@@ -90,39 +90,6 @@ export default async function StopSpendPanel({
             );
           })}
         </ul>
-      )}
-
-      {/* Last movements */}
-      {detail.last_movements.length > 0 && (
-        <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
-            Últimos movimientos
-          </p>
-          <ul className="divide-y divide-border">
-            {detail.last_movements.map((m, i) => (
-              <li key={i} className="flex items-baseline gap-2 py-1.5">
-                <span className="text-[12px] text-ink-3 font-tabular shrink-0 w-12">
-                  {new Date(m.date).toLocaleDateString("es-AR", {
-                    day: "numeric",
-                    month: "short",
-                    timeZone: "UTC",
-                  })}
-                </span>
-                <span className="text-sm text-ink truncate flex-1 min-w-0">
-                  {m.description ?? "—"}
-                </span>
-                <span className="font-tabular text-[12px] font-bold text-ink shrink-0">
-                  {m.currency !== "USD" && (
-                    <span className="text-ink-3 font-normal">
-                      {m.amount} {m.currency} ·{" "}
-                    </span>
-                  )}
-                  USD {m.amount_usd}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
       )}
     </div>
   );

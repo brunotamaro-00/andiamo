@@ -91,6 +91,15 @@
   input[type="search"]::-webkit-search-cancel-button { display: none; }
 }
 
+/* iOS Safari auto-zooms on focus when a control's font-size is < 16px, and
+   leaves the page zoomed after. Force a 16px floor on all text-entry controls.
+   Unlayered so it wins over Tailwind's layered text-* utilities. */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  font-size: 16px;
+}
+
 :root {
   color-scheme: light;
 }

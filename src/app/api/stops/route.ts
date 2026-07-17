@@ -19,10 +19,8 @@ export async function GET(request: Request): Promise<Response> {
     arrivalDate: toDateStr(s.arrivalDate),
     departureDate: toDateStr(s.departureDate),
     nights: s.nights,
-    datesFixed: s.datesFixed,
     currencyCode: s.currencyCode,
     timezone: s.timezone,
-    isTransit: s.isTransit,
     isCandidate: s.isCandidate,
     isFlexMargin: s.isFlexMargin,
   }));
