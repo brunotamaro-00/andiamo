@@ -34,17 +34,20 @@ export function useOptimisticList<T, A>(
 
   /** Apply an optimistic update and call `serverAction`.
    *  On failure (thrown or resolved `{ error }`), sets `mutationError` and
-   *  refreshes the page to roll back. */
+   *  refreshes the page to roll back. `onSuccess` fires only after the action
+   *  resolved without error — use it for confirmation toasts. */
   function mutate(
     optimisticAction: A,
     serverAction: () => Promise<unknown>,
     errorMsg: string,
+    onSuccess?: () => void,
   ) {
     setMutationError(null);
     startTransition(async () => {
       applyOptimistic(optimisticAction);
       try {
         if (resolvedError(await serverAction())) throw new Error(errorMsg);
+        onSuccess?.();
       } catch {
         haptics.error();
         setMutationError(errorMsg);
@@ -55,11 +58,16 @@ export function useOptimisticList<T, A>(
 
   /** Call `serverAction` inside the shared transition without an optimistic
    *  update — for mutations whose result can't be predicted locally (edits). */
-  function run(serverAction: () => Promise<unknown>, errorMsg: string) {
+  function run(
+    serverAction: () => Promise<unknown>,
+    errorMsg: string,
+    onSuccess?: () => void,
+  ) {
     setMutationError(null);
     startTransition(async () => {
       try {
         if (resolvedError(await serverAction())) throw new Error(errorMsg);
+        onSuccess?.();
       } catch {
         haptics.error();
         setMutationError(errorMsg);

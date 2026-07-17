@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { login } from "@/app/actions/auth";
 import { Wordmark } from "@/components/Wordmark";
+import { Label } from "@/components/ui/Label";
 import { PEOPLE, personLabel } from "@/lib/person";
 
 export const metadata: Metadata = { title: "Acceder · Andiamo" };
@@ -26,24 +27,19 @@ export default async function LoginPage({ searchParams }: Props) {
       {/* Form card */}
       <form
         action={login}
-        className="w-full max-w-xs bg-surface rounded-[6px] p-6 card-shadow space-y-5 border-2 border-border animate-slide-up stagger-2"
+        className="w-full max-w-xs bg-surface rounded-xl p-6 card-shadow space-y-5 border border-border animate-slide-up stagger-2"
       >
         <input type="hidden" name="from" value={from} />
 
         <div>
-          <label
-            htmlFor="password"
-            className="block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5"
-          >
-            Contraseña
-          </label>
+          <Label htmlFor="password">Contraseña</Label>
           <input
             id="password"
             name="password"
             type="password"
             autoFocus
             autoComplete="current-password"
-            className="w-full px-3 py-2.5 bg-surface-2 border border-border rounded-lg text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:border-brick transition-colors duration-150 hover:border-border-strong"
+            className="w-full px-3 py-2.5 bg-surface-2 border border-border rounded-xl text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:border-brick transition-colors duration-150 hover:border-border-strong"
             placeholder="••••••••"
             required
           />
@@ -52,8 +48,8 @@ export default async function LoginPage({ searchParams }: Props) {
         {/* Only decides whose share of los gastos se muestra — todo lo demás
             del viaje es idéntico para los dos. */}
         <fieldset>
-          <legend className="block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
-            ¿Quién sos?
+          <legend>
+            <Label as="span">¿Quién sos?</Label>
           </legend>
           <div className="grid grid-cols-2 gap-2">
             {PEOPLE.map((p) => (
@@ -82,7 +78,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
         <button
           type="submit"
-          className="w-full py-2.5 bg-brick hover:bg-brick-hover active:bg-brick-press active:translate-x-[3px] active:translate-y-[3px] active:shadow-none text-white font-display uppercase tracking-wide text-sm rounded-[2px] hard-shadow-ink transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="w-full min-h-[44px] py-2.5 bg-brick hover:bg-brick-hover active:bg-brick-press active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-white font-display uppercase tracking-wide text-sm rounded-[6px] hard-shadow-ink transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Entrar
         </button>

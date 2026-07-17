@@ -29,7 +29,7 @@ export function PageHeader({ subtitle, actions }: PageHeaderProps) {
         <BrandLink>
           <Wordmark size="sm" />
           {subtitle && (
-            <span className="text-[9px] font-display uppercase tracking-[0.14em] text-ink-3 ml-8 -mt-0.5 truncate">
+            <span className="text-[11px] font-display uppercase tracking-[0.14em] text-ink-3 ml-8 -mt-0.5 truncate">
               {subtitle}
             </span>
           )}

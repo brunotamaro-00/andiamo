@@ -16,6 +16,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
 import { TodayPoiList } from "@/components/TodayPoiList";
+import { QuickAddPoi } from "@/components/QuickAddPoi";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import TripSpendStrip from "@/components/TripSpendStrip";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Flag } from "@/components/Flag";
@@ -123,6 +125,7 @@ export default async function HoyPage() {
       <PageHeader subtitle={todayLabel} actions={<PersonSwitcher person={await getPerson()} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
+        <PullToRefresh />
         {phase === "unplanned" && (
           <HeroCard
             numeral="—"
@@ -187,22 +190,39 @@ export default async function HoyPage() {
           </Suspense>
         )}
 
-        {/* Pending POIs at the current stop */}
-        {showStopSections && details && details.pois.length > 0 && (
+        {/* Pending POIs at the current stop — the "+" adds one without
+            navigating to the stop detail */}
+        {showStopSections && details && (
           <Card className="animate-fade-in stagger-1">
             <SectionHeader
               title="Pendientes acá"
-              count={details.pois.length}
+              count={details.pois.length > 0 ? details.pois.length : undefined}
               action={
-                <Link
-                  href={`/stops/${currentStop!.slug}#pois`}
-                  className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
-                >
-                  Ver todos
-                </Link>
+                <>
+                  {details.pois.length > 0 && (
+                    <Link
+                      href={`/stops/${currentStop!.slug}#pois`}
+                      className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
+                    >
+                      Ver todos
+                    </Link>
+                  )}
+                  <QuickAddPoi
+                    stopId={currentStop!.id}
+                    slug={currentStop!.slug}
+                    stopLat={currentStop!.latitude}
+                    stopLng={currentStop!.longitude}
+                  />
+                </>
               }
             />
-            <TodayPoiList slug={currentStop!.slug} pois={details.pois} />
+            {details.pois.length > 0 ? (
+              <TodayPoiList slug={currentStop!.slug} pois={details.pois} />
+            ) : (
+              <p className="text-sm text-ink-2">
+                Nada pendiente acá. Anotá un lugar con el «+».
+              </p>
+            )}
           </Card>
         )}
 
@@ -217,11 +237,11 @@ export default async function HoyPage() {
                     href={`/api/documents/${doc.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-[4px] transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                    className="flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-lg transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
                   >
                     <FileText size={15} strokeWidth={1.5} aria-hidden="true" className="text-ink-3 shrink-0" />
                     <span className="flex-1 min-w-0 truncate text-sm text-ink">{doc.label}</span>
-                    <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+                    <span className="shrink-0 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
                       {KIND_LABEL[doc.kind] ?? doc.kind}
                     </span>
                   </a>
@@ -250,13 +270,13 @@ export default async function HoyPage() {
                 <li key={`${entry.guide.slug}/${entry.doc.slug}`}>
                   <Link
                     href={`/guias/${entry.guide.slug}/${entry.doc.slug}`}
-                    className="flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-[4px] transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                    className="flex items-center gap-2.5 px-2 py-2 min-h-[44px] rounded-lg transition-colors duration-150 hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
                   >
                     <AlertTriangle size={15} strokeWidth={1.5} aria-hidden="true" className="text-brick shrink-0" />
                     <span className="flex-1 min-w-0 truncate text-sm text-ink">
                       <Flag flag={entry.guide.countryFlag} /> {entry.guide.title}
                     </span>
-                    <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+                    <span className="shrink-0 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
                       {formatShortDateStr(arrival!)}
                     </span>
                   </Link>
@@ -270,9 +290,9 @@ export default async function HoyPage() {
         {phase === "during" && showStopSections && nextStop && (
           <Link
             href={`/stops/${nextStop.slug}`}
-            className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[4px] animate-fade-in stagger-4"
+            className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl animate-fade-in stagger-4"
           >
-            <div className="flex items-center gap-3 bg-surface border-2 border-border rounded-[4px] px-4 py-3 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+            <div className="flex items-center gap-3 bg-surface border border-border rounded-xl px-4 py-3 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
               <MapPin size={16} strokeWidth={1.5} aria-hidden="true" className="text-ink-3 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Próxima parada</p>
@@ -302,13 +322,13 @@ function HeroCard({
   return (
     <Link
       href={href}
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[4px] animate-fade-in"
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl animate-fade-in"
     >
-      <div className="flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-[4px] px-4 py-4 card-shadow transition-all duration-150 hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+      <div className="flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-xl px-4 py-4 card-shadow transition-all duration-150 hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
         <div className="text-center shrink-0">
           <p className="text-5xl font-numeral leading-none text-gold-ink">{numeral}</p>
           {numeralLabel && (
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">
               {numeralLabel}
             </p>
           )}
@@ -360,9 +380,9 @@ function CurrentStopHero({
   return (
     <Link
       href={`/stops/${stop.slug}`}
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[6px] animate-fade-in"
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl animate-fade-in"
     >
-      <div className="bg-surface border-2 border-border border-t-[3px] border-t-brick rounded-[6px] p-4 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+      <div className="bg-surface border border-border border-t-[3px] border-t-brick rounded-xl p-4 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             Día {day} del viaje

@@ -9,6 +9,10 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, SelectField } from "@/components/ui/Field";
+import { Label } from "@/components/ui/Label";
+import { useToast } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 interface StopOption {
   id: string;
@@ -62,6 +66,7 @@ function EditModal({
   allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
   const [pinnedChecked, setPinnedChecked] = useState(datesFixed);
@@ -88,6 +93,7 @@ function EditModal({
         const result = await updateStop(stopId, formData, afterOrder);
         if (result?.error) { setMutationError(result.error); return; }
         haptics.success();
+        toast("Ciudad actualizada");
         onClose();
       } catch {
         haptics.error();
@@ -97,10 +103,6 @@ function EditModal({
   }
 
   function handleDelete() {
-    if (!confirmDelete) {
-      setConfirmDelete(true);
-      return;
-    }
     setMutationError(null);
     haptics.warning();
     startTransition(async () => {
@@ -109,6 +111,7 @@ function EditModal({
       } catch {
         haptics.error();
         setMutationError("No se pudo borrar la ciudad. Intentá de nuevo.");
+        setConfirmDelete(false);
       }
     });
   }
@@ -122,12 +125,13 @@ function EditModal({
           label="Noches"
           name="nights"
           type="number"
+          inputMode="numeric"
           defaultValue={nights}
           min={0}
         />
 
         {/* Arrival date — read-only display when not pinned; editable input when pinned */}
-        <div className="rounded-[4px] border border-border bg-surface-2 px-3 py-2.5 space-y-2">
+        <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5 space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 leading-none mb-1">
@@ -179,15 +183,18 @@ function EditModal({
           ))}
         </SelectField>
 
-        <SelectField
-          label="Cómo llegás"
-          name="arrivalMode"
-          value={modeValue}
-          onChange={(e) => setModeValue(e.target.value as "flight" | "ground")}
-        >
-          <option value="ground">Auto / Tren</option>
-          <option value="flight">Avión</option>
-        </SelectField>
+        <div>
+          <Label as="span">Cómo llegás</Label>
+          <SegmentedControl
+            label="Cómo llegás"
+            value={modeValue}
+            onChange={setModeValue}
+            options={[
+              { value: "ground", label: "Auto / Tren" },
+              { value: "flight", label: "Avión" },
+            ]}
+          />
+        </div>
 
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
@@ -233,44 +240,30 @@ function EditModal({
         )}
       </form>
 
-      {/* Danger zone */}
+      {/* Danger zone — the confirmation runs in its own dialog: the stop
+          carries POIs, notas y documentos, so it follows the ConfirmDialog
+          policy (entity with children) instead of the inline row confirm. */}
       <div className="border-t border-border pt-3">
-        {confirmDelete ? (
-          <div className="space-y-2">
-            <p className="text-sm text-danger">
-              ¿Borrar &ldquo;{name}&rdquo; y todos sus POIs, notas y documentos?
-            </p>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                className="flex-1"
-                onClick={() => setConfirmDelete(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="button"
-                variant="danger"
-                className="flex-1"
-                onClick={handleDelete}
-                loading={isPending}
-              >
-                {isPending ? "Borrando..." : "Sí, borrar"}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="danger"
-            className="w-full"
-            onClick={handleDelete}
-          >
-            Borrar ciudad
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="danger"
+          className="w-full"
+          onClick={() => setConfirmDelete(true)}
+        >
+          Borrar ciudad
+        </Button>
       </div>
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Borrar ciudad"
+          message={`¿Borrar "${name}" y todos sus POIs, notas y documentos? Esta acción no se puede deshacer.`}
+          busy={isPending}
+          error={mutationError}
+          onConfirm={handleDelete}
+          onClose={() => setConfirmDelete(false)}
+        />
+      )}
     </Modal>
   );
 }

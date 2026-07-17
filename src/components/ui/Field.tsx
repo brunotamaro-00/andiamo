@@ -7,7 +7,7 @@ export const labelClass =
   "block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none";
 
 export const inputClass =
-  "w-full bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-sm text-ink " +
+  "w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-ink " +
   "placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 " +
   "focus-visible:border-brick focus-visible:bg-surface focus-visible:ring-offset-0 disabled:opacity-50 " +
   "transition-colors duration-150 hover:border-border-strong";
@@ -27,6 +27,8 @@ interface FieldProps {
   min?: string | number;
   autoFocus?: boolean;
   accept?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
 }
 
 export function Field({ label, name, type = "text", ...rest }: FieldProps) {

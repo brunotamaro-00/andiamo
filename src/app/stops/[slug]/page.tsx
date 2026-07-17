@@ -12,7 +12,8 @@ import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, MapPin, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { SectionNav } from "@/components/SectionNav";
 import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
@@ -153,9 +154,21 @@ export default async function StopPage({ params }: Props) {
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
+
+        {/* Sticky section chips — the page is long; jump without scrolling */}
+        <SectionNav
+          items={[
+            { id: "pois", label: "Lugares" },
+            { id: "notas", label: "Notas" },
+            { id: "docs", label: "Docs" },
+            { id: "moneda", label: "Moneda" },
+            { id: "gastos", label: "Gastos" },
+          ]}
+        />
+
         {/* City header card */}
         <div
-          className={`rounded-[6px] p-4 border-2 card-shadow ${
+          className={`rounded-xl p-4 border-2 card-shadow ${
             isActive
               ? "bg-surface border-border border-t-[3px] border-t-brick"
               : "bg-surface border-border"
@@ -171,6 +184,15 @@ export default async function StopPage({ params }: Props) {
                   </h1>
                   <p className="text-sm text-ink-2 mt-0.5">{stop.country}</p>
                 </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${stop.latitude},${stop.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Abrir ${stop.name} en Google Maps`}
+                  className="self-start h-11 w-11 flex items-center justify-center rounded-full text-brick hover:bg-brick-bg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                >
+                  <MapPin size={18} strokeWidth={1.5} aria-hidden="true" />
+                </a>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-3">
@@ -257,8 +279,8 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${prevStop.slug}`}
               className={[
-                "flex-1 flex items-center gap-1.5 bg-surface border-2 border-border",
-                "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
+                "flex-1 flex items-center gap-1.5 bg-surface border border-border",
+                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -276,8 +298,8 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${nextStop.slug}`}
               className={[
-                "flex-1 flex items-center justify-end gap-1.5 bg-surface border-2 border-border",
-                "rounded-[4px] px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
+                "flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border",
+                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -318,24 +340,30 @@ export default async function StopPage({ params }: Props) {
         </div>
 
         {/* Documents */}
-        <DocumentsPanel
-          stopId={stop.id}
-          slug={stop.slug}
-          documents={
-            stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
-          }
-          path={path}
-        />
+        <div id="docs" className="scroll-mt-20">
+          <DocumentsPanel
+            stopId={stop.id}
+            slug={stop.slug}
+            documents={
+              stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
+            }
+            path={path}
+          />
+        </div>
 
         {/* Currency — streamed; converter stays interactive client-side */}
-        <Suspense fallback={<CurrencyCardSkeleton />}>
-          <CurrencySection currencyCode={stop.currencyCode} />
-        </Suspense>
+        <div id="moneda" className="scroll-mt-20">
+          <Suspense fallback={<CurrencyCardSkeleton />}>
+            <CurrencySection currencyCode={stop.currencyCode} />
+          </Suspense>
+        </div>
 
         {/* Spend panel — fed by Spitwise; degrades silently if unreachable */}
-        <Suspense fallback={<SpendPanelSkeleton />}>
-          <StopSpendPanel slug={stop.slug} arrivalDate={stop.arrivalDate} />
-        </Suspense>
+        <div id="gastos" className="scroll-mt-20">
+          <Suspense fallback={<SpendPanelSkeleton />}>
+            <StopSpendPanel slug={stop.slug} arrivalDate={stop.arrivalDate} />
+          </Suspense>
+        </div>
       </main>
     </div>
   );
@@ -349,10 +377,10 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   if (!primary) return null;
 
   return (
-    <div className="bg-surface rounded-[4px] border-2 border-border card-shadow p-4 animate-fade-in">
+    <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
       <Link
         href={`/guias/${primary.slug}`}
-        className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-[4px]"
+        className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
       >
         <BookOpen size={18} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
         <div className="flex-1 min-w-0">
@@ -370,7 +398,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
             <Link
               key={doc.slug}
               href={`/guias/${primary.slug}/${doc.slug}`}
-              className="rounded-full border-2 border-border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+              className="rounded-full border border-border px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
             >
               {doc.title}
             </Link>
@@ -398,9 +426,9 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
 
 function DateBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-0.5 text-xs bg-surface-2 text-ink-2 rounded-full px-2.5 py-1 border border-border font-medium">
+    <Badge variant="default" className="gap-0.5 px-2.5 py-1">
       {children}
-    </span>
+    </Badge>
   );
 }
 

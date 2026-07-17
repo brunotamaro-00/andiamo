@@ -18,9 +18,9 @@ export default async function TripSpendStrip() {
       href={spitwiseUrl}
       target="_blank"
       rel="noopener"
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-[4px] animate-fade-in stagger-1"
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-xl animate-fade-in stagger-1"
     >
-      <div className="flex items-center gap-3 bg-surface border-2 border-border rounded-[4px] px-4 py-3 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
+      <div className="flex items-center gap-3 bg-surface border border-border rounded-xl px-4 py-3 card-shadow transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
         <Wallet size={16} strokeWidth={1.5} aria-hidden="true" className="text-gold shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">

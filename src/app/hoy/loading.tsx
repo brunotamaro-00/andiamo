@@ -1,18 +1,21 @@
 import { Skeleton } from "@/components/ui/Skeleton";
+import { HeaderSkeleton } from "@/components/ui/HeaderSkeleton";
 
 export default function Loading() {
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-canvas/90 backdrop-blur border-b border-border px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <div className="max-w-lg mx-auto">
-          <Skeleton className="h-6 w-32" />
-        </div>
-      </header>
+      <HeaderSkeleton />
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
-        <Skeleton className="h-32" />
-        <Skeleton className="h-40" />
-        <Skeleton className="h-24" />
-        <Skeleton className="h-16" />
+        {/* Hero (current stop / countdown) */}
+        <Skeleton className="h-32 rounded-xl" />
+        {/* Spend strip */}
+        <Skeleton className="h-16 rounded-xl" />
+        {/* Pending POIs card */}
+        <Skeleton className="h-40 rounded-xl" />
+        {/* Docs / urgent */}
+        <Skeleton className="h-24 rounded-xl" />
+        {/* Next stop */}
+        <Skeleton className="h-16 rounded-xl" />
       </main>
     </div>
   );

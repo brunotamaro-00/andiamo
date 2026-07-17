@@ -26,10 +26,9 @@ export function Wordmark({ size = "sm" }: WordmarkProps) {
 
       <span
         className={[
-          "font-display uppercase tracking-wide text-ink inline-block leading-none",
-          lg ? "text-3xl" : "text-xl",
+          "font-display uppercase tracking-tight text-ink inline-block leading-none",
+          lg ? "text-4xl" : "text-2xl",
         ].join(" ")}
-        style={{ transform: "scaleY(1.65)", transformOrigin: "50% 50%" }}
       >
         Andiamo
       </span>

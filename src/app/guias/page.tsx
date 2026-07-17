@@ -18,7 +18,7 @@ export default function GuidesIndexPage() {
         {/* Urgent reservations shortcut */}
         <Link
           href="/guias/reservas"
-          className="flex items-center gap-3 bg-brick-bg border-2 border-brick-border rounded-[4px] px-4 py-3.5 card-shadow animate-fade-in transition-all duration-150 hover:border-brick hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#C44428] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+          className="flex items-center gap-3 bg-brick-bg border border-brick-border rounded-xl px-4 py-3.5 card-shadow animate-fade-in transition-all duration-150 hover:border-brick hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
         >
           <AlertTriangle size={20} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
@@ -38,7 +38,7 @@ export default function GuidesIndexPage() {
             <Globe size={12} strokeWidth={2} aria-hidden="true" />
             El viaje
           </p>
-          <div className="bg-surface rounded-[4px] border-2 border-border card-shadow divide-y divide-border">
+          <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
             {manifest.general.map((doc) => (
               <DocRow key={doc.slug} href={`/guias/general/${doc.slug}`} title={doc.title} />
             ))}
@@ -65,7 +65,7 @@ export default function GuidesIndexPage() {
                   <Link
                     key={guide.slug}
                     href={`/guias/${guide.slug}`}
-                    className="flex items-center gap-3 bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:shadow-[5px_5px_0_#1B1A17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+                    className="flex items-center gap-3 bg-surface rounded-xl border border-border card-shadow px-4 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
                   >
                     <BookOpen size={18} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
@@ -85,7 +85,7 @@ export default function GuidesIndexPage() {
                 <Link
                   key={doc.slug}
                   href={`/guias/${country.slug}/${doc.slug}`}
-                  className="flex items-center gap-3 bg-surface rounded-[4px] border-2 border-border card-shadow px-4 py-3 transition-all duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                  className="flex items-center gap-3 bg-surface rounded-xl border border-border card-shadow px-4 py-3 transition-all duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
                 >
                   <FileText size={18} strokeWidth={1.5} className="text-ink-3 shrink-0" aria-hidden="true" />
                   <p className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">{doc.title}</p>

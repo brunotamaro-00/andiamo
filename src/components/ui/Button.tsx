@@ -8,8 +8,8 @@ const variantClasses: Record<Variant, string> = {
   primary: [
     "bg-brick text-white hover:bg-brick-hover active:bg-brick-press",
     "font-display uppercase tracking-wide border border-transparent",
-    "rounded-[2px] hard-shadow-ink",
-    "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
+    "rounded-[6px] hard-shadow-ink",
+    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
   ].join(" "),
   secondary:
     "border-2 border-ink text-ink-2 hover:text-ink bg-surface rounded-full",
@@ -19,9 +19,10 @@ const variantClasses: Record<Variant, string> = {
     "border-2 border-danger/40 text-danger hover:bg-danger-bg bg-transparent rounded-full",
 };
 
+/* Both sizes keep a 44px touch target; `sm` only shrinks type and padding. */
 const sizeClasses: Record<Size, string> = {
-  sm: "py-1.5 px-3.5 text-xs",
-  md: "py-2 px-5 text-sm",
+  sm: "min-h-[44px] py-1.5 px-3.5 text-xs",
+  md: "min-h-[44px] py-2 px-5 text-sm",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

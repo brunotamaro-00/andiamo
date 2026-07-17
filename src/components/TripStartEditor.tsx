@@ -53,7 +53,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
 
   if (!editing) {
     return (
-      <div className="flex items-center justify-between px-3 py-2.5 rounded-[4px] border border-border bg-surface">
+      <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-border bg-surface">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             Inicio del viaje
@@ -64,7 +64,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
           type="button"
           onClick={() => setEditing(true)}
           aria-label="Editar fecha de inicio del viaje"
-          className="p-1.5 rounded-full text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+          className="h-11 w-11 -my-2 flex items-center justify-center rounded-full text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
         >
           <Pencil size={13} strokeWidth={1.5} aria-hidden="true" />
         </button>
@@ -73,7 +73,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
   }
 
   return (
-    <form action={handleSubmit} className="flex items-center gap-2 px-3 py-2.5 rounded-[4px] border border-brick-border bg-brick-bg/40">
+    <form action={handleSubmit} className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-brick-border bg-brick-bg/40">
       <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
         Inicio del viaje
       </span>
@@ -88,7 +88,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
         type="submit"
         disabled={isPending}
         aria-label="Guardar fecha de inicio"
-        className="p-1.5 rounded-full text-brick hover:text-brick-hover hover:bg-brick-bg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 shrink-0 disabled:opacity-50"
+        className="h-11 w-11 -my-2 flex items-center justify-center rounded-full text-brick hover:text-brick-hover hover:bg-brick-bg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 shrink-0 disabled:opacity-50"
       >
         <Check size={14} strokeWidth={2} aria-hidden="true" />
       </button>

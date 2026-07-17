@@ -1,19 +1,16 @@
 import { Skeleton } from "@/components/ui/Skeleton";
+import { HeaderSkeleton } from "@/components/ui/HeaderSkeleton";
 
 export default function Loading() {
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-10 bg-surface border-b border-border-strong px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center gap-3">
-        <Skeleton className="h-5 w-16" />
-        <div className="flex-1 flex justify-center">
-          <Skeleton className="h-5 w-36" />
-        </div>
-        <div className="w-20" />
-      </header>
+      <HeaderSkeleton />
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-56 w-full" />
-        <Skeleton className="h-56 w-full" />
+        {/* Intro banner */}
+        <Skeleton className="h-14 rounded-xl" />
+        {/* Reservas cards */}
+        <Skeleton className="h-56 rounded-xl" />
+        <Skeleton className="h-56 rounded-xl" />
       </main>
     </div>
   );

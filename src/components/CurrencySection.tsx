@@ -32,13 +32,13 @@ export function CurrencyCardSkeleton() {
     <Card>
       <SectionHeader title="Moneda" />
       <div className="flex items-center gap-3 mb-4">
-        <Skeleton className="h-[52px] flex-1 rounded-[4px]" />
+        <Skeleton className="h-[52px] flex-1 rounded-lg" />
         <div className="space-y-1.5 flex flex-col items-end">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-3 w-16" />
         </div>
       </div>
-      <Skeleton className="h-[120px] rounded-[4px]" />
+      <Skeleton className="h-[120px] rounded-lg" />
     </Card>
   );
 }
