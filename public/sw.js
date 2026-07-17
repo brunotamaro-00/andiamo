@@ -6,7 +6,7 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v7";   // bumped: /hoy added to the shell
+const SHELL_CACHE = "andiamo-shell-v8";   // bumped: UX cleanup (cards, stop form, layout gutter)
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];

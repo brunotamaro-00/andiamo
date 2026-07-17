@@ -289,14 +289,18 @@ function PoiItem({
       </div>
 
       {(poi.address || poi.notes) && (
-        <div className="pl-12 pr-1">
+        <button
+          onClick={onOpen}
+          aria-label={`Ver detalle de "${poi.name}"`}
+          className="block w-full text-left pl-12 pr-1 rounded-lg py-0.5 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+        >
           {poi.address && (
             <p className="text-xs text-ink-3 truncate">{poi.address}</p>
           )}
           {poi.notes && (
             <p className="text-xs text-ink-3 mt-0.5">{poi.notes}</p>
           )}
-        </div>
+        </button>
       )}
     </li>
   );
