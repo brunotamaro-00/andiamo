@@ -87,6 +87,7 @@ model Document {
   sizeBytes   Int?
   storagePath String?
   externalUrl String?
+  docDate     DateTime?    @db.Date
   createdAt   DateTime     @default(now())
 
   @@index([stopId])

@@ -291,7 +291,10 @@ export default async function StopPage({ params }: Props) {
             stopId={stop.id}
             slug={stop.slug}
             documents={
-              stop.documents as Parameters<typeof DocumentsPanel>[0]["documents"]
+              stop.documents.map((d) => ({
+                ...d,
+                docDate: d.docDate ? d.docDate.toISOString().slice(0, 10) : null,
+              })) as Parameters<typeof DocumentsPanel>[0]["documents"]
             }
             path={path}
           />

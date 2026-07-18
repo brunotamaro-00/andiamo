@@ -40,7 +40,10 @@ export default async function GeneralPage() {
         <DocumentsPanel
           stopId={null}
           slug={null}
-          documents={documents as Parameters<typeof DocumentsPanel>[0]["documents"]}
+          documents={documents.map((d) => ({
+            ...d,
+            docDate: d.docDate ? d.docDate.toISOString().slice(0, 10) : null,
+          })) as Parameters<typeof DocumentsPanel>[0]["documents"]}
           path="/general"
         />
       </main>

@@ -11,7 +11,7 @@ export async function createDocumentLink(formData: FormData) {
 
   const parsed = parseForm(formData, CreateDocumentLinkSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { slug, stopId, label, kind, url } = parsed.data;
+  const { slug, stopId, label, kind, docDate, url } = parsed.data;
 
   try {
     await db.document.create({
@@ -21,6 +21,7 @@ export async function createDocumentLink(formData: FormData) {
         kind: (kind as DocumentKind) ?? "other",
         source: "link",
         externalUrl: url,
+        docDate: docDate ? new Date(docDate) : null,
       },
     });
   } catch (e) {
@@ -37,7 +38,7 @@ export async function updateDocument(id: string, formData: FormData, path: strin
 
   const parsed = parseForm(formData, UpdateDocumentSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { label, kind, url } = parsed.data;
+  const { label, kind, docDate, url } = parsed.data;
 
   try {
     await db.document.update({
@@ -45,6 +46,7 @@ export async function updateDocument(id: string, formData: FormData, path: strin
       data: {
         label,
         kind: (kind as DocumentKind) ?? "other",
+        docDate: docDate ? new Date(docDate) : null,
         // Only link documents send a URL; uploads omit it and keep their file.
         ...(url !== undefined ? { externalUrl: url } : {}),
       },

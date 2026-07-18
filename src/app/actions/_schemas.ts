@@ -57,6 +57,15 @@ const optionalNumeric = z
   .nullable()
   .optional();
 
+/** Optional YYYY-MM-DD date — empty/absent → null; a bad format is rejected. */
+const optionalDateStr = z
+  .string()
+  .transform((v) => v.trim())
+  .refine((v) => v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v), "Formato AAAA-MM-DD")
+  .transform((v) => (v === "" ? null : v))
+  .nullable()
+  .optional();
+
 /** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
 const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
 
@@ -129,6 +138,7 @@ export const CreateDocumentLinkSchema = z.object({
   stopId: z.string().transform((v) => v || null).nullable().optional(),
   label: requiredStr,
   kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
+  docDate: optionalDateStr,
   url: z
     .string()
     .min(1, "URL requerida")
@@ -143,6 +153,7 @@ export const CreateDocumentLinkSchema = z.object({
 export const UpdateDocumentSchema = z.object({
   label: requiredStr,
   kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
+  docDate: optionalDateStr,
   url: optionalUrl,
 });
 
