@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { easeSmooth } from "@/lib/motion";
 
 /* Page transition: template.tsx remounts on every navigation by design, so
  * each page enters with a subtle fade + rise. Chosen over Next's experimental
@@ -11,7 +12,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.22, ease: easeSmooth }}
     >
       {children}
     </motion.div>

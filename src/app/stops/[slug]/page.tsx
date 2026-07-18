@@ -236,15 +236,20 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${prevStop.slug}`}
               className={[
-                "flex-1 flex items-center gap-1.5 bg-surface border border-border",
-                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors",
+                "group flex-1 flex items-center gap-1.5 bg-surface border border-border card-shadow card-hover",
+                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
-              <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
+              <ArrowLeft
+                size={14}
+                strokeWidth={1.5}
+                aria-hidden="true"
+                className="transition-transform duration-150 group-hover:-translate-x-0.5 motion-reduce:group-hover:translate-x-0"
+              />
               <Flag flag={prevStop.countryFlag} />{" "}
               {prevStop.name}
             </Link>
@@ -255,8 +260,8 @@ export default async function StopPage({ params }: Props) {
             <Link
               href={`/stops/${nextStop.slug}`}
               className={[
-                "flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border",
-                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors text-right",
+                "group flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border card-shadow card-hover",
+                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0 text-right",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -265,7 +270,12 @@ export default async function StopPage({ params }: Props) {
             >
               <Flag flag={nextStop.countryFlag} />{" "}
               {nextStop.name}
-              <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
+              <ArrowRight
+                size={14}
+                strokeWidth={1.5}
+                aria-hidden="true"
+                className="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:group-hover:translate-x-0"
+              />
             </Link>
           ) : (
             <div className="flex-1" />

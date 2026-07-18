@@ -91,16 +91,19 @@ export default async function StopsPage() {
               const isActive = stop.slug === currentSlug;
               const isPast = stop.departureDate && today > dateToStr(stop.departureDate);
               const isCandidate = stop.isCandidate;
-              const stagger = idx < 6 ? `stagger-${(idx % 6) + 1}` : "";
+              // 40ms per item (--duration-stagger), capped so the total stays
+              // ≤240ms on a long itinerary and later rows share the max delay
+              // instead of popping in ahead of the earlier ones.
+              const staggerDelay = `${Math.min(idx, 6) * 40}ms`;
 
               return (
                 <Link
                   key={stop.id}
                   id={isActive ? "current" : undefined}
                   href={`/stops/${stop.slug}`}
+                  style={{ animationDelay: staggerDelay }}
                   className={[
                     "flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all duration-150 animate-fade-in",
-                    stagger,
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
                     "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
                     isActive

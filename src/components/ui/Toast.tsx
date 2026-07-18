@@ -12,13 +12,13 @@ import {
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { Check, AlertCircle } from "lucide-react";
+import { springToast } from "@/lib/motion";
 
 /* Hydration flag: false on the server snapshot, true on the client */
 const subscribeNoop = () => () => {};
 const getTrue = () => true;
 const getFalse = () => false;
 
-const SPRING = { type: "spring", stiffness: 500, damping: 32 } as const;
 const DURATION_MS = 2600;
 
 type ToastKind = "success" | "error";
@@ -79,7 +79,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   initial={{ opacity: 0, y: 16, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                  transition={SPRING}
+                  transition={springToast}
                   className={[
                     "flex items-center gap-2 max-w-sm rounded-full px-4 py-2.5 card-shadow-lg",
                     current.kind === "success"

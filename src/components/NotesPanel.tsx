@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
+import { easeSmooth } from "@/lib/motion";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { haptics } from "@/lib/haptics";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
@@ -178,18 +180,27 @@ function NoteCard({
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [expanded, setExpanded] = useState(false);
   const [clamped, setClamped] = useState(false);
+  // Measured height of the collapsed 2-line preview; null until first paint so
+  // the initial render keeps the static line-clamp (no flash), then the toggle
+  // animates between this height and auto.
+  const [collapsedPx, setCollapsedPx] = useState<number | null>(null);
   const bodyRef = useRef<HTMLParagraphElement | null>(null);
+  const reduced = useReducedMotion();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
 
-  /* Detect whether the collapsed body actually overflows its 2-line clamp,
-     so the "Ver más" hint only shows on long notes. */
+  /* Measure the 2-line collapsed height and whether the body overflows it (so
+     the "Ver más" hint only shows on long notes). scrollHeight is the full
+     content height regardless of the clamp, so this is stable across states. */
   useEffect(() => {
-    if (editing || expanded) return;
+    if (editing) return;
     const el = bodyRef.current;
     if (!el) return;
-    setClamped(el.scrollHeight > el.clientHeight + 1);
-  }, [note.body, editing, expanded]);
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 16;
+    const twoLines = lineHeight * 2;
+    setCollapsedPx(twoLines);
+    setClamped(el.scrollHeight > twoLines + 1);
+  }, [note.body, editing]);
 
   /* Seed the editable fields from the latest note when entering edit mode.
      We intentionally gate on `editing` rather than note values to avoid
@@ -374,14 +385,27 @@ function NoteCard({
           aria-label={`${expanded ? "Colapsar" : "Expandir"} nota "${note.title}"`}
           className="block w-full text-left rounded-lg -mx-1 -mb-1 px-1 pb-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
         >
-          <p
-            ref={bodyRef}
-            className={`text-xs text-ink-2 mt-1 whitespace-pre-wrap ${
-              expanded ? "" : "line-clamp-2"
-            }`}
-          >
-            {note.body}
-          </p>
+          {collapsedPx === null ? (
+            // First paint: static clamp so the collapsed preview is pixel-correct
+            // before we measure. Swaps to the animated wrapper after mount.
+            <p
+              ref={bodyRef}
+              className="text-xs text-ink-2 mt-1 whitespace-pre-wrap line-clamp-2"
+            >
+              {note.body}
+            </p>
+          ) : (
+            <motion.div
+              className="overflow-hidden mt-1"
+              initial={false}
+              animate={{ height: expanded || !clamped ? "auto" : collapsedPx }}
+              transition={reduced ? { duration: 0 } : { duration: 0.25, ease: easeSmooth }}
+            >
+              <p ref={bodyRef} className="text-xs text-ink-2 whitespace-pre-wrap">
+                {note.body}
+              </p>
+            </motion.div>
+          )}
           {(clamped || expanded) && (
             <span className="mt-1 inline-block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
               {expanded ? "Ver menos" : "Ver más"}

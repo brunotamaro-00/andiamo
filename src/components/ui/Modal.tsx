@@ -10,11 +10,10 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { IconButton } from "./IconButton";
+import { springSheet } from "@/lib/motion";
 
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-const SPRING = { type: "spring", stiffness: 420, damping: 38 } as const;
 
 /* Hydration flag: false on the server snapshot, true on the client */
 const subscribeNoop = () => () => {};
@@ -136,7 +135,7 @@ export function Modal({ title, onClose, children, locked = false }: ModalProps) 
             initial={isSheet ? { y: "100%" } : { opacity: 0, scale: 0.96, y: 8 }}
             animate={isSheet ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
             exit={isSheet ? { y: "100%" } : { opacity: 0, scale: 0.97, y: 8 }}
-            transition={reduced ? { duration: 0 } : SPRING}
+            transition={reduced ? { duration: 0 } : springSheet}
             // Drag-to-dismiss: mobile sheet only. The drag listens on the
             // handle+header zone (dragControls), never the scrollable body.
             drag={isSheet && !locked ? "y" : false}

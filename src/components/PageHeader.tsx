@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { BrandLink } from "@/components/BrandLink";
 import { Wordmark } from "@/components/Wordmark";
 import { LogoutButton } from "@/components/LogoutButton";
+import { StickyHeader } from "@/components/StickyHeader";
 
 interface PageHeaderProps {
   /** Gray uppercase label under the wordmark. Omit when a page needs no context line. */
@@ -24,7 +25,7 @@ interface PageHeaderProps {
  */
 export function PageHeader({ subtitle, actions }: PageHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 bg-surface backdrop-blur-md border-b border-border-strong px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
+    <StickyHeader>
       <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
         <BrandLink>
           <Wordmark size="sm" />
@@ -39,6 +40,6 @@ export function PageHeader({ subtitle, actions }: PageHeaderProps) {
           <LogoutButton />
         </div>
       </div>
-    </header>
+    </StickyHeader>
   );
 }
