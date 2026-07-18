@@ -1,6 +1,7 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { categoryIcon } from "@/lib/categoryIcons";
 import { spitwisePublicUrl, fetchStopSpendDetail } from "@/lib/spitwise";
 import { personLabel } from "@/lib/person";
@@ -55,7 +56,7 @@ export default async function StopSpendPanel({
             {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
           </p>
           <p className="font-display uppercase text-[22px] leading-tight text-ink font-tabular">
-            USD {detail.total_usd}
+            USD <AnimatedNumber value={total} decimals={2} />
           </p>
           {detail.itinerary_days > 0 && (
             <p className="text-[12px] text-ink-2 font-tabular">
@@ -70,7 +71,7 @@ export default async function StopSpendPanel({
       {/* Category bars */}
       {detail.by_category.length > 0 && (
         <ul className="space-y-2">
-          {detail.by_category.map((cat) => {
+          {detail.by_category.map((cat, i) => {
             const value = Number(cat.total_usd);
             const pct = total > 0 ? Math.max((value / total) * 100, 2) : 0;
             const Icon = categoryIcon(cat.name);
@@ -85,7 +86,7 @@ export default async function StopSpendPanel({
                     USD {cat.total_usd}
                   </span>
                 </div>
-                <ProgressBar value={pct} />
+                <ProgressBar value={pct} animateIn delayMs={Math.min(i, 5) * 40} />
               </li>
             );
           })}
@@ -112,8 +113,8 @@ function SpitwiseLink({ href }: { href: string }) {
 export function SpendPanelSkeleton() {
   return (
     <div className="bg-surface rounded-xl border border-border card-shadow p-4 space-y-3 animate-pulse-skeleton">
-      <div className="h-3 w-16 bg-surface-2 rounded" />
-      <div className="h-6 w-32 bg-surface-2 rounded" />
+      <div className="h-3 w-16 bg-surface-2 rounded-md" />
+      <div className="h-6 w-32 bg-surface-2 rounded-md" />
       <div className="h-1.5 w-full bg-surface-2 rounded-full" />
       <div className="h-1.5 w-3/4 bg-surface-2 rounded-full" />
     </div>

@@ -48,7 +48,7 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(var(--distance-base)); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -67,6 +67,12 @@
   to   { transform: translateX(100%); }
 }
 
+/* Bar draw-in: scaleX keeps the target width dynamic, no JS needed. */
+@keyframes growIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -75,6 +81,23 @@
     font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Kills orphaned last-line words everywhere (inherits). Display headings
+       additionally balance below. */
+    text-wrap: pretty;
+  }
+
+  /* Paper grain — a fixed noise layer that sits on the cream canvas *behind*
+     content (z-index: -1), so opaque cards cover it and only the canvas gaps
+     get textured. Ultra-low opacity: reads as warm paper, never as noise. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   ::selection {
@@ -102,6 +125,23 @@ select {
 
 :root {
   color-scheme: light;
+
+  /* ── Motion scale — transitions.dev tokens ─────────────
+     Plain custom props (not @theme) so they don't clobber Tailwind's
+     built-in --ease-out / --ease-in-out easings or generate stray filter
+     and scale utilities. Reference anywhere as var(--…); JS springs live in
+     src/lib/motion.ts. Match on usage, never nearest number. */
+  --duration-stagger: 40ms;      /* per-item stagger offset */
+  --duration-micro: 80ms;        /* intent delay, shake segment */
+  --duration-quick: 150ms;       /* close, text swap, hover-in */
+  --duration-fast: 250ms;        /* icon swap, open, tabs, page slide */
+  --duration-medium: 350ms;      /* panel/toast close, width tween */
+  --duration-slow: 400ms;        /* panel open, entrance reveal, input clear */
+  --duration-very-slow: 500ms;   /* emphasis, badge/check, count-up */
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);  /* app default: open/close, slide, resize */
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);   /* badge / check pop overshoot */
+  --distance-base: 8px;          /* page slide, small reveal travel */
+  --distance-medium: 12px;       /* text/section reveal travel */
 }
 
 /* ── Reduced motion — entry animations start at opacity 0 (fill: both),
@@ -111,6 +151,7 @@ select {
   .animate-fade-in,
   .animate-slide-up,
   .animate-pulse-skeleton,
+  .animate-grow-in,
   .animate-map-pulse {
     animation: none;
   }
@@ -133,6 +174,12 @@ select {
   box-shadow: 2px 2px 0 var(--color-ink);
 }
 
+/* Soft downward diffuse for the sticky header once the page is scrolled —
+   the warm diffuse half of card-shadow, no hard offset. */
+@utility header-shadow {
+  box-shadow: 0 4px 14px rgb(27 26 23 / 0.06);
+}
+
 /* Hover lifts — tokenized (never inline hex shadows) */
 @utility hover-shadow-brick {
   box-shadow: 4px 4px 0 var(--color-brick), 0 10px 28px rgb(27 26 23 / 0.08);
@@ -146,8 +193,8 @@ select {
 @utility shadow-soft-lg { box-shadow: 4px 4px 0 var(--color-ink), 0 10px 28px rgb(27 26 23 / 0.10); }
 
 /* ── Animation utilities ─────────────────────────────── */
-@utility animate-fade-in    { animation: fadeIn  400ms ease-out both; }
-@utility animate-slide-up   { animation: slideUp 400ms ease-out both; }
+@utility animate-fade-in    { animation: fadeIn  var(--duration-slow) var(--ease-smooth-out) both; }
+@utility animate-slide-up   { animation: slideUp var(--duration-slow) var(--ease-smooth-out) both; }
 @utility animate-pulse-skeleton { animation: pulseGlow 1.5s ease-in-out infinite alternate; }
 
 /* Diagonal shimmer sweep for skeletons — pair with `relative overflow-hidden` */
@@ -164,6 +211,12 @@ select {
     );
     animation: shimmer 1.6s ease-in-out infinite;
   }
+}
+
+/* Bar draw-in — grows from the left; pair with a per-item animation-delay for stagger */
+@utility animate-grow-in {
+  animation: growIn var(--duration-slow) var(--ease-smooth-out) both;
+  transform-origin: left center;
 }
 
 @utility stagger-1 { animation-delay: 60ms; }
@@ -186,7 +239,8 @@ select {
 
 /* ── Card hover — sticker shift ──────────────────────── */
 @utility card-hover {
-  transition: box-shadow 150ms ease, transform 150ms ease;
+  transition: box-shadow var(--duration-quick) var(--ease-smooth-out),
+              transform var(--duration-quick) var(--ease-smooth-out);
 }
 
 /* ── Hide scrollbar on horizontal chip rows ──────────── */
@@ -210,3 +264,8 @@ select {
 }
 
 .font-display, .font-sans, .font-numeral { font-optical-sizing: auto; }
+
+/* Display headings balance their line breaks (short strings = no-op); large
+   editorial numerals get a hair of negative tracking to read tighter. */
+.font-display { text-wrap: balance; }
+.font-numeral { letter-spacing: -0.01em; }

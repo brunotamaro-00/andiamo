@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 import { haptics } from "@/lib/haptics";
+import { springNav } from "@/lib/motion";
 
 const TABS = [
   {
@@ -71,7 +72,7 @@ export function TabBar() {
                   {active && (
                     <motion.span
                       layoutId="tab-pill"
-                      transition={{ type: "spring", stiffness: 480, damping: 36 }}
+                      transition={springNav}
                       className="absolute inset-0 rounded-full bg-brick-bg"
                       aria-hidden="true"
                     />

@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { motion } from "motion/react";
+import { springNav } from "@/lib/motion";
 
 interface SegmentedOption<V extends string> {
   value: V;
@@ -48,7 +49,7 @@ export function SegmentedControl<V extends string>({
             {active && (
               <motion.span
                 layoutId={layoutId}
-                transition={{ type: "spring", stiffness: 480, damping: 36 }}
+                transition={springNav}
                 className="absolute inset-0 rounded-full bg-ink"
                 aria-hidden="true"
               />

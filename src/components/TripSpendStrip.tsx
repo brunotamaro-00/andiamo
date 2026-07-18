@@ -1,5 +1,6 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { spitwisePublicUrl, fetchTripSpend } from "@/lib/spitwise";
 import { personLabel } from "@/lib/person";
 import { getPerson } from "@/lib/person-server";
@@ -27,7 +28,7 @@ export default async function TripSpendStrip() {
             {person ? `Gastos · ${personLabel(person)}` : "Gastos del viaje"}
           </p>
           <p className="text-sm font-semibold text-ink mt-0.5 font-tabular">
-            USD {spend.total_usd}
+            USD <AnimatedNumber value={Number(spend.total_usd)} decimals={2} />
             {spend.today_usd !== "0.00" && (
               <span className="text-ink-2 font-normal"> · hoy USD {spend.today_usd}</span>
             )}

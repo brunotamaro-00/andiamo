@@ -20,6 +20,7 @@ import { QuickAddPoi } from "@/components/QuickAddPoi";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TripSpendStrip from "@/components/TripSpendStrip";
 import { Card, SectionHeader } from "@/components/ui/Card";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Flag } from "@/components/Flag";
 
 export const dynamic = "force-dynamic";
@@ -138,7 +139,7 @@ export default async function HoyPage() {
 
         {phase === "before" && (
           <HeroCard
-            numeral={Math.max(0, daysBetween(today, firstArrivalStr!)).toString()}
+            numeral={Math.max(0, daysBetween(today, firstArrivalStr!))}
             numeralLabel={daysBetween(today, firstArrivalStr!) === 1 ? "día" : "días"}
             title="Faltan para el despegue"
             subtitle={
@@ -161,7 +162,7 @@ export default async function HoyPage() {
 
         {phase === "during" && !showStopSections && (
           <HeroCard
-            numeral={(daysBetween(firstArrivalStr!, today) + 1).toString()}
+            numeral={daysBetween(firstArrivalStr!, today) + 1}
             numeralLabel="día"
             title="En tránsito"
             subtitle={
@@ -175,7 +176,7 @@ export default async function HoyPage() {
 
         {phase === "after" && (
           <HeroCard
-            numeral={daysBetween(firstArrivalStr!, lastDepartureStr!).toString()}
+            numeral={daysBetween(firstArrivalStr!, lastDepartureStr!)}
             numeralLabel="días"
             title="Viaje terminado"
             subtitle={`${confirmed.length} paradas · ${[...new Set(confirmed.map((s) => s.country))].length} países`}
@@ -305,7 +306,8 @@ export default async function HoyPage() {
 function HeroCard({
   numeral, numeralLabel, title, subtitle, href,
 }: {
-  numeral: string;
+  /** Number counts up on mount; string (e.g. "—") renders static. */
+  numeral: number | string;
   numeralLabel: string;
   title: string;
   subtitle?: string;
@@ -318,7 +320,14 @@ function HeroCard({
     >
       <div className="flex items-center gap-4 bg-gold-bg border-2 border-gold-border rounded-xl px-4 py-4 card-shadow transition-all duration-150 hover:border-gold hover:-translate-y-[2px] motion-reduce:hover:translate-y-0">
         <div className="text-center shrink-0">
-          <p className="text-5xl font-numeral leading-none text-gold-ink">{numeral}</p>
+          {typeof numeral === "number" ? (
+            <AnimatedNumber
+              value={numeral}
+              className="block text-5xl font-numeral leading-none text-gold-ink"
+            />
+          ) : (
+            <p className="text-5xl font-numeral leading-none text-gold-ink">{numeral}</p>
+          )}
           {numeralLabel && (
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink/70 mt-0.5">
               {numeralLabel}
