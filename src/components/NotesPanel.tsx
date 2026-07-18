@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, useReducedMotion } from "motion/react";
 import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
-import { easeSmooth } from "@/lib/motion";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { haptics } from "@/lib/haptics";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
@@ -39,7 +37,7 @@ type OptimisticAction =
 
 export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   const [open, setOpen] = useState(false);
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { items: optimisticNotes, mutate, mutationError, isPending } = useOptimisticList(
@@ -58,13 +56,15 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     }
   );
 
+  const detailNote = detailId ? optimisticNotes.find((n) => n.id === detailId) ?? null : null;
+
   function handleTogglePin(id: string) {
     haptics.tap();
     mutate({ type: "togglePin", id }, () => toggleNotePin(id, path), "No se pudo guardar el cambio. Reintentá.");
   }
 
   function handleDelete(id: string) {
-    setConfirmingId(null);
+    setDetailId(null);
     haptics.warning();
     mutate({ type: "delete", id }, () => deleteNote(id, path), "No se pudo borrar la nota. Reintentá.", () => toast("Nota borrada"));
   }
@@ -140,15 +140,11 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
           className={`space-y-2 transition-opacity ${isPending ? "opacity-70" : ""}`}
         >
           {sorted.map((note) => (
-            <NoteCard
+            <NoteRow
               key={note.id}
               note={note}
-              confirming={confirmingId === note.id}
+              onOpen={() => setDetailId(note.id)}
               onTogglePin={() => handleTogglePin(note.id)}
-              onRequestDelete={() => setConfirmingId(note.id)}
-              onCancelDelete={() => setConfirmingId(null)}
-              onConfirmDelete={() => handleDelete(note.id)}
-              onSave={(title, body) => handleSave(note.id, title, body)}
             />
           ))}
         </div>
@@ -157,65 +153,148 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
       {open && (
         <AddNoteModal onSubmit={handleAdd} onClose={() => setOpen(false)} />
       )}
+
+      {detailNote && (
+        <NoteDetailModal
+          note={detailNote}
+          onSave={(title, body) => handleSave(detailNote.id, title, body)}
+          onDelete={() => handleDelete(detailNote.id)}
+          onClose={() => setDetailId(null)}
+        />
+      )}
     </Card>
+  );
+}
+
+/** Compact note row: pin indicator + title + body preview all in one tap
+ *  target that opens the detail sheet. The pin toggle is the only inline
+ *  action; edit/delete live in the sheet (matches Documentos/Puntos de interés). */
+function NoteRow({
+  note, onOpen, onTogglePin,
+}: {
+  note: Note;
+  onOpen: () => void;
+  onTogglePin: () => void;
+}) {
+  return (
+    <div
+      className={`p-3 rounded-lg border transition-colors ${
+        note.pinned
+          ? "border-warning/30 bg-warning-bg/40"
+          : "border-border bg-surface-2/30"
+      }`}
+    >
+      <div className="flex items-start gap-1">
+        <button
+          onClick={onOpen}
+          aria-label={`Ver nota "${note.title}"`}
+          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+        >
+          <div className="flex items-center gap-1.5">
+            {note.pinned && (
+              <Pin
+                size={12}
+                strokeWidth={1.5}
+                aria-hidden="true"
+                className="text-warning shrink-0"
+              />
+            )}
+            <span className="text-sm font-medium text-ink truncate">{note.title}</span>
+          </div>
+          {note.body && (
+            <p className="text-xs text-ink-2 mt-0.5 whitespace-pre-wrap line-clamp-2">
+              {note.body}
+            </p>
+          )}
+        </button>
+
+        <button
+          onClick={onTogglePin}
+          aria-label={note.pinned ? "Quitar pin" : "Fijar arriba"}
+          aria-pressed={note.pinned}
+          className={`${actionBtn} shrink-0 ${
+            note.pinned
+              ? "text-warning hover:bg-surface-2"
+              : "text-ink-faint hover:text-ink-2 hover:bg-surface-2"
+          }`}
+        >
+          <Pin size={16} strokeWidth={1.5} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
   );
 }
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
-function NoteCard({
-  note, confirming, onTogglePin, onRequestDelete, onCancelDelete, onConfirmDelete, onSave,
+/** Per-note detail sheet: read the full note, or switch to an inline autosave
+ *  editor, or delete. Replaces the old row action icons. */
+function NoteDetailModal({
+  note, onSave, onDelete, onClose,
 }: {
   note: Note;
-  confirming: boolean;
-  onTogglePin: () => void;
-  onRequestDelete: () => void;
-  onCancelDelete: () => void;
-  onConfirmDelete: () => void;
   onSave: (title: string, body: string) => Promise<"ok" | "error">;
+  onDelete: () => void;
+  onClose: () => void;
 }) {
   const [editing, setEditing] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+
+  if (editing) {
+    return (
+      <Modal title="Editar nota" onClose={onClose}>
+        <NoteEditor note={note} onSave={onSave} onDone={() => setEditing(false)} />
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal title="Nota" onClose={onClose}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          {note.pinned && (
+            <Pin size={14} strokeWidth={1.5} aria-hidden="true" className="text-warning shrink-0" />
+          )}
+          <p className="text-base font-semibold text-ink">{note.title}</p>
+        </div>
+
+        {note.body && (
+          <p className="text-sm text-ink-2 whitespace-pre-wrap">{note.body}</p>
+        )}
+
+        {confirming ? (
+          <InlineDeleteConfirm label={note.title} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
+        ) : (
+          <div className="flex gap-2 border-t border-border pt-3">
+            <Button type="button" variant="secondary" className="flex-1" onClick={() => setEditing(true)}>
+              <Pencil size={14} strokeWidth={1.5} aria-hidden="true" />
+              Editar
+            </Button>
+            <Button type="button" variant="danger" className="flex-1" onClick={() => setConfirming(true)}>
+              <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
+              Borrar
+            </Button>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
+/** Debounced autosave editor for a single note. Flushes any pending save when
+ *  the user taps "Listo" (returns to the detail view). */
+function NoteEditor({
+  note, onSave, onDone,
+}: {
+  note: Note;
+  onSave: (title: string, body: string) => Promise<"ok" | "error">;
+  onDone: () => void;
+}) {
   const [title, setTitle] = useState(note.title);
   const [body, setBody] = useState(note.body);
   const [status, setStatus] = useState<SaveStatus>("idle");
-  const [expanded, setExpanded] = useState(false);
-  const [clamped, setClamped] = useState(false);
-  // Measured height of the collapsed 2-line preview; null until first paint so
-  // the initial render keeps the static line-clamp (no flash), then the toggle
-  // animates between this height and auto.
-  const [collapsedPx, setCollapsedPx] = useState<number | null>(null);
-  const bodyRef = useRef<HTMLParagraphElement | null>(null);
-  const reduced = useReducedMotion();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
-
-  /* Measure the 2-line collapsed height and whether the body overflows it (so
-     the "Ver más" hint only shows on long notes). scrollHeight is the full
-     content height regardless of the clamp, so this is stable across states. */
-  useEffect(() => {
-    if (editing) return;
-    const el = bodyRef.current;
-    if (!el) return;
-    const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 16;
-    const twoLines = lineHeight * 2;
-    setCollapsedPx(twoLines);
-    setClamped(el.scrollHeight > twoLines + 1);
-  }, [note.body, editing]);
-
-  /* Seed the editable fields from the latest note when entering edit mode.
-     We intentionally gate on `editing` rather than note values to avoid
-     overwriting in-progress edits on re-renders. The initialisation runs
-     inside a callback so it's not synchronous within the effect body. */
-  useEffect(() => {
-    if (!editing) return;
-    const id = requestAnimationFrame(() => {
-      setTitle(note.title);
-      setBody(note.body);
-      setStatus("idle");
-    });
-    return () => cancelAnimationFrame(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing]);
 
   /* Flush any pending save on unmount. */
   useEffect(() => {
@@ -238,7 +317,7 @@ function NoteCard({
     }, 700);
   }
 
-  async function closeEditor() {
+  async function done() {
     if (timer.current) clearTimeout(timer.current);
     if (dirty.current) {
       dirty.current = false;
@@ -246,173 +325,61 @@ function NoteCard({
       const result = await onSave(title.trim(), body);
       setStatus(result === "ok" ? "saved" : "error");
     }
-    setEditing(false);
-  }
-
-  if (editing) {
-    return (
-      <div className="p-3 rounded-lg border border-brick-border/40 bg-surface-2/40 space-y-2">
-        <input
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            scheduleSave(e.target.value, body);
-          }}
-          aria-label="Título de la nota"
-          placeholder="Título"
-          className="w-full bg-transparent text-base font-medium text-ink placeholder:text-ink-faint focus:outline-none"
-          autoFocus
-        />
-        <textarea
-          value={body}
-          onChange={(e) => {
-            setBody(e.target.value);
-            scheduleSave(title, e.target.value);
-          }}
-          aria-label="Cuerpo de la nota"
-          placeholder="Detalles..."
-          rows={Math.min(12, Math.max(3, body.split("\n").length + 1))}
-          className="w-full bg-transparent text-base text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
-        />
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-[11px] text-ink-3 flex items-center gap-1" aria-live="polite">
-            {status === "saving" && (
-              <>
-                <Loader2 size={11} className="animate-spin" aria-hidden="true" />
-                Guardando…
-              </>
-            )}
-            {status === "saved" && (
-              <>
-                <Check size={11} strokeWidth={2} aria-hidden="true" className="text-success" />
-                Guardado
-              </>
-            )}
-            {status === "error" && (
-              <span className="text-danger flex items-center gap-1">
-                <AlertCircle size={11} strokeWidth={1.5} aria-hidden="true" />
-                Error al guardar
-              </span>
-            )}
-            {status === "idle" && !title.trim() && body.trim() && (
-              <span className="text-ink-3 text-[11px]">Sin título</span>
-            )}
-          </span>
-          <Button variant="ghost" size="sm" onClick={closeEditor}>
-            Listo
-          </Button>
-        </div>
-      </div>
-    );
+    onDone();
   }
 
   return (
-    <div
-      className={`p-3 rounded-lg border transition-colors ${
-        note.pinned
-          ? "border-warning/30 bg-warning-bg/40"
-          : "border-border bg-surface-2/30"
-      }`}
-    >
-      {/* Header row: only the title shares width with the action buttons —
-          the body renders below at full card width. */}
-      <div className="flex items-start justify-between gap-1">
-        <button
-          onClick={() => (note.body ? setExpanded((v) => !v) : setEditing(true))}
-          aria-expanded={note.body ? expanded : undefined}
-          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-          aria-label={
-            note.body
-              ? `${expanded ? "Colapsar" : "Expandir"} nota "${note.title}"`
-              : `Editar nota "${note.title}"`
-          }
-        >
-          <div className="flex items-center gap-1.5">
-            {note.pinned && (
-              <Pin
-                size={12}
-                strokeWidth={1.5}
-                aria-hidden="true"
-                className="text-warning shrink-0"
-              />
-            )}
-            <span className="text-sm font-medium text-ink">{note.title}</span>
-          </div>
-        </button>
-
-        {confirming ? (
-          <InlineDeleteConfirm
-            label={note.title}
-            onConfirm={onConfirmDelete}
-            onCancel={onCancelDelete}
-          />
-        ) : (
-          <div className="flex items-center shrink-0">
-            <button
-              onClick={onTogglePin}
-              aria-label={note.pinned ? "Quitar pin" : "Fijar arriba"}
-              aria-pressed={note.pinned}
-              className={`${actionBtn} ${
-                note.pinned
-                  ? "text-warning hover:bg-surface-2"
-                  : "text-ink-faint hover:text-ink-2 hover:bg-surface-2"
-              }`}
-            >
-              <Pin size={16} strokeWidth={1.5} aria-hidden="true" />
-            </button>
-            <button
-              onClick={() => setEditing(true)}
-              aria-label={`Editar nota "${note.title}"`}
-              className={`${actionBtn} text-ink-faint hover:text-brick hover:bg-surface-2`}
-            >
-              <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
-            </button>
-            <button
-              onClick={onRequestDelete}
-              aria-label={`Borrar nota "${note.title}"`}
-              className={`${actionBtn} text-border-strong hover:text-danger hover:bg-danger-bg`}
-            >
-              <Trash2 size={16} strokeWidth={1.5} aria-hidden="true" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {note.body && (
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-          aria-label={`${expanded ? "Colapsar" : "Expandir"} nota "${note.title}"`}
-          className="block w-full text-left rounded-lg -mx-1 -mb-1 px-1 pb-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-        >
-          {collapsedPx === null ? (
-            // First paint: static clamp so the collapsed preview is pixel-correct
-            // before we measure. Swaps to the animated wrapper after mount.
-            <p
-              ref={bodyRef}
-              className="text-xs text-ink-2 mt-1 whitespace-pre-wrap line-clamp-2"
-            >
-              {note.body}
-            </p>
-          ) : (
-            <motion.div
-              className="overflow-hidden mt-1"
-              initial={false}
-              animate={{ height: expanded || !clamped ? "auto" : collapsedPx }}
-              transition={reduced ? { duration: 0 } : { duration: 0.25, ease: easeSmooth }}
-            >
-              <p ref={bodyRef} className="text-xs text-ink-2 whitespace-pre-wrap">
-                {note.body}
-              </p>
-            </motion.div>
+    <div className="space-y-2">
+      <input
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+          scheduleSave(e.target.value, body);
+        }}
+        aria-label="Título de la nota"
+        placeholder="Título"
+        className="w-full bg-transparent text-base font-medium text-ink placeholder:text-ink-faint focus:outline-none"
+        autoFocus
+      />
+      <textarea
+        value={body}
+        onChange={(e) => {
+          setBody(e.target.value);
+          scheduleSave(title, e.target.value);
+        }}
+        aria-label="Cuerpo de la nota"
+        placeholder="Detalles..."
+        rows={Math.min(12, Math.max(3, body.split("\n").length + 1))}
+        className="w-full bg-transparent text-base text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
+      />
+      <div className="flex items-center justify-between pt-1">
+        <span className="text-[11px] text-ink-3 flex items-center gap-1" aria-live="polite">
+          {status === "saving" && (
+            <>
+              <Loader2 size={11} className="animate-spin" aria-hidden="true" />
+              Guardando…
+            </>
           )}
-          {(clamped || expanded) && (
-            <span className="mt-1 inline-block text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-              {expanded ? "Ver menos" : "Ver más"}
+          {status === "saved" && (
+            <>
+              <Check size={11} strokeWidth={2} aria-hidden="true" className="text-success" />
+              Guardado
+            </>
+          )}
+          {status === "error" && (
+            <span className="text-danger flex items-center gap-1">
+              <AlertCircle size={11} strokeWidth={1.5} aria-hidden="true" />
+              Error al guardar
             </span>
           )}
-        </button>
-      )}
+          {status === "idle" && !title.trim() && body.trim() && (
+            <span className="text-ink-3 text-[11px]">Sin título</span>
+          )}
+        </span>
+        <Button variant="ghost" size="sm" onClick={done}>
+          Listo
+        </Button>
+      </div>
     </div>
   );
 }
