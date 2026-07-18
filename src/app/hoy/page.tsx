@@ -90,7 +90,7 @@ export default async function HoyPage() {
               select: { id: true, name: true, type: true, done: true, reservationRequired: true },
             },
             documents: {
-              orderBy: { createdAt: "asc" },
+              orderBy: [{ docDate: { sort: "asc", nulls: "last" } }, { createdAt: "asc" }],
               select: { id: true, label: true, kind: true },
             },
           },

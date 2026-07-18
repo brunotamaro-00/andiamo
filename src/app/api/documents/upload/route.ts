@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
   const label = ((formData.get("label") as string) ?? "").trim();
   const kind = (formData.get("kind") as DocumentKind) ?? "other";
   const stopId = (formData.get("stopId") as string) || null;
+  const docDateRaw = ((formData.get("docDate") as string) ?? "").trim();
+  const docDate = /^\d{4}-\d{2}-\d{2}$/.test(docDateRaw) ? new Date(docDateRaw) : null;
 
   if (!file) return Response.json({ error: "Falta el archivo" }, { status: 400 });
   const effectiveLabel = label || file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || file.name;
@@ -58,6 +60,7 @@ export async function POST(req: NextRequest) {
       mimeType: file.type,
       sizeBytes: file.size,
       storagePath: key,
+      docDate,
     },
   });
 

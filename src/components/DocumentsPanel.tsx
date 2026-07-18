@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useId } from "react";
+import { useState, useRef, useEffect, useId, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, TrainFront, ShieldCheck, Plane, FileText,
@@ -35,10 +35,11 @@ interface Document {
   fileName: string | null;
   externalUrl: string | null;
   sizeBytes: number | null;
+  docDate: string | null;
 }
 
 const KIND_LABEL: Record<string, string> = {
-  checkin: "Check-in", voucher: "Voucher", ticket: "Entrada",
+  checkin: "Check-in", ticket: "Entrada",
   carRental: "Auto", train: "Tren", insurance: "Seguro", flight: "Vuelo", other: "Otro",
 };
 
@@ -55,11 +56,27 @@ const KIND_ICON: Record<string, LucideIcon> = {
 
 const DOCUMENT_KINDS = Object.keys(KIND_LABEL) as (keyof typeof KIND_LABEL)[];
 
-function formatSize(bytes: number | null): string | null {
-  if (!bytes) return null;
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+/** Format a YYYY-MM-DD entry/reservation date for display (UTC-anchored). */
+function formatDocDate(dateStr: string | null): string | null {
+  if (!dateStr) return null;
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/** Sort docs by their entry/reservation date, soonest first; dateless docs last. */
+function sortByDate(docs: Document[]): Document[] {
+  return [...docs].sort((a, b) => {
+    if (a.docDate && b.docDate) return a.docDate.localeCompare(b.docDate);
+    if (a.docDate) return -1;
+    if (b.docDate) return 1;
+    return 0;
+  });
 }
 
 interface DocumentsPanelProps {
@@ -158,6 +175,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     }
   );
 
+  const sortedDocs = useMemo(() => sortByDate(optimisticDocs), [optimisticDocs]);
   const openDoc = openId ? optimisticDocs.find((d) => d.id === openId) ?? null : null;
 
   function handleDelete(id: string) {
@@ -171,6 +189,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
       ...doc,
       label: (formData.get("label") as string)?.trim() || doc.label,
       kind: (formData.get("kind") as string) || doc.kind,
+      docDate: (formData.get("docDate") as string) || null,
       externalUrl:
         doc.source === "link" ? (formData.get("url") as string) || doc.externalUrl : doc.externalUrl,
     };
@@ -195,6 +214,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
       fileName: null,
       externalUrl: (formData.get("url") as string) || null,
       sizeBytes: null,
+      docDate: (formData.get("docDate") as string) || null,
     };
     setMode(null);
     haptics.success();
@@ -220,7 +240,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         <EmptyState
           icon={FileText}
           title="Sin documentos"
-          description="Guardá vouchers, entradas y seguros. Subí PDFs/imágenes o pegá un link."
+          description="Guardá entradas, reservas y seguros. Subí PDFs/imágenes o pegá un link."
           action={
             <Button variant="primary" size="sm" onClick={() => setMode("upload")}>
               <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
@@ -232,9 +252,9 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         <div
           className={`space-y-2 transition-opacity ${isPending ? "opacity-70" : ""}`}
         >
-          {optimisticDocs.map((doc) => {
+          {sortedDocs.map((doc) => {
             const Icon = KIND_ICON[doc.kind] ?? FileText;
-            const size = formatSize(doc.sizeBytes);
+            const date = formatDocDate(doc.docDate);
             return (
               <div
                 key={doc.id}
@@ -253,7 +273,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                     </p>
                     <p className="text-xs text-ink-2">
                       {KIND_LABEL[doc.kind] ?? doc.kind}
-                      {size ? ` · ${size}` : ""}
+                      {date ? ` · ${date}` : ""}
                     </p>
                   </div>
                 </button>
@@ -307,7 +327,7 @@ function DocDetailModal({
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const Icon = KIND_ICON[doc.kind] ?? FileText;
-  const size = formatSize(doc.sizeBytes);
+  const date = formatDocDate(doc.docDate);
 
   if (editing) {
     return (
@@ -321,6 +341,13 @@ function DocDetailModal({
               </option>
             ))}
           </SelectField>
+          <Field
+            label="Fecha (entrada/reserva)"
+            name="docDate"
+            type="date"
+            defaultValue={doc.docDate ?? ""}
+            hint="Opcional — ordena los documentos por esta fecha"
+          />
           {doc.source === "link" && (
             <Field
               label="URL"
@@ -355,7 +382,7 @@ function DocDetailModal({
             <p className="text-base font-semibold text-ink truncate">{doc.label}</p>
             <p className="text-xs text-ink-2">
               {KIND_LABEL[doc.kind] ?? doc.kind}
-              {size ? ` · ${size}` : ""}
+              {date ? ` · ${date}` : ""}
             </p>
           </div>
         </div>
@@ -447,12 +474,18 @@ function LinkForm({
           ))}
         </SelectField>
         <Field
+          label="Fecha (entrada/reserva)"
+          name="docDate"
+          type="date"
+          hint="Opcional — ordena los documentos por esta fecha"
+        />
+        <Field
           label="URL"
           name="url"
           type="url"
           required
           placeholder="https://..."
-          hint="Link al voucher, reserva o check-in online"
+          hint="Link a la reserva, entrada o check-in online"
         />
         <div className="flex gap-2 pt-1">
           <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
@@ -504,6 +537,7 @@ function UploadForm({
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState("");
   const [kind, setKind] = useState("other");
+  const [docDate, setDocDate] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -548,6 +582,7 @@ function UploadForm({
     fd.set("file", file);
     fd.set("label", label.trim());
     fd.set("kind", kind);
+    if (docDate) fd.set("docDate", docDate);
     if (stopId) fd.set("stopId", stopId);
 
     try {
@@ -595,6 +630,14 @@ function UploadForm({
             </option>
           ))}
         </SelectField>
+        <Field
+          label="Fecha (entrada/reserva)"
+          name="docDate"
+          type="date"
+          value={docDate}
+          onChange={(e) => setDocDate(e.target.value)}
+          hint="Opcional — ordena los documentos por esta fecha"
+        />
         <div>
           <label htmlFor={fileInputId} className="block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none">Archivo</label>
           <input
