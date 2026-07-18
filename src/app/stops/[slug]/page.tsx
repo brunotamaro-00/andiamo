@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { computeCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr, tripDayNumber } from "@/lib/trip";
+import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { Suspense } from "react";
 import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
@@ -12,7 +12,7 @@ import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, MapPin, Thermometer, Sunrise, Sunset } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
@@ -135,6 +135,12 @@ export default async function StopPage({ params }: Props) {
       )
     : null;
 
+  // Same top-right countdown as /hoy's CurrentStopHero
+  const daysLeft =
+    isActive && tripPhase === "during" && stop.departureDate
+      ? Math.max(0, daysBetween(today, dateToStr(stop.departureDate)))
+      : null;
+
   const path = `/stops/${slug}`;
 
   return (
@@ -144,40 +150,45 @@ export default async function StopPage({ params }: Props) {
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
 
-        {/* City header card */}
+        {/* City header — same composition as /hoy CurrentStopHero */}
         <div
-          className={`rounded-xl p-4 border-2 card-shadow ${
-            isActive
-              ? "bg-surface border-border border-t-[3px] border-t-brick"
-              : "bg-surface border-border"
+          className={`bg-surface border border-border rounded-xl p-4 card-shadow ${
+            isActive ? "border-t-[3px] border-t-brick" : ""
           }`}
         >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-3">
-                <Flag flag={stop.countryFlag} className="text-4xl" />
-                <div>
-                  <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide">
-                    {stop.name}
-                  </h1>
-                  <p className="text-sm text-ink-2 mt-0.5">{stop.country}</p>
-                </div>
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${stop.latitude},${stop.longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Abrir ${stop.name} en Google Maps`}
-                  className="self-start h-11 w-11 flex items-center justify-center rounded-full text-brick hover:bg-brick-bg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-                >
-                  <MapPin size={18} strokeWidth={1.5} aria-hidden="true" />
-                </a>
-              </div>
-            </div>
-
-            <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
-              {isActive && tripPhase === "during" && <Badge variant="active">Aquí ahora</Badge>}
-              {isActive && tripPhase === "before" && <Badge variant="special">Próxima parada</Badge>}
+          <div className="flex items-center justify-between gap-3">
+            {tripDay !== null ? (
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+                Día {tripDay} del viaje
+              </p>
+            ) : (
+              <span />
+            )}
+            <div className="flex items-center gap-2 shrink-0">
+              {daysLeft !== null && (
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-brick">
+                  {daysLeft === 0
+                    ? "Última noche"
+                    : `${daysLeft} ${daysLeft === 1 ? "día" : "días"} acá`}
+                </p>
+              )}
+              {isActive && tripPhase === "before" && (
+                <Badge variant="special">Próxima parada</Badge>
+              )}
               {stop.isCandidate && <Badge variant="special">tentativa</Badge>}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mt-2">
+            <Flag flag={stop.countryFlag} className="text-4xl" />
+            <div className="min-w-0">
+              <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide truncate">
+                {stop.name}
+              </h1>
+              <p className="text-sm text-ink-2">{stop.country}</p>
+            </div>
+            {/* Same slot as /hoy's ChevronRight — compact so card height matches */}
+            <div className="ml-auto shrink-0 [&_button]:h-auto [&_button]:w-auto [&_button]:p-0 [&_button]:text-border-strong [&_button]:hover:bg-transparent [&_button]:hover:text-ink">
               <EditStopPanel
                 stopId={stop.id}
                 slug={stop.slug}
@@ -192,41 +203,31 @@ export default async function StopPage({ params }: Props) {
             </div>
           </div>
 
-          {(() => {
-            const dateRange = stop.arrivalDate
-              ? `${formatDate(stop.arrivalDate)} – ${
-                  stop.departureDate
-                    ? formatDate(stop.departureDate)
-                    : stayWindow
-                    ? `≈${formatDate(stayWindow.departure)}`
-                    : "?"
-                }`
-              : stayWindow
-              ? `≈${formatDate(stayWindow.arrival)} – ${formatDate(stayWindow.departure)}`
-              : null;
-            const hasMeta = dateRange || tripDay !== null || stop.tempRange || sunTimes;
-            if (!hasMeta) return null;
-            return (
-              <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
-                {dateRange && <span className="text-ink-2 font-medium">{dateRange}</span>}
-                {stop.arrivalDate && tripDay !== null && <span>Día {tripDay} del viaje</span>}
-                {stop.tempRange && (
-                  <span className="flex items-center gap-1">
-                    <Thermometer size={13} strokeWidth={1.5} aria-hidden="true" />
-                    ≈{stop.tempRange}
-                  </span>
-                )}
-                {sunTimes && (
-                  <span className="ml-auto flex items-center gap-1.5 tabular-nums">
-                    <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
-                    {sunTimes.sunrise}
-                    <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="ml-1.5" />
-                    {sunTimes.sunset}
-                  </span>
-                )}
-              </div>
-            );
-          })()}
+          {(stop.tempRange || sunTimes || stop.departureDate || stayWindow) && (
+            <div className="mt-3 pt-3 border-t border-border/50 flex flex-wrap items-center gap-3 text-xs text-ink-3">
+              {stop.departureDate ? (
+                <span>Hasta el {formatShortDate(stop.departureDate)}</span>
+              ) : (
+                stayWindow && (
+                  <span>Hasta el ≈{formatShortDate(stayWindow.departure)}</span>
+                )
+              )}
+              {stop.tempRange && (
+                <span className="flex items-center gap-1">
+                  <Thermometer size={13} strokeWidth={1.5} aria-hidden="true" />
+                  ≈{stop.tempRange}
+                </span>
+              )}
+              {sunTimes && (
+                <span className="ml-auto flex items-center gap-1.5 tabular-nums">
+                  <Sunrise size={13} strokeWidth={1.5} aria-hidden="true" className="text-warning" />
+                  {sunTimes.sunrise}
+                  <Sunset size={13} strokeWidth={1.5} aria-hidden="true" className="ml-1.5" />
+                  {sunTimes.sunset}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Prev / Next navigation */}
@@ -380,7 +381,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   );
 }
 
-function formatDate(d: Date | string): string {
+function formatShortDate(d: Date | string): string {
   return new Date(d).toLocaleDateString("es-AR", {
     day: "numeric",
     month: "short",
