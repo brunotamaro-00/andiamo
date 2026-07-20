@@ -90,7 +90,9 @@ export default async function StopPage({ params }: Props) {
     viewer,
   );
 
-  const allOtherStops = allStopsRaw.filter((s) => !s.isFlexMargin);
+  // Only stops the viewer can actually open — otherwise prev/next would link to
+  // a neighbour they can't see (Pititas ↔ Porto across the swap) and 404.
+  const allOtherStops = allStopsRaw.filter((s) => !s.isFlexMargin && stopVisibleTo(s, viewer));
   const firstDatedArrival = allOtherStops.find((s) => s.arrivalDate)?.arrivalDate ?? null;
   const tripDay = tripDayNumber(
     allOtherStops.find((s) => s.slug === slug)?.arrivalDate,
