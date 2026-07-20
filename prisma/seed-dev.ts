@@ -42,11 +42,12 @@ async function main() {
 
   // 1. Upsert stops with rebased dates ---------------------------------------
   console.log("Reescribiendo fechas de paradas...");
-  for (const stop of STOPS) {
+  for (let i = 0; i < STOPS.length; i++) {
+    const stop = STOPS[i];
     const arrival = shift(stop.arrivalDate);
     const departure = shift(stop.departureDate);
     const data = {
-      order: stop.order,
+      order: i + 1, // position wins over the decorative `order` literal
       country: stop.country,
       countryFlag: stop.countryFlag,
       name: stop.name,
@@ -61,6 +62,8 @@ async function main() {
       currencyCode: stop.currencyCode,
       tempRange: stop.tempRange,
       isCandidate: stop.isCandidate ?? false,
+      ownerPerson: stop.ownerPerson ?? null,
+      isLocal: stop.isLocal ?? false,
     };
     await prisma.stop.upsert({
       where: { slug: stop.slug },

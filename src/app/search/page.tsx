@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { searchGuides } from "@/lib/guides";
 import { Flag } from "@/components/Flag";
+import { getPerson } from "@/lib/person-server";
+import { stopVisibleTo } from "@/lib/person";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Buscar · Andiamo" };
@@ -27,7 +29,8 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const hasQuery = query.length >= 2;
 
-  const [stops, pois, notes, documents] = hasQuery
+  const viewer = await getPerson();
+  const [stopHits, poiHits, noteHits, docHits] = hasQuery
     ? await Promise.all([
         db.stop.findMany({
           where: {
@@ -38,7 +41,7 @@ export default async function SearchPage({ searchParams }: Props) {
             ],
           },
           orderBy: { order: "asc" },
-          select: { slug: true, name: true, country: true, countryFlag: true },
+          select: { slug: true, name: true, country: true, countryFlag: true, ownerPerson: true },
         }),
         db.poi.findMany({
           where: {
@@ -53,7 +56,7 @@ export default async function SearchPage({ searchParams }: Props) {
             id: true,
             name: true,
             done: true,
-            stop: { select: { slug: true, name: true, countryFlag: true } },
+            stop: { select: { slug: true, name: true, countryFlag: true, ownerPerson: true } },
           },
         }),
         db.note.findMany({
@@ -67,7 +70,7 @@ export default async function SearchPage({ searchParams }: Props) {
           select: {
             id: true,
             title: true,
-            stop: { select: { slug: true, name: true, countryFlag: true } },
+            stop: { select: { slug: true, name: true, countryFlag: true, ownerPerson: true } },
           },
         }),
         db.document.findMany({
@@ -79,11 +82,18 @@ export default async function SearchPage({ searchParams }: Props) {
             id: true,
             label: true,
             kind: true,
-            stop: { select: { slug: true, name: true, countryFlag: true } },
+            stop: { select: { slug: true, name: true, countryFlag: true, ownerPerson: true } },
           },
         }),
       ])
     : [[], [], [], []];
+
+  // Person-scoped stops (and their POIs/notes/docs) only surface for their
+  // owner; general (stopless) notes/docs always show. "Ambos" sees everything.
+  const stops = stopHits.filter((s) => stopVisibleTo(s, viewer));
+  const pois = poiHits.filter((p) => stopVisibleTo(p.stop, viewer));
+  const notes = noteHits.filter((n) => !n.stop || stopVisibleTo(n.stop, viewer));
+  const documents = docHits.filter((d) => !d.stop || stopVisibleTo(d.stop, viewer));
 
   const guideHits = hasQuery ? searchGuides(query) : [];
 

@@ -18,6 +18,7 @@ import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
+import { stopVisibleTo } from "@/lib/person";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
 import { Flag } from "@/components/Flag";
@@ -46,7 +47,7 @@ export default async function StopPage({ params }: Props) {
 
   // All three queries are independent and run concurrently. The stop list is
   // fetched once and shared by the current-stop, trip-day, and nav derivations.
-  const [stop, allStopsRaw, currentOverride] = await Promise.all([
+  const [stop, allStopsRaw, currentOverride, viewer] = await Promise.all([
     db.stop.findUnique({
       where: { slug },
       include: {
@@ -70,14 +71,24 @@ export default async function StopPage({ params }: Props) {
         isFlexMargin: true,
         arrivalDate: true,
         departureDate: true,
+        ownerPerson: true,
       },
     }),
     db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
+    getPerson(),
   ]);
 
   if (!stop) notFound();
+  // A person-scoped stop is invisible to the other viewer — don't leak it even
+  // by direct URL (Bruno → /stops/pititas 404s, Katia → /stops/lisboa 404s).
+  if (!stopVisibleTo(stop, viewer)) notFound();
 
-  const currentSlug = computeCurrentStopSlug(allStopsRaw, currentOverride?.value ?? null);
+  const currentSlug = computeCurrentStopSlug(
+    allStopsRaw,
+    currentOverride?.value ?? null,
+    todayStr(),
+    viewer,
+  );
 
   const allOtherStops = allStopsRaw.filter((s) => !s.isFlexMargin);
   const firstDatedArrival = allOtherStops.find((s) => s.arrivalDate)?.arrivalDate ?? null;
@@ -124,8 +135,9 @@ export default async function StopPage({ params }: Props) {
   // Stay window — own dates, or the assumed gap between dated neighbors
   const stayWindow = assumedDateWindow(stop, allStopsRaw);
 
-  // Tentative sunrise/sunset for the stay — pure local computation, no API
-  const sunTimes = stayWindow
+  // Tentative sunrise/sunset for the stay — pure local computation, no API.
+  // A pseudo-city (Pititas) has no real coordinates → no sun/weather at all.
+  const sunTimes = !stop.isLocal && stayWindow
     ? tentativeSunTimes(
         stop.latitude,
         stop.longitude,
@@ -145,7 +157,7 @@ export default async function StopPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <PageHeader subtitle={stop.name} actions={<PersonSwitcher person={await getPerson()} />} />
+      <PageHeader subtitle={stop.name} actions={<PersonSwitcher person={viewer} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
@@ -321,12 +333,15 @@ export default async function StopPage({ params }: Props) {
           />
         </div>
 
-        {/* Currency — streamed; converter stays interactive client-side */}
-        <div id="moneda" className="scroll-mt-20">
-          <Suspense fallback={<CurrencyCardSkeleton />}>
-            <CurrencySection currencyCode={stop.currencyCode} />
-          </Suspense>
-        </div>
+        {/* Currency — streamed; converter stays interactive client-side.
+            Hidden for pseudo-cities (Pititas): no real "local" currency. */}
+        {!stop.isLocal && (
+          <div id="moneda" className="scroll-mt-20">
+            <Suspense fallback={<CurrencyCardSkeleton />}>
+              <CurrencySection currencyCode={stop.currencyCode} />
+            </Suspense>
+          </div>
+        )}
 
         {/* Spend panel — fed by Spitwise; degrades silently if unreachable */}
         <div id="gastos" className="scroll-mt-20">

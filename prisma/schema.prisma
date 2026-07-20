@@ -26,6 +26,13 @@ model Stop {
   tempRange     String?
   isCandidate   Boolean    @default(false)
   isFlexMargin  Boolean    @default(false)
+  /// Who this stop belongs to. null = shared (default, every stop today).
+  /// A person value ("bruno"/"katia") makes it a *person-scoped* stop: visible
+  /// only to that viewer (and to "Ambos"), hidden from the other. See Pititas.
+  ownerPerson   String?
+  /// Pseudo-city that exists only in Andiamo's per-person view: no flag/sun/
+  /// weather/temp/currency, and excluded from the /api/stops sync to Spitwise.
+  isLocal       Boolean    @default(false)
   pois          Poi[]
   notes         Note[]
   documents     Document[]
@@ -80,6 +87,7 @@ model Document {
   stopId      String?
   stop        Stop?        @relation(fields: [stopId], references: [id], onDelete: Cascade)
   label       String
+  note        String?
   kind        DocumentKind @default(other)
   source      String
   fileName    String?

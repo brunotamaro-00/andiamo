@@ -9,7 +9,12 @@ export async function GET(request: Request): Promise<Response> {
   if (!key || key !== process.env.TRIP_SHARED_API_KEY) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
-  const stops = await db.stop.findMany({ orderBy: { order: "asc" } });
+  // Pseudo-cities (Pititas) live only in Andiamo's per-person view. Spitwise
+  // seeds its own local Pititas row, so exposing ours here would collide on slug.
+  const stops = await db.stop.findMany({
+    where: { isLocal: false },
+    orderBy: { order: "asc" },
+  });
   const payload = stops.map((s) => ({
     slug: s.slug,
     order: s.order,

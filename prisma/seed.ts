@@ -22,8 +22,14 @@ interface StopInput {
   currencyCode: string;
   tempRange: string;
   isCandidate?: boolean;
+  /** null = shared (default). A person makes it person-scoped (see Pititas). */
+  ownerPerson?: "bruno" | "katia" | null;
+  /** Pseudo-city: no flag/sun/weather/currency, excluded from the Spitwise sync. */
+  isLocal?: boolean;
 }
 
+// NOTE: `order` below is decorative — the real order is each stop's position in
+// this array, assigned as `i + 1` in main(). Keep the array in itinerary order.
 export const STOPS: StopInput[] = [
   {
     order: 1, country: "Reino Unido", countryFlag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "Londres", slug: "londres",
@@ -84,15 +90,26 @@ export const STOPS: StopInput[] = [
     category: "Ciudad", priceLevel: "$-$$",
     arrivalDate: "2026-09-04", departureDate: "2026-09-09", nights: 5,
     latitude: 38.7223, longitude: -9.1393, timezone: "Europe/Lisbon", currencyCode: "EUR", tempRange: "18-26°C",
+    ownerPerson: "bruno",
   },
   {
     order: 11, country: "Portugal", countryFlag: "🇵🇹", name: "Porto", slug: "porto",
     category: "Ciudad/Costa", priceLevel: "$-$$",
     arrivalDate: "2026-09-09", departureDate: "2026-09-12", nights: 3,
     latitude: 41.1579, longitude: -8.6291, timezone: "Europe/Lisbon", currencyCode: "EUR", tempRange: "15-24°C",
+    ownerPerson: "bruno",
   },
   {
-    order: 12, country: "Francia", countryFlag: "🇫🇷", name: "Estrasburgo", slug: "estrasburgo",
+    // Pseudo-ciudad: Katia con las amigas (4-11 sept) mientras Bruno está en
+    // Portugal. Sin bandera/sol/clima; solo para cargar sus notas y archivos.
+    order: 12, country: "", countryFlag: "", name: "Pititas", slug: "pititas",
+    category: "Pseudo", priceLevel: "$",
+    arrivalDate: "2026-09-04", departureDate: "2026-09-12", nights: 8,
+    latitude: 0, longitude: 0, timezone: "Europe/Paris", currencyCode: "EUR", tempRange: "",
+    ownerPerson: "katia", isLocal: true,
+  },
+  {
+    order: 13, country: "Francia", countryFlag: "🇫🇷", name: "Estrasburgo", slug: "estrasburgo",
     category: "Ciudad", priceLevel: "$$",
     arrivalDate: "2026-09-12", departureDate: "2026-09-14", nights: 2,
     latitude: 48.5734, longitude: 7.7521, timezone: "Europe/Paris", currencyCode: "EUR", tempRange: "12-20°C",
@@ -222,11 +239,13 @@ export const STOPS: StopInput[] = [
 async function main() {
   console.log("Seeding stops...");
 
-  for (const stop of STOPS) {
+  for (let i = 0; i < STOPS.length; i++) {
+    const stop = STOPS[i];
+    const order = i + 1; // position wins over the decorative `order` literal
     await prisma.stop.upsert({
       where: { slug: stop.slug },
       update: {
-        order: stop.order,
+        order,
         country: stop.country,
         countryFlag: stop.countryFlag,
         name: stop.name,
@@ -241,9 +260,11 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        ownerPerson: stop.ownerPerson ?? null,
+        isLocal: stop.isLocal ?? false,
       },
       create: {
-        order: stop.order,
+        order,
         country: stop.country,
         countryFlag: stop.countryFlag,
         name: stop.name,
@@ -259,6 +280,8 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        ownerPerson: stop.ownerPerson ?? null,
+        isLocal: stop.isLocal ?? false,
       },
     });
     console.log(`  ✓ ${stop.countryFlag} ${stop.name}`);

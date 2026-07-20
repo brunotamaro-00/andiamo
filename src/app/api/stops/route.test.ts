@@ -1,9 +1,17 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+const findMany = vi.fn();
+
 vi.mock("@/lib/db", () => ({
   db: {
     stop: {
-      findMany: vi.fn().mockResolvedValue([
+      findMany: (...args: unknown[]) => findMany(...args),
+    },
+  },
+}));
+
+beforeEach(() => {
+  findMany.mockResolvedValue([
         {
           slug: "londres", order: 1, name: "Londres", country: "Reino Unido",
           countryFlag: "🇬🇧", arrivalDate: new Date("2026-08-05"),
@@ -11,10 +19,8 @@ vi.mock("@/lib/db", () => ({
           currencyCode: "GBP", timezone: "Europe/London",
           isCandidate: false, isFlexMargin: false,
         },
-      ]),
-    },
-  },
-}));
+      ]);
+});
 
 import { GET } from "./route";
 
@@ -40,5 +46,12 @@ describe("GET /api/stops", () => {
     const body = await res.json();
     expect(body[0].slug).toBe("londres");
     expect(body[0].arrivalDate).toBe("2026-08-05");
+  });
+
+  it("excluye pseudo-ciudades (isLocal) del sync a Spitwise", async () => {
+    await GET(req("k"));
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { isLocal: false } }),
+    );
   });
 });
