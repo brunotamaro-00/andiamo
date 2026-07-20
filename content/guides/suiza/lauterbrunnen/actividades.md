@@ -40,6 +40,8 @@ De mejor a peor ratio esfuerzo/vistas, priorizando lo accesible desde esta base:
 | **Panoramaweg: Männlichen → Kleine Scheidegg** | Fácil | ~1.5h | Wengen + teleférico Männlichen (aparte) | 10/10 | Sendero icónico con Eiger/Mönch/Jungfrau enfrente; también accesible desde Grindelwald |
 | **Schynige Platte → Faulhorn → First** | Intenso | 6–7h | Tren desde Wilderswil **CHF 72** | 10/10 | El trekking top de la región; llegar a Wilderswil en tren (Eurail); no con clima incierto |
 
+> ⭐ **Nuestros favoritos:** **Schynige Platte → Faulhorn → First** y el **North Face of the Eiger (Eiger-Trail)**. Detalle completo (tiempos, agua, teleféricos, reseñas) en `trekkings.md`.
+
 ---
 
 ## 🚠 Schilthorn / Piz Gloria (el "caro" de esta base)

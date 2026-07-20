@@ -712,6 +712,11 @@
           "slug": "gastronomia",
           "title": "Gastronomía",
           "file": "suiza/gastronomia.md"
+        },
+        {
+          "slug": "trekkings",
+          "title": "Trekkings de la región Jungfrau + Kandersteg (base: Balmers Hostel, Interlaken)",
+          "file": "suiza/trekkings.md"
         }
       ]
     },
