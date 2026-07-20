@@ -102,7 +102,7 @@ export const STOPS: StopInput[] = [
   {
     // Pseudo-ciudad: Katia con las amigas (4-11 sept) mientras Bruno está en
     // Portugal. Sin bandera/sol/clima; solo para cargar sus notas y archivos.
-    order: 12, country: "", countryFlag: "", name: "Pititas", slug: "pititas",
+    order: 12, country: "", countryFlag: "👭", name: "Pititas", slug: "pititas",
     category: "Pseudo", priceLevel: "$",
     arrivalDate: "2026-09-04", departureDate: "2026-09-12", nights: 8,
     latitude: 0, longitude: 0, timezone: "Europe/Paris", currencyCode: "EUR", tempRange: "",
