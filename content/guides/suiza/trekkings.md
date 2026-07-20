@@ -1,4 +1,6 @@
-# 🥾 Trekkings de la región Jungfrau + Kandersteg (base: Balmers Hostel, Interlaken)
+# 🥾 Trekkings
+
+**Región Jungfrau + Kandersteg** · base: Balmers Hostel, Interlaken
 
 **Base:** Balmers Hostel, Interlaken · **Ventana del viaje:** mediados de septiembre 2026 · **Pases:** Eurail (2p)
 **Estado:** referencia (tramo post-Portugal, fechas tentativas) · **Moneda:** CHF (1 CHF ≈ €1.08)
