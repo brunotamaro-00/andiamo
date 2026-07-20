@@ -26,5 +26,23 @@ export function personLabel(person: PersonView): string {
   return person === null ? "Ambos" : person.charAt(0).toUpperCase() + person.slice(1);
 }
 
+/** Whether a stop is visible to the given viewer.
+ *
+ *  Stops are shared by default (`ownerPerson === null`) — identical for both of
+ *  us, the historical behaviour. A person-scoped stop (`ownerPerson` set to a
+ *  Person) is only visible to its owner, so the itinerary *swaps*: while Bruno
+ *  is in Portugal (Lisboa/Porto owned by "bruno") Katia sees "Pititas" (owned by
+ *  "katia") in their place. "Ambos" (`viewer === null`) is the household superset
+ *  and sees every stop. This is the single exception to "person only affects
+ *  expenses" — keep it confined to this predicate. */
+export function stopVisibleTo(
+  stop: { ownerPerson: string | null },
+  viewer: PersonView,
+): boolean {
+  if (viewer === null) return true; // "Ambos" ve todo
+  if (stop.ownerPerson === null) return true; // parada compartida
+  return stop.ownerPerson === viewer; // swap: solo la del dueño
+}
+
 /* Reading the cookie lives in person-server.ts: PersonSwitcher is a client
  * component and imports this module, so it must stay free of next/headers. */

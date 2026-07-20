@@ -1,5 +1,7 @@
 import { db } from "./db";
 import { todayStr, dateToStr, tripDayNumber } from "./trip";
+import { stopVisibleTo, type PersonView } from "./person";
+import { getPerson } from "./person-server";
 
 export interface CurrentStopInput {
   id: string;
@@ -9,6 +11,7 @@ export interface CurrentStopInput {
   isFlexMargin: boolean;
   arrivalDate: Date | null;
   departureDate: Date | null;
+  ownerPerson: string | null;
 }
 
 /**
@@ -23,13 +26,18 @@ export function computeCurrentStopSlug(
   allStops: CurrentStopInput[],
   overrideId: string | null,
   today: string = todayStr(),
+  viewer: PersonView = null,
 ): string | null {
+  // Person-scoped stops swap per viewer: during the Portugal leg the current
+  // stop is Pititas for Katia and Lisboa/Porto for Bruno. "Ambos" sees all.
+  const visible = allStops.filter((s) => stopVisibleTo(s, viewer));
+
   if (overrideId) {
-    const overridden = allStops.find((s) => s.id === overrideId);
+    const overridden = visible.find((s) => s.id === overrideId);
     if (overridden) return overridden.slug;
   }
 
-  const stops = allStops.filter((s) => !s.isFlexMargin && s.nights > 0);
+  const stops = visible.filter((s) => !s.isFlexMargin && s.nights > 0);
 
   for (const stop of stops) {
     if (stop.arrivalDate && stop.departureDate) {
@@ -53,7 +61,7 @@ export function computeCurrentStopSlug(
 }
 
 export async function getCurrentStopSlug(): Promise<string | null> {
-  const [override, stops] = await Promise.all([
+  const [override, stops, viewer] = await Promise.all([
     db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
     db.stop.findMany({
       orderBy: { order: "asc" },
@@ -65,11 +73,13 @@ export async function getCurrentStopSlug(): Promise<string | null> {
         isFlexMargin: true,
         arrivalDate: true,
         departureDate: true,
+        ownerPerson: true,
       },
     }),
+    getPerson(),
   ]);
 
-  return computeCurrentStopSlug(stops, override?.value ?? null);
+  return computeCurrentStopSlug(stops, override?.value ?? null, todayStr(), viewer);
 }
 
 export async function getTripDayNumber(slug: string): Promise<number | null> {

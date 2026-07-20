@@ -15,6 +15,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
+import { stopVisibleTo } from "@/lib/person";
 import { TodayPoiList } from "@/components/TodayPoiList";
 import { QuickAddPoi } from "@/components/QuickAddPoi";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -34,7 +35,7 @@ const KIND_LABEL: Record<string, string> = {
 export default async function HoyPage() {
   await requireAuth();
 
-  const [stops, override] = await Promise.all([
+  const [allStops, override, viewer] = await Promise.all([
     db.stop.findMany({
       orderBy: { order: "asc" },
       select: {
@@ -42,13 +43,19 @@ export default async function HoyPage() {
         order: true, nights: true, isCandidate: true, isFlexMargin: true,
         arrivalDate: true, departureDate: true, tempRange: true,
         latitude: true, longitude: true, timezone: true,
+        ownerPerson: true, isLocal: true,
       },
     }),
     db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
+    getPerson(),
   ]);
 
+  // Person-scoped stops swap per viewer: Katia's dashboard centres on Pititas
+  // during the Portugal leg, Bruno's on Lisboa/Porto. "Ambos" (null) sees all.
+  const stops = allStops.filter((s) => stopVisibleTo(s, viewer));
+
   const today = todayStr();
-  const currentSlug = computeCurrentStopSlug(stops, override?.value ?? null, today);
+  const currentSlug = computeCurrentStopSlug(stops, override?.value ?? null, today, viewer);
   const confirmed = stops.filter((s) => !s.isFlexMargin && !s.isCandidate);
 
   const firstArrivalStr =
@@ -123,7 +130,7 @@ export default async function HoyPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <PageHeader subtitle={todayLabel} actions={<PersonSwitcher person={await getPerson()} />} />
+      <PageHeader subtitle={todayLabel} actions={<PersonSwitcher person={viewer} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <PullToRefresh />
@@ -357,6 +364,7 @@ interface HeroStop {
   latitude: number;
   longitude: number;
   timezone: string | null;
+  isLocal: boolean;
 }
 
 /** Main hero while staying at a stop — city, trip day, days left, temp and sun. */
@@ -374,7 +382,8 @@ function CurrentStopHero({
     : null;
 
   const stayWindow = assumedDateWindow(stop, allStops);
-  const sunTimes = stayWindow
+  // A pseudo-city (Pititas) has no real coordinates → no sun/weather.
+  const sunTimes = !stop.isLocal && stayWindow
     ? tentativeSunTimes(stop.latitude, stop.longitude, stayWindow.arrival, stayWindow.departure, stop.timezone)
     : null;
 

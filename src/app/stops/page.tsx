@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
+import { getPerson } from "@/lib/person-server";
+import { stopVisibleTo } from "@/lib/person";
 import { AddStopButton } from "@/components/AddStopButton";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
@@ -19,14 +21,21 @@ export const metadata: Metadata = { title: "Itinerario · Andiamo" };
 
 export default async function StopsPage() {
   await requireAuth();
-  const [stops, currentSlug, tripStartSetting] = await Promise.all([
+  const [allStops, currentSlug, tripStartSetting, viewer] = await Promise.all([
     db.stop.findMany({ orderBy: { order: "asc" } }),
     getCurrentStopSlug(),
     db.setting.findUnique({ where: { key: "tripStartDate" } }),
+    getPerson(),
   ]);
 
-  // Derive trip range from DB data — no hardcoded dates.
-  const confirmedWithDates = stops.filter((s) => !s.isFlexMargin && !s.isCandidate);
+  // Person-scoped stops swap per viewer (Pititas for Katia in place of the
+  // Portugal leg); "Ambos" (null) sees the full household superset.
+  const stops = allStops.filter((s) => stopVisibleTo(s, viewer));
+
+  // Derive trip range from DB data — no hardcoded dates. Pseudo-cities (Pititas)
+  // never count as real stops in the stats or the trip range.
+  const realStops = stops.filter((s) => !s.isLocal);
+  const confirmedWithDates = realStops.filter((s) => !s.isFlexMargin && !s.isCandidate);
   const tripStartDate = confirmedWithDates.find((s) => s.arrivalDate)?.arrivalDate ?? null;
   const tripEndDate = [...confirmedWithDates].reverse().find((s) => s.departureDate)?.departureDate ?? null;
   const tripDays =
@@ -63,7 +72,7 @@ export default async function StopsPage() {
         <div className="grid grid-cols-3 gap-3 mb-5 animate-fade-in">
           <Stat
             label="Paradas"
-            value={stops.filter((s) => !s.isFlexMargin && !s.isCandidate).length.toString()}
+            value={confirmedWithDates.length.toString()}
           />
           <Stat
             label="Días"
@@ -72,7 +81,7 @@ export default async function StopsPage() {
           />
           <Stat
             label="Países"
-            value={[...new Set(stops.map((s) => s.country))].length.toString()}
+            value={[...new Set(realStops.map((s) => s.country))].length.toString()}
           />
         </div>
 

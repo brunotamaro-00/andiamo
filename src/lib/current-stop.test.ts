@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-// The module also exports DB-backed wrappers — stub the Prisma client out.
+// The module also exports DB-backed wrappers — stub the Prisma client and the
+// cookie-reading person helper (pulls in next/headers) out.
 vi.mock("./db", () => ({ db: {} }));
+vi.mock("./person-server", () => ({ getPerson: async () => null }));
 
 import { computeCurrentStopSlug, type CurrentStopInput } from "./current-stop";
 
@@ -18,6 +20,7 @@ function stop(
     order,
     nights: 2,
     isFlexMargin: false,
+    ownerPerson: null,
     arrivalDate: arrival ? new Date(`${arrival}T00:00:00.000Z`) : null,
     departureDate: departure ? new Date(`${departure}T00:00:00.000Z`) : null,
     ...overrides,
@@ -67,5 +70,26 @@ describe("computeCurrentStopSlug", () => {
 
   it("returns null for an empty list", () => {
     expect(computeCurrentStopSlug([], null, "2026-06-05")).toBeNull();
+  });
+
+  it("swaps the current stop per viewer for person-scoped overlaps", () => {
+    // Bruno in Porto while Katia is in Pititas over the same window.
+    const stops = [
+      stop("porto", 1, "2026-06-01", "2026-06-05", { ownerPerson: "bruno" }),
+      stop("pititas", 2, "2026-06-01", "2026-06-05", { ownerPerson: "katia" }),
+    ];
+    expect(computeCurrentStopSlug(stops, null, "2026-06-03", "bruno")).toBe("porto");
+    expect(computeCurrentStopSlug(stops, null, "2026-06-03", "katia")).toBe("pititas");
+    // "Ambos" sees all → first by order wins.
+    expect(computeCurrentStopSlug(stops, null, "2026-06-03", null)).toBe("porto");
+  });
+
+  it("ignores an override pointing at a stop the viewer can't see", () => {
+    const stops = [
+      stop("porto", 1, "2026-06-01", "2026-06-05", { ownerPerson: "bruno" }),
+      stop("pititas", 2, "2026-06-01", "2026-06-05", { ownerPerson: "katia" }),
+    ];
+    // Katia's session can't be pinned to Porto — falls back to her visible set.
+    expect(computeCurrentStopSlug(stops, "id-porto", "2026-06-03", "katia")).toBe("pititas");
   });
 });

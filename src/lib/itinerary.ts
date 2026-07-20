@@ -113,7 +113,12 @@ export function assumedDateWindow(
 export async function recalculateItinerary(): Promise<void> {
   const [tripStartSetting, stops] = await Promise.all([
     db.setting.findUnique({ where: { key: "tripStartDate" } }),
+    // Pseudo-cities (Pititas) sit *parallel* to the linear itinerary — they run
+    // during another stop's window, not after it. Feeding one into the cursor
+    // walk would push every later stop's dates by its nights, so keep them out
+    // of the recalculation entirely; their dates are fixed at seed time.
     db.stop.findMany({
+      where: { isLocal: false },
       orderBy: { order: "asc" },
       select: {
         id: true,
