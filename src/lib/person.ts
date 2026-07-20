@@ -1,8 +1,8 @@
-/** Who is looking at the expenses. This is a *view preference*, not auth:
- *  the app has a single shared APP_PASSWORD and anyone who knows it can switch
- *  person freely. It exists so each of us sees our own share of the Spitwise
- *  ledger, and it must never gate anything else — every other surface (stops,
- *  POIs, notes, documents, guides) shows both of us exactly the same thing. */
+/** Who is looking at the expenses. This is a *view preference*, not hard auth:
+ *  login is a Bruno/Katia picker (no password) and PersonSwitcher can still
+ *  change the view freely. It exists so each of us sees our own share of the
+ *  Spitwise ledger, and it must never gate anything else — every other surface
+ *  (stops, POIs, notes, documents, guides) shows both of us exactly the same thing. */
 
 export const PERSON_COOKIE_NAME = "trip_person";
 export const PERSON_MAX_AGE = 60 * 60 * 24 * 365;

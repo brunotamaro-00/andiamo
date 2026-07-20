@@ -7,7 +7,7 @@ Personal PWA travel guide for a 26-stop Europe trip. Designed to run as a home-s
 - Stop list with weather widget and currency info
 - POI management per stop (hostels, museums, food, transport…)
 - Notes and document storage per stop (and globally)
-- Password-protected, single-user
+- Login by picking Bruno or Katia (no password); session cookie lasts 90 days
 
 ## Tech stack
 
@@ -21,13 +21,12 @@ Personal PWA travel guide for a 26-stop Europe trip. Designed to run as a home-s
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `APP_PASSWORD` | Yes | Password for the app login screen |
 | `SESSION_SECRET` | Yes | Secret for HMAC session token signing |
 
 ## Local setup
 
 ```bash
-cp .env.example .env   # fill in the three vars above
+cp .env.example .env   # fill in DATABASE_URL + SESSION_SECRET
 npm install
 npm run db:migrate     # run Prisma migrations
 npm run db:seed        # seed the 26 stops
