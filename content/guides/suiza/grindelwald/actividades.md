@@ -48,6 +48,8 @@ El teleférico First es el "caballo de batalla" del Grindelwald activo. **Return
 | **Pfingstegg → Bäregg / Stieregg** | Moderado | 2–3h | Teleférico Pfingstegg (barato, aparte) | 8/10 | Balcón sobre el glaciar inferior de Grindelwald; menos concurrido |
 | **Grindelwald → Grosse Scheidegg** (o en PostBus) | Mod-Intenso | 3–4h a pie | Gratis a pie / PostBus | 8/10 | Paso alpino clásico entre Grindelwald y Meiringen |
 
+> ⭐ **Nuestros favoritos:** el **Eiger Trail (North Face of the Eiger)** y **First → Faulhorn → Schynige Platte**. Detalle completo (tiempos, agua, teleféricos, reseñas) en `trekkings.md`.
+
 ---
 
 ## 🏔️ Jungfraujoch — "Top of Europe" (el "caro" de esta base)
