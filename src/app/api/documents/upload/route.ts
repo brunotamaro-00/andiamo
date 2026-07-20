@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
   const label = ((formData.get("label") as string) ?? "").trim();
+  const note = ((formData.get("note") as string) ?? "").trim();
   const kind = (formData.get("kind") as DocumentKind) ?? "other";
   const stopId = (formData.get("stopId") as string) || null;
   const docDateRaw = ((formData.get("docDate") as string) ?? "").trim();
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
     data: {
       stopId,
       label: effectiveLabel,
+      note: note || null,
       kind,
       source: "upload",
       fileName: file.name,
