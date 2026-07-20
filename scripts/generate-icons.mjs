@@ -1,10 +1,15 @@
 /**
- * PWA icon generator — Andiamo brand mark.
+ * PWA icon generator — Andiamo brand mark (legacy map-pin draft).
  *
- * Renders the Andiamo map-pin symbol on a warm off-white canvas:
- *   • Background: canvas #FAF9F7
- *   • Pin body:   coral  #FF385C (solid fill, teardrop shape)
- *   • Inner dot:  #FFF0F3 (off-white, matches coral-bg)
+ * NOTE: Production icons use the hand mark (`public/logo.svg` / hand PNGs).
+ * Do not run this script unless you intentionally want to replace those assets.
+ * Tab favicons for non-HTML responses (e.g. `/api/documents/*`) come from
+ * `src/app/favicon.ico` — keep that in sync with the brick hand mark.
+ *
+ * Palette (matches globals.css @theme tokens):
+ *   • Background: canvas #F3ECD8
+ *   • Pin body:   brick  #C44428
+ *   • Inner dot:  brick-bg #FAE8E3
  *
  * Dependency-free; encodes PNG using only Node's built-in `zlib`.
  * Run with: `node scripts/generate-icons.mjs`
@@ -23,9 +28,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(__dirname, "..", "public");
 
 /* ── Palette (matches globals.css @theme tokens) ─────────────────── */
-const BG   = [0xfa, 0xf9, 0xf7]; // canvas #FAF9F7
-const PIN  = [0xff, 0x38, 0x5c]; // coral  #FF385C
-const DOT  = [0xff, 0xf0, 0xf3]; // coral-bg #FFF0F3
+const BG   = [0xf3, 0xec, 0xd8]; // canvas #F3ECD8
+const PIN  = [0xc4, 0x44, 0x28]; // brick  #C44428
+const DOT  = [0xfa, 0xe8, 0xe3]; // brick-bg #FAE8E3
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const lerp  = (a, b, t) => a + (b - a) * t;
