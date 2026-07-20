@@ -137,6 +137,7 @@ export const CreateDocumentLinkSchema = z.object({
   slug: z.string().nullable().optional(),
   stopId: z.string().transform((v) => v || null).nullable().optional(),
   label: requiredStr,
+  note: z.string().transform((v) => v.trim()).default(""),
   kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
   docDate: optionalDateStr,
   url: z
@@ -152,6 +153,7 @@ export const CreateDocumentLinkSchema = z.object({
  *  uploads leave it absent and keep their stored file. */
 export const UpdateDocumentSchema = z.object({
   label: requiredStr,
+  note: z.string().transform((v) => v.trim()).default(""),
   kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
   docDate: optionalDateStr,
   url: optionalUrl,

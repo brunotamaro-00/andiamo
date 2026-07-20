@@ -13,7 +13,7 @@ import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField, inputClass } from "@/components/ui/Field";
+import { Field, SelectField, TextareaField, inputClass } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InlineDeleteConfirm } from "@/components/ui/InlineDeleteConfirm";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
@@ -30,6 +30,7 @@ const ACCEPT = ".pdf,.jpg,.jpeg,.png,.webp";
 interface Document {
   id: string;
   label: string;
+  note: string | null;
   kind: string;
   source: string;
   fileName: string | null;
@@ -188,6 +189,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     const updated: Document = {
       ...doc,
       label: (formData.get("label") as string)?.trim() || doc.label,
+      note: ((formData.get("note") as string) ?? "").trim() || null,
       kind: (formData.get("kind") as string) || doc.kind,
       docDate: (formData.get("docDate") as string) || null,
       externalUrl:
@@ -209,6 +211,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     const temp: Document = {
       id: `temp-${Date.now()}`,
       label: (formData.get("label") as string) || "—",
+      note: ((formData.get("note") as string) ?? "").trim() || null,
       kind: (formData.get("kind") as string) || "other",
       source: "link",
       fileName: null,
@@ -275,6 +278,11 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                       {KIND_LABEL[doc.kind] ?? doc.kind}
                       {date ? ` · ${date}` : ""}
                     </p>
+                    {doc.note && (
+                      <p className="text-xs text-ink-3 truncate mt-0.5">
+                        {doc.note}
+                      </p>
+                    )}
                   </div>
                 </button>
                 {/* Explicit open icon — opens the document directly in one tap. */}
@@ -334,6 +342,12 @@ function DocDetailModal({
       <Modal title="Editar documento" onClose={onClose}>
         <form action={onSave} className="space-y-3">
           <Field label="Etiqueta" name="label" required defaultValue={doc.label} autoFocus />
+          <TextareaField
+            label="Nota"
+            name="note"
+            defaultValue={doc.note ?? ""}
+            placeholder="Descripción o detalle del documento…"
+          />
           <SelectField label="Tipo" name="kind" defaultValue={doc.kind}>
             {DOCUMENT_KINDS.map((k) => (
               <option key={k} value={k}>
@@ -386,6 +400,12 @@ function DocDetailModal({
             </p>
           </div>
         </div>
+
+        {doc.note && (
+          <p className="text-sm text-ink-2 whitespace-pre-wrap rounded-lg bg-surface-2/40 border border-border p-3">
+            {doc.note}
+          </p>
+        )}
 
         <div className="flex items-center gap-2">
           {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
@@ -466,6 +486,11 @@ function LinkForm({
           required
           placeholder="Ej: Check-in Generator Hostel"
         />
+        <TextareaField
+          label="Nota"
+          name="note"
+          placeholder="Opcional — descripción o detalle del documento"
+        />
         <SelectField label="Tipo" name="kind">
           {DOCUMENT_KINDS.map((k) => (
             <option key={k} value={k}>
@@ -536,6 +561,7 @@ function UploadForm({
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState("");
+  const [note, setNote] = useState("");
   const [kind, setKind] = useState("other");
   const [docDate, setDocDate] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -581,6 +607,7 @@ function UploadForm({
     const fd = new FormData();
     fd.set("file", file);
     fd.set("label", label.trim());
+    if (note.trim()) fd.set("note", note.trim());
     fd.set("kind", kind);
     if (docDate) fd.set("docDate", docDate);
     if (stopId) fd.set("stopId", stopId);
@@ -617,6 +644,13 @@ function UploadForm({
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Ej: Voucher hostel Londres"
+        />
+        <TextareaField
+          label="Nota"
+          name="note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Opcional — descripción o detalle del documento"
         />
         <SelectField
           label="Tipo"
