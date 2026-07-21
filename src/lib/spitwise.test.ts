@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { notifyStopsChanged } from "./spitwise";
+import { notifyNotesChanged, notifyStopsChanged } from "./spitwise";
 
 describe("notifyStopsChanged", () => {
   const fetchMock = vi.fn();
@@ -45,5 +45,14 @@ describe("notifyStopsChanged", () => {
     vi.stubEnv("SPITWISE_URL", "");
     await notifyStopsChanged();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("notifyNotesChanged posts notes.changed to the same hook", async () => {
+    fetchMock.mockResolvedValue({ ok: true });
+    await notifyNotesChanged();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("http://spitwise.test/api/v1/andiamo/sync-hook");
+    expect(JSON.parse(init.body).event).toBe("notes.changed");
   });
 });
