@@ -31,5 +31,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/documents|api/stops|_next/static|_next/image|favicon.ico).*)"],
+  // Spitwise integration routes authenticate with X-Api-Key in the handler —
+  // they must bypass the session cookie gate (same as /api/stops).
+  matcher: [
+    "/((?!api/documents|api/stops|api/notes|api/guides|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

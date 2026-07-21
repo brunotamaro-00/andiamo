@@ -43,7 +43,7 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 
 **Pruebas visuales / browser (MCP Playwright o Claude in Chrome):** siempre con viewport **iPhone 17** — `402×874` CSS px, `deviceScaleFactor: 3`, mobile UA. No probar el frontend en desktop por defecto.
 
-**Seeds:** `npm run db:seed` loads the real itinerary (Aug–Nov 2026 dates, real notes). `npm run db:seed:dev` (`prisma/seed-dev.ts`) loads **dummy data for local testing**: it reuses the exported `STOPS` from `seed.ts` but rebases every date around *today* so the trip appears at its midpoint (currently "in Viena", arrived 2 days ago) — this is what activates the `during` phase of `/hoy`. It also **wipes and regenerates** all notes/documents: current-stop docs plus trip-wide docs are `source:"link"` placeholders (no real files/addresses). Destructive to child tables — re-run `db:seed` to restore production data.
+**Seeds:** `npm run db:seed` loads the real itinerary (Aug–Nov 2026 dates, real notes). `npm run db:seed:dev` (`prisma/seed-dev.ts`) loads **dummy data for local testing**: it reuses the exported `STOPS` from `seed.ts` but rebases every date around *today* so the trip appears at its midpoint (currently "in Viena", arrived 2 days ago) — this is what activates the `during` phase of `/hoy`. It also **wipes and regenerates** notes/documents with itinerary-aligned placeholders (Auschwitz, zakaz handlu, monedas, vouchers por parada; `source:"link"`, no R2). Destructive to child tables — re-run `db:seed` to restore production data.
 
 ## Design system
 
