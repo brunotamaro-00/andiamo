@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaClient, DocumentKind } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { STOPS } from "./seed";
+import { STOP_DUMMY } from "./seed-dev-content";
 import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
 
 /**
@@ -11,15 +12,17 @@ import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
  * midpoint (currently in Viena), which lets the "during" phase of /hoy and
  * current-stop docs render without waiting for Aug 2026.
  *
+ * Notes/docs: tips y vouchers coherentes con Itinerary (seed-dev-content.ts).
+ * Cada parada toma al azar 1–4 notas y 1–4 docs de su pool. Sin archivos R2.
+ *
  * DESTRUCTIVE: wipes all Note / Document rows and re-creates dummy ones.
  * Stops are upserted (slugs preserved). Run the real seed (`npm run db:seed`)
- * to restore the production dataset. No real files/addresses are used.
+ * to restore the production dataset.
  */
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
 
-// --- Date rebasing: make Viena the current stop (arrived 2 days ago) ---------
 const today = todayStr();
 const vienaOrig = STOPS.find((s) => s.slug === "viena")!.arrivalDate!; // "2026-09-23"
 const OFFSET = daysBetween(vienaOrig, addDaysStr(today, -2));
@@ -28,17 +31,34 @@ function shift(dateStr: string | null): string | null {
   return dateStr ? addDaysStr(dateStr, OFFSET) : null;
 }
 
+function randInt(min: number, max: number): number {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+/** Fisher–Yates shuffle (copia). */
+function shuffled<T>(items: T[]): T[] {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickN<T>(items: T[], n: number): T[] {
+  return shuffled(items).slice(0, Math.min(n, items.length));
+}
+
 async function main() {
   console.log(`Seeding DEV data — hoy=${today}, offset=${OFFSET}d (Viena = parada actual)\n`);
 
-  // 1. Upsert stops with rebased dates ---------------------------------------
   console.log("Reescribiendo fechas de paradas...");
   for (let i = 0; i < STOPS.length; i++) {
     const stop = STOPS[i];
     const arrival = shift(stop.arrivalDate);
     const departure = shift(stop.departureDate);
     const data = {
-      order: i + 1, // position wins over the decorative `order` literal
+      order: i + 1,
       country: stop.country,
       countryFlag: stop.countryFlag,
       name: stop.name,
@@ -63,17 +83,11 @@ async function main() {
     });
   }
 
-  // 2. Wipe child tables (dummy content is regenerated each run) --------------
   console.log("Limpiando notas / documentos previos...");
   await prisma.note.deleteMany({});
   await prisma.document.deleteMany({});
 
-  const dbStops = await prisma.stop.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  // 3. Dummy documents (source "link", sin archivos reales) ------------------
-  console.log("Generando documentos dummy...");
+  const dbStops = await prisma.stop.findMany({ orderBy: { order: "asc" } });
   const currentStop = dbStops.find((s) => {
     if (!s.arrivalDate) return false;
     const arr = s.arrivalDate.toISOString().slice(0, 10);
@@ -81,56 +95,138 @@ async function main() {
     return arr <= today && today < dep;
   });
 
-  // Trip-wide docs (stopId: null)
-  const globalDocs: Array<{ label: string; kind: DocumentKind }> = [
-    { label: "Vuelo de ida BUE → LHR (ejemplo)", kind: "flight" },
-    { label: "Seguro de viaje (ejemplo)", kind: "insurance" },
-    { label: "Vuelo de regreso MAD → BUE (ejemplo)", kind: "flight" },
+  // --- Documentos (links dummy; coherentes con el viaje) ---------------------
+  console.log("Generando documentos dummy...");
+  const globalDocs: Array<{
+    label: string;
+    kind: DocumentKind;
+    note?: string;
+    docDate?: string;
+  }> = [
+    {
+      label: "Vuelo ida BUE → LHR",
+      kind: "flight",
+      note: "Smiles · ~USD 484 pp · 4→5 ago (data dummy)",
+      docDate: shift("2026-08-05") ?? undefined,
+    },
+    {
+      label: "Seguro PAX Assistance Long Stay",
+      kind: "insurance",
+      note: "BASIC 4 meses · USD 350 pp · COMPRADO (dummy)",
+    },
+    {
+      label: "Eurail Pass Global",
+      kind: "train",
+      note: "Activar en ventana correcta — ver EURAIL.md (dummy)",
+    },
+    {
+      label: "Vuelo regreso MAD → BUE",
+      kind: "flight",
+      note: "Plus Ultra · USD 473 pp · 21 nov (dummy)",
+      docDate: shift("2026-11-21") ?? undefined,
+    },
   ];
   for (const d of globalDocs) {
     await prisma.document.create({
-      data: { stopId: null, label: d.label, kind: d.kind, source: "link", externalUrl: "#" },
-    });
-  }
-
-  // Current-stop docs so /hoy muestra la sección de documentos
-  if (currentStop) {
-    const stopDocs: Array<{ label: string; kind: DocumentKind }> = [
-      { label: `Check-in ${currentStop.name} (ejemplo)`, kind: "checkin" },
-      { label: `Voucher alojamiento ${currentStop.name} (ejemplo)`, kind: "voucher" },
-      { label: `Entrada museo ${currentStop.name} (ejemplo)`, kind: "ticket" },
-    ];
-    for (const d of stopDocs) {
-      await prisma.document.create({
-        data: { stopId: currentStop.id, label: d.label, kind: d.kind, source: "link", externalUrl: "#" },
-      });
-    }
-  }
-  console.log("  ✓ documentos globales + parada actual");
-
-  // 5. Notas dummy ------------------------------------------------------------
-  console.log("Generando notas dummy...");
-  await prisma.note.create({
-    data: {
-      stopId: null,
-      title: "Monedas no-Euro (ejemplo)",
-      body: "CHF · CZK · PLN · HUF — sacar efectivo en cajeros bancarios. Data dummy.",
-      pinned: true,
-    },
-  });
-  if (currentStop) {
-    await prisma.note.create({
       data: {
-        stopId: currentStop.id,
-        title: `Notas de ${currentStop.name}`,
-        body: "Recordatorio de ejemplo para la parada actual. Data dummy.",
-        pinned: true,
+        stopId: null,
+        label: d.label,
+        kind: d.kind,
+        note: d.note ?? null,
+        source: "link",
+        externalUrl: "https://example.com/andiamo-dummy",
+        docDate: d.docDate ? new Date(d.docDate) : null,
       },
     });
   }
-  console.log("  ✓ notas");
+
+  // --- Documentos por parada (pool Itinerary, 1–4 al azar) -------------------
+  let stopDocCount = 0;
+  const missingDocSlugs: string[] = [];
+  for (const stop of dbStops) {
+    const pool = STOP_DUMMY[stop.slug]?.docs ?? [];
+    if (pool.length === 0) {
+      missingDocSlugs.push(stop.slug);
+      continue;
+    }
+    for (const d of pickN(pool, randInt(1, 4))) {
+      await prisma.document.create({
+        data: {
+          stopId: stop.id,
+          label: d.label,
+          kind: d.kind,
+          note: d.note,
+          source: "link",
+          externalUrl: "https://example.com/andiamo-dummy",
+        },
+      });
+      stopDocCount++;
+    }
+  }
+  console.log(
+    `  ✓ ${globalDocs.length} globales + ${stopDocCount} por parada` +
+      (missingDocSlugs.length ? ` · sin pool: ${missingDocSlugs.join(",")}` : ""),
+  );
+
+  // --- Notas (contenido que el bot de Spitwise puede citar vía /api/notes) --
+  console.log("Generando notas dummy...");
+  const globalNotes = [
+    {
+      title: "UK ETA",
+      body: "Ambos necesitan UK ETA (~£16 pp). Solo irlandeses exentos. Pedir antes del tramo UK.",
+      pinned: true,
+    },
+    {
+      title: "Schengen — Persona 2",
+      body: "89 días en Schengen (límite 90). Ámsterdam → fin del viaje incluyendo Portugal.",
+      pinned: true,
+    },
+    {
+      title: "Monedas no-Euro",
+      body:
+        "CHF (Suiza) · CZK (Chequia) · PLN (Polonia) · HUF (Hungría — cajero OTP Bank, NUNCA Euronet). " +
+        "En Polonia: dziękuję al pagar = 'quedate el cambio' — no decir gracias hasta recibir el vuelto.",
+      pinned: true,
+    },
+    {
+      title: "Domingo en Polonia",
+      body:
+        "Zakaz handlu: súper grandes cerrados la mayoría de los domingos. " +
+        "El domingo del tramo Cracovia NO es comercial → comprar el sábado. Abren Żabka, panaderías, gastronomía.",
+      pinned: false,
+    },
+  ];
+  for (const n of globalNotes) {
+    await prisma.note.create({ data: { ...n, stopId: null } });
+  }
+
+  let stopNoteCount = 0;
+  const missingNoteSlugs: string[] = [];
+  for (const stop of dbStops) {
+    const pool = STOP_DUMMY[stop.slug]?.notes ?? [];
+    if (pool.length === 0) {
+      missingNoteSlugs.push(stop.slug);
+      continue;
+    }
+    for (const n of pickN(pool, randInt(1, 4))) {
+      await prisma.note.create({
+        data: {
+          stopId: stop.id,
+          title: n.title,
+          body: n.body,
+          pinned: n.pinned ?? false,
+        },
+      });
+      stopNoteCount++;
+    }
+  }
+  console.log(
+    `  ✓ ${globalNotes.length} globales + ${stopNoteCount} por parada` +
+      (missingNoteSlugs.length ? ` · sin pool: ${missingNoteSlugs.join(",")}` : ""),
+  );
 
   console.log(`\nListo. Estás \"en\" ${currentStop?.name ?? "—"} 🎯`);
+  console.log("Guías markdown: content/guides (npm run guides:sync desde Itinerary).");
 }
 
 main()
