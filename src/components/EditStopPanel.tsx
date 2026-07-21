@@ -173,7 +173,7 @@ function EditModal({
       </form>
 
       {/* Danger zone — the confirmation runs in its own dialog: the stop
-          carries POIs, notas y documentos, so it follows the ConfirmDialog
+          carries notas y documentos, so it follows the ConfirmDialog
           policy (entity with children) instead of the inline row confirm. */}
       <div className="border-t border-border pt-3">
         <Button
@@ -189,7 +189,7 @@ function EditModal({
       {confirmDelete && (
         <ConfirmDialog
           title="Borrar ciudad"
-          message={`¿Borrar "${name}" y todos sus POIs, notas y documentos? Esta acción no se puede deshacer.`}
+          message={`¿Borrar "${name}" y todas sus notas y documentos? Esta acción no se puede deshacer.`}
           busy={isPending}
           error={mutationError}
           onConfirm={handleDelete}

@@ -16,8 +16,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
-import { TodayPoiList } from "@/components/TodayPoiList";
-import { QuickAddPoi } from "@/components/QuickAddPoi";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TripSpendStrip from "@/components/TripSpendStrip";
 import { Card, SectionHeader } from "@/components/ui/Card";
@@ -91,11 +89,6 @@ export default async function HoyPage() {
       ? db.stop.findUnique({
           where: { id: currentStop.id },
           select: {
-            pois: {
-              where: { done: false, reservationRequired: true },
-              orderBy: { createdAt: "asc" },
-              select: { id: true, name: true, type: true, done: true, reservationRequired: true },
-            },
             documents: {
               orderBy: [{ docDate: { sort: "asc", nulls: "last" } }, { createdAt: "asc" }],
               select: { id: true, label: true, kind: true },
@@ -220,34 +213,6 @@ export default async function HoyPage() {
                 </li>
               ))}
             </ul>
-          </Card>
-        )}
-
-        {/* Reservations to make at the current stop — only POIs marked
-            "Reservar"; the card hides entirely when there are none. */}
-        {showStopSections && details && details.pois.length > 0 && (
-          <Card className="animate-fade-in stagger-2">
-            <SectionHeader
-              title="Reservar acá"
-              count={details.pois.length}
-              action={
-                <>
-                  <Link
-                    href={`/stops/${currentStop!.slug}#pois`}
-                    className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
-                  >
-                    Ver todos
-                  </Link>
-                  <QuickAddPoi
-                    stopId={currentStop!.id}
-                    slug={currentStop!.slug}
-                    stopLat={currentStop!.latitude}
-                    stopLng={currentStop!.longitude}
-                  />
-                </>
-              }
-            />
-            <TodayPoiList slug={currentStop!.slug} pois={details.pois} />
           </Card>
         )}
 

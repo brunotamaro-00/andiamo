@@ -10,9 +10,6 @@ import { z } from "zod";
 /** Coerce a FormData value to a trimmed non-empty string, or throw. */
 const requiredStr = z.string().min(1, "required").transform((v) => v.trim());
 
-/** Optional string — null/empty → undefined */
-const optionalStr = z.string().transform((v) => v.trim() || undefined).optional();
-
 /** Optional URL string — validates format when present */
 const optionalUrl = z
   .string()
@@ -46,16 +43,6 @@ const coordStr = (min: number, max: number) =>
     }
     return n;
   });
-
-/** Optional coordinate-style number — empty/invalid → null, but a valid "0" is kept. */
-const optionalNumeric = z
-  .string()
-  .transform((v) => {
-    const n = parseFloat(v);
-    return Number.isFinite(n) ? n : null;
-  })
-  .nullable()
-  .optional();
 
 /** Optional YYYY-MM-DD date — empty/absent → null; a bad format is rejected. */
 const optionalDateStr = z
@@ -93,31 +80,6 @@ export const TripStartSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato AAAA-MM-DD")
     .refine((v) => !Number.isNaN(new Date(v).getTime()), "Fecha inválida"),
-});
-
-export const CreatePoiSchema = z.object({
-  stopId: requiredStr,
-  slug: requiredStr,
-  name: requiredStr,
-  type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
-  latitude: optionalNumeric,
-  longitude: optionalNumeric,
-  address: optionalStr,
-  url: optionalUrl,
-  notes: optionalStr,
-  reservationRequired: boolStr,
-});
-
-export const UpdatePoiSchema = z.object({
-  slug: requiredStr,
-  name: requiredStr,
-  type: z.enum(["hospedaje", "museo", "actividad", "comida", "mirador", "transporte", "otro"]).catch("otro"),
-  latitude: optionalNumeric,
-  longitude: optionalNumeric,
-  address: optionalStr,
-  url: optionalUrl,
-  notes: optionalStr,
-  reservationRequired: boolStr,
 });
 
 export const CreateNoteSchema = z.object({

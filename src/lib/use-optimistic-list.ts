@@ -8,7 +8,7 @@ import { haptics } from "./haptics";
  * useOptimisticList — shared hook for panels that manage a list with optimistic mutations.
  *
  * Encapsulates the useOptimistic + useTransition + mutationError + router.refresh()
- * boilerplate that was duplicated across NotesPanel, PoiPanel, and DocumentsPanel.
+ * boilerplate that was duplicated across NotesPanel and DocumentsPanel.
  *
  * Usage:
  *   const { items, mutate, mutationError, clearError, isPending } = useOptimisticList(

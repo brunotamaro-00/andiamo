@@ -13,8 +13,7 @@ export default function Loading() {
           <Skeleton className="h-11 flex-1 rounded-lg" />
           <Skeleton className="h-11 flex-1 rounded-lg" />
         </div>
-        {/* POIs / notes / docs cards */}
-        <Skeleton className="h-40 rounded-xl" />
+        {/* Notes / docs cards */}
         <Skeleton className="h-44 rounded-xl" />
         <Skeleton className="h-56 rounded-xl" />
       </main>

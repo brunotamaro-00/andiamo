@@ -3,7 +3,7 @@
 import { Loader2, ArrowDown } from "lucide-react";
 import { usePullToRefresh } from "@/lib/use-pull-to-refresh";
 
-/** Thin client wrapper mounted only on /hoy: weather/spend/POIs go stale with
+/** Thin client wrapper mounted only on /hoy: weather/spend go stale with
  *  staleTimes + SW SWR, and the natural mobile gesture to re-check is pulling
  *  down. Renders just the indicator — the page itself stays a RSC. */
 export function PullToRefresh() {
