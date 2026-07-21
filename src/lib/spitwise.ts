@@ -1,4 +1,4 @@
-/** Spitwise (expense tracker) integration. Same rule as rates.ts:
+/** Spitwise (expense tracker) integration. Rule:
  *  never let a third-party failure 500 a page — degrade to null.
  *  Env: SPITWISE_URL (falls back to the legacy BOTARDO_URL until the
  *  Railway variable is renamed) + TRIP_SHARED_API_KEY. */
