@@ -31,7 +31,6 @@ export async function createDocumentLink(formData: FormData) {
   }
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
-  revalidatePath("/hoy");
 }
 
 export async function updateDocument(id: string, formData: FormData, path: string) {
@@ -59,7 +58,6 @@ export async function updateDocument(id: string, formData: FormData, path: strin
   }
 
   revalidatePath(path);
-  revalidatePath("/hoy");
 }
 
 export async function deleteDocument(id: string, path: string) {
@@ -77,5 +75,4 @@ export async function deleteDocument(id: string, path: string) {
     if (!isRecordMissing(e)) throw e;
   }
   revalidatePath(path);
-  revalidatePath("/hoy");
 }

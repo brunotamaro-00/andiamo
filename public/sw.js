@@ -6,17 +6,16 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v10";   // bumped: POIs removed from /hoy, /stops, /search
+const SHELL_CACHE = "andiamo-shell-v11";   // bumped: /hoy now redirects to the current stop (not a shell route)
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
-// "/" is intentionally excluded: it always issues a redirect (→ /hoy or
-// /login), and a redirected response cannot be returned to a navigation
-// request — doing so triggers ERR_FAILED.
+// "/" and "/hoy" are intentionally excluded: both issue a redirect (→ the
+// current stop or /login), and a redirected response cannot be returned to a
+// navigation request — doing so triggers ERR_FAILED.
 const SHELL_ROUTES = [
-  "/hoy",
   "/stops",
   "/guias",
   "/general",

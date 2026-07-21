@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 import { springNav } from "@/lib/motion";
+import { useCurrentStopSlug } from "@/components/CurrentStopContext";
 
 const TABS = [
   {
@@ -42,8 +43,12 @@ const TABS = [
 
 export function TabBar() {
   const pathname = usePathname();
+  const currentStopSlug = useCurrentStopSlug();
 
   if (pathname === "/login") return null;
+
+  // "Hoy" redirects to the current stop's detail, so it also owns that route.
+  const currentStopPath = currentStopSlug ? `/stops/${currentStopSlug}` : null;
 
   return (
     <nav
@@ -52,7 +57,10 @@ export function TabBar() {
     >
       <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
-          const active = match(pathname);
+          const active =
+            href === "/hoy"
+              ? match(pathname) || pathname === currentStopPath
+              : match(pathname);
           return (
             <li key={href} className="flex-1">
               <Link
