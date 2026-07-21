@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect, useId, useMemo } from "react";
+import { useState, useRef, useId, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   BedDouble, Ticket, Car, TrainFront, ShieldCheck, Plane, FileText,
-  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, WifiOff, Download, Pencil,
+  ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, Download, Pencil,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createDocumentLink, updateDocument, deleteDocument } from "@/app/actions/documents";
@@ -92,67 +92,75 @@ type DocAction =
   | { type: "add"; doc: Document }
   | { type: "update"; doc: Document };
 
-/** Button that checks the SW cache and offers to save a document offline.
- *  Only rendered for uploaded files (source === "upload"). */
-function OfflineDocButton({ docId }: { docId: string }) {
-  const [cached, setCached] = useState<boolean | null>(null); // null = loading
+const docActionBtnClass =
+  "flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 disabled:opacity-40";
+
+/** Downloads an uploaded file to the device. On mobile, prefers the native
+ *  share sheet (Save to Files / Photos). Offline cache is automatic via the
+ *  service worker whenever the file is fetched (open or download). */
+function DownloadDocButton({
+  docId, fileName,
+}: {
+  docId: string;
+  fileName: string | null;
+}) {
   const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
   const url = `/api/documents/${docId}`;
+  const name = fileName?.trim() || `documento-${docId}`;
 
-  useEffect(() => {
-    let cancelled = false;
-    const check =
-      "caches" in window
-        ? caches.match(url).then((match) => !!match, () => false)
-        : Promise.resolve(false);
-    check.then((value) => {
-      if (!cancelled) setCached(value);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  async function handleSave() {
-    if (saving || cached) return;
+  async function handleDownload() {
+    if (saving) return;
     setSaving(true);
     try {
-      await fetch(url); // SW will intercept and cache it
-      setCached(true);
-    } catch {
-      // Network failure — can't cache right now
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const type = blob.type || "application/octet-stream";
+      const file = new File([blob], name, { type });
+
+      // iOS / Android: share sheet → "Guardar en Archivos" / Downloads
+      if (
+        typeof navigator.canShare === "function" &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({ files: [file], title: name });
+        return;
+      }
+
+      // Desktop / browsers without file sharing: trigger a real download
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = name;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      // User dismissed the share sheet — not an error
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast("No se pudo descargar el archivo");
     } finally {
       setSaving(false);
     }
   }
 
-  if (cached === null) return null; // still checking
-
-  if (cached) {
-    return (
-      <span
-        title="Disponible sin conexión"
-        aria-label="Disponible sin conexión"
-        className={`${actionBtn} text-success cursor-default`}
-      >
-        <WifiOff size={14} strokeWidth={1.5} aria-hidden="true" />
-      </span>
-    );
-  }
-
   return (
     <button
-      onClick={handleSave}
+      type="button"
+      onClick={handleDownload}
       disabled={saving}
-      title="Guardar para usar sin conexión"
-      aria-label="Guardar documento para uso sin conexión"
-      className={`${actionBtn} text-ink-faint hover:text-ink-2 hover:bg-surface-2 disabled:opacity-40`}
+      aria-label="Descargar documento al celular"
+      className={docActionBtnClass}
     >
       {saving ? (
-        <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+        <Loader2 size={13} className="animate-spin" aria-hidden="true" />
       ) : (
-        <Download size={14} strokeWidth={1.5} aria-hidden="true" />
+        <Download size={13} strokeWidth={2} aria-hidden="true" />
       )}
+      {saving ? "…" : "Descargar"}
     </button>
   );
 }
@@ -408,12 +416,14 @@ function DocDetailModal({
         )}
 
         <div className="flex items-center gap-2">
-          {doc.source === "upload" && <OfflineDocButton docId={doc.id} />}
+          {doc.source === "upload" && (
+            <DownloadDocButton docId={doc.id} fileName={doc.fileName} />
+          )}
           <a
             href={`/api/documents/${doc.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            className={docActionBtnClass}
           >
             Abrir
             <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
