@@ -34,6 +34,6 @@ export const config = {
   // Spitwise integration routes authenticate with X-Api-Key in the handler —
   // they must bypass the session cookie gate (same as /api/stops).
   matcher: [
-    "/((?!api/documents|api/stops|api/notes|api/guides|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/documents|api/stops|api/notes|api/guides|api/integration|_next/static|_next/image|favicon.ico).*)",
   ],
 };

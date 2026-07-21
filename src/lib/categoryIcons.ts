@@ -1,7 +1,7 @@
 import {
   BedDouble,
   Bus,
-  Gift,
+  Coffee,
   HeartPulse,
   type LucideIcon,
   ShoppingBag,
@@ -9,6 +9,7 @@ import {
   Tag,
   Ticket,
   UtensilsCrossed,
+  WashingMachine,
   Wine,
 } from "lucide-react";
 
@@ -19,12 +20,13 @@ import {
 const MAP: Record<string, LucideIcon> = {
   Alojamiento: BedDouble,
   Comida: UtensilsCrossed,
+  Cafetería: Coffee,
   Supermercado: ShoppingCart,
   Transporte: Bus,
   Actividades: Ticket,
   Compras: ShoppingBag,
   Salidas: Wine,
-  Regalos: Gift,
+  Lavandería: WashingMachine,
   Salud: HeartPulse,
   Otros: Tag,
 };
