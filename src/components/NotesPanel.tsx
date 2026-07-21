@@ -176,15 +176,19 @@ function NoteRow({
   onOpen: () => void;
   onTogglePin: () => void;
 }) {
+  const hasBody = Boolean(note.body?.trim());
+
   return (
     <div
-      className={`p-3 rounded-lg border transition-colors ${
+      className={`rounded-lg border transition-colors ${
+        hasBody ? "p-3" : "px-3 py-1.5"
+      } ${
         note.pinned
           ? "border-warning/30 bg-warning-bg/40"
           : "border-border bg-surface-2/30"
       }`}
     >
-      <div className="flex items-start gap-1">
+      <div className={`flex gap-1 ${hasBody ? "items-start" : "items-center"}`}>
         <button
           onClick={onOpen}
           aria-label={`Ver nota "${note.title}"`}
@@ -201,7 +205,7 @@ function NoteRow({
             )}
             <span className="text-sm font-medium text-ink truncate">{note.title}</span>
           </div>
-          {note.body && (
+          {hasBody && (
             <p className="text-xs text-ink-2 mt-0.5 whitespace-pre-wrap line-clamp-2">
               {note.body}
             </p>
@@ -212,7 +216,7 @@ function NoteRow({
           onClick={onTogglePin}
           aria-label={note.pinned ? "Quitar pin" : "Fijar arriba"}
           aria-pressed={note.pinned}
-          className={`${actionBtn} shrink-0 ${
+          className={`${actionBtn} shrink-0 ${hasBody ? "" : "-my-1.5"} ${
             note.pinned
               ? "text-warning hover:bg-surface-2"
               : "text-ink-faint hover:text-ink-2 hover:bg-surface-2"
