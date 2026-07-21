@@ -125,15 +125,15 @@ export async function fetchTripSpend(person: PersonView = null): Promise<TripSpe
   }
 }
 
-/** Fire-and-forget "stops.changed" ping so Spitwise re-pulls the itinerary
- *  immediately instead of waiting for its 6h lazy sync. Never throws — the
- *  lazy pull is the fallback when Spitwise is unreachable. Run it via
- *  `after()` from server actions so stop edits never wait on it. */
-export async function notifyStopsChanged(): Promise<void> {
+/** Fire-and-forget change ping so Spitwise re-pulls immediately instead of
+ *  waiting for its 6h lazy sync. Never throws — the lazy pull is the fallback
+ *  when Spitwise is unreachable. Run it via `after()` from server actions so
+ *  edits never wait on it. */
+async function notifyChanged(event: string): Promise<void> {
   const cfg = env();
   if (!cfg) return;
   const body = JSON.stringify({
-    event: "stops.changed",
+    event,
     source: "andiamo",
     ts: new Date().toISOString(),
   });
@@ -152,4 +152,12 @@ export async function notifyStopsChanged(): Promise<void> {
     }
     if (attempt === 0) await new Promise((r) => setTimeout(r, 1500));
   }
+}
+
+export async function notifyStopsChanged(): Promise<void> {
+  return notifyChanged("stops.changed");
+}
+
+export async function notifyNotesChanged(): Promise<void> {
+  return notifyChanged("notes.changed");
 }

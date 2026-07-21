@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { db, isRecordMissing } from "@/lib/db";
+import { notifyNotesChanged } from "@/lib/spitwise";
 import { requireAuth } from "@/lib/auth";
 import { parseForm, CreateNoteSchema, UpdateNoteSchema } from "./_schemas";
 
@@ -36,6 +38,7 @@ export async function createNote(formData: FormData) {
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
   revalidatePath("/search");
+  after(() => notifyNotesChanged());
 }
 
 export async function toggleNotePin(id: string, path: string) {
@@ -44,6 +47,7 @@ export async function toggleNotePin(id: string, path: string) {
   if (!note) return;
   await db.note.update({ where: { id }, data: { pinned: !note.pinned } });
   revalidatePath(path);
+  after(() => notifyNotesChanged());
 }
 
 export async function deleteNote(id: string, path: string) {
@@ -56,6 +60,7 @@ export async function deleteNote(id: string, path: string) {
   }
   revalidatePath(path);
   revalidatePath("/search");
+  after(() => notifyNotesChanged());
 }
 
 export async function updateNote(id: string, formData: FormData, path: string) {
@@ -79,4 +84,5 @@ export async function updateNote(id: string, formData: FormData, path: string) {
   }
   revalidatePath(path);
   revalidatePath("/search");
+  after(() => notifyNotesChanged());
 }
