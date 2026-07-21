@@ -5,7 +5,6 @@ import { computeCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { Suspense } from "react";
-import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
@@ -319,16 +318,6 @@ export default async function StopPage({ params }: Props) {
             path={path}
           />
         </div>
-
-        {/* Currency — streamed; converter stays interactive client-side.
-            Hidden for pseudo-cities (Pititas): no real "local" currency. */}
-        {!stop.isLocal && (
-          <div id="moneda" className="scroll-mt-20">
-            <Suspense fallback={<CurrencyCardSkeleton />}>
-              <CurrencySection currencyCode={stop.currencyCode} />
-            </Suspense>
-          </div>
-        )}
 
         {/* Spend panel — fed by Spitwise; degrades silently if unreachable */}
         <div id="gastos" className="scroll-mt-20">
