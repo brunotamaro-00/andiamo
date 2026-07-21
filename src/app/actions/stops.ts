@@ -68,7 +68,6 @@ export async function createStop(formData: FormData) {
   after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
-  revalidatePath("/hoy");
   redirect(`/stops/${slug}`);
 }
 
@@ -124,7 +123,6 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
 
   revalidatePath(`/stops/${current.slug}`);
   revalidatePath("/stops");
-  revalidatePath("/hoy");
 }
 
 export async function deleteStop(id: string) {
@@ -156,7 +154,6 @@ export async function deleteStop(id: string) {
   after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
-  revalidatePath("/hoy");
   redirect("/stops");
 }
 
@@ -177,6 +174,5 @@ export async function setTripStart(formData: FormData): Promise<{ error?: string
   after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
-  revalidatePath("/hoy");
   return {};
 }

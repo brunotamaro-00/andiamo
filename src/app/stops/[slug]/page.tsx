@@ -13,6 +13,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
+import { CurrentStopSync } from "@/components/CurrentStopContext";
 import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
@@ -144,7 +145,7 @@ export default async function StopPage({ params }: Props) {
       )
     : null;
 
-  // Same top-right countdown as /hoy's CurrentStopHero
+  // Top-right countdown while staying at this stop
   const daysLeft =
     isActive && tripPhase === "during" && stop.departureDate
       ? Math.max(0, daysBetween(today, dateToStr(stop.departureDate)))
@@ -158,8 +159,10 @@ export default async function StopPage({ params }: Props) {
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />
+        {/* Publish the current stop to the TabBar so "Hoy" lights up here */}
+        <CurrentStopSync slug={currentSlug} />
 
-        {/* City header — same composition as /hoy CurrentStopHero */}
+        {/* City header — flag, trip day, temp/sun, countdown */}
         <div
           className={`bg-surface border border-border rounded-xl p-4 card-shadow ${
             isActive ? "border-t-[3px] border-t-brick" : ""
@@ -196,7 +199,7 @@ export default async function StopPage({ params }: Props) {
               </h1>
               <p className="text-sm text-ink-2">{stop.country}</p>
             </div>
-            {/* Same slot as /hoy's ChevronRight — compact so card height matches */}
+            {/* Compact edit trigger in the header's top-right slot */}
             <div className="ml-auto shrink-0 [&_button]:h-auto [&_button]:w-auto [&_button]:p-0 [&_button]:text-border-strong [&_button]:hover:bg-transparent [&_button]:hover:text-ink">
               <EditStopPanel
                 stopId={stop.id}
@@ -294,6 +297,16 @@ export default async function StopPage({ params }: Props) {
         {/* City guide */}
         <GuideCard stopSlug={stop.slug} />
 
+        {/* Notes */}
+        <div id="notas" className="scroll-mt-20">
+          <NotesPanel
+            stopId={stop.id}
+            slug={stop.slug}
+            notes={stop.notes.map((n) => ({ ...n, createdAt: n.createdAt }))}
+            path={path}
+          />
+        </div>
+
         {/* Documents */}
         <div id="docs" className="scroll-mt-20">
           <DocumentsPanel
@@ -305,16 +318,6 @@ export default async function StopPage({ params }: Props) {
                 docDate: d.docDate ? d.docDate.toISOString().slice(0, 10) : null,
               })) as Parameters<typeof DocumentsPanel>[0]["documents"]
             }
-            path={path}
-          />
-        </div>
-
-        {/* Notes */}
-        <div id="notas" className="scroll-mt-20">
-          <NotesPanel
-            stopId={stop.id}
-            slug={stop.slug}
-            notes={stop.notes.map((n) => ({ ...n, createdAt: n.createdAt }))}
             path={path}
           />
         </div>

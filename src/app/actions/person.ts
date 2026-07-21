@@ -26,7 +26,6 @@ export async function setPerson(value: string): Promise<{ error: string } | void
     return { error: "Persona inválida" };
   }
 
-  // The two spend surfaces: the /hoy strip and every stop detail panel.
-  revalidatePath("/hoy");
+  // Spend surface: every stop detail panel reflects the new person view.
   revalidatePath("/stops/[slug]", "page");
 }
