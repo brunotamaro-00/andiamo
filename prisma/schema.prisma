@@ -33,40 +33,10 @@ model Stop {
   /// Pseudo-city that exists only in Andiamo's per-person view: no flag/sun/
   /// weather/temp/currency, and excluded from the /api/stops sync to Spitwise.
   isLocal       Boolean    @default(false)
-  pois          Poi[]
   notes         Note[]
   documents     Document[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-}
-
-model Poi {
-  id                  String   @id @default(cuid())
-  stopId              String
-  stop                Stop     @relation(fields: [stopId], references: [id], onDelete: Cascade)
-  name                String
-  type                PoiType  @default(otro)
-  latitude            Float?
-  longitude           Float?
-  address             String?
-  url                 String?
-  notes               String?
-  reservationRequired Boolean  @default(false)
-  done                Boolean  @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  @@index([stopId])
-}
-
-enum PoiType {
-  hospedaje
-  museo
-  actividad
-  comida
-  mirador
-  transporte
-  otro
 }
 
 model Note {

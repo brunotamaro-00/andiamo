@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient, PoiType, DocumentKind } from "../src/generated/prisma/client";
+import { PrismaClient, DocumentKind } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { STOPS } from "./seed";
 import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
@@ -8,10 +8,10 @@ import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
  * seed-dev.ts — DEV-ONLY dummy data for local navigation/testing.
  *
  * Rebases the whole itinerary around TODAY so the trip appears to be at its
- * midpoint (currently in Viena), which lets the "during" phase of /hoy,
- * current-stop docs, and pending POIs render without waiting for Aug 2026.
+ * midpoint (currently in Viena), which lets the "during" phase of /hoy and
+ * current-stop docs render without waiting for Aug 2026.
  *
- * DESTRUCTIVE: wipes all Poi / Note / Document rows and re-creates dummy ones.
+ * DESTRUCTIVE: wipes all Note / Document rows and re-creates dummy ones.
  * Stops are upserted (slugs preserved). Run the real seed (`npm run db:seed`)
  * to restore the production dataset. No real files/addresses are used.
  */
@@ -27,15 +27,6 @@ const OFFSET = daysBetween(vienaOrig, addDaysStr(today, -2));
 function shift(dateStr: string | null): string | null {
   return dateStr ? addDaysStr(dateStr, OFFSET) : null;
 }
-
-// Per-stop POI blueprint. `reserva` → reservationRequired (fuels /hoy badges).
-const POI_TEMPLATES: Array<{ suffix: string; type: PoiType; reserva: boolean }> = [
-  { suffix: "Alojamiento céntrico", type: "hospedaje", reserva: true },
-  { suffix: "Museo principal", type: "museo", reserva: true },
-  { suffix: "Casco histórico a pie", type: "actividad", reserva: false },
-  { suffix: "Mirador panorámico", type: "mirador", reserva: false },
-  { suffix: "Cena típica del lugar", type: "comida", reserva: false },
-];
 
 async function main() {
   console.log(`Seeding DEV data — hoy=${today}, offset=${OFFSET}d (Viena = parada actual)\n`);
@@ -73,8 +64,7 @@ async function main() {
   }
 
   // 2. Wipe child tables (dummy content is regenerated each run) --------------
-  console.log("Limpiando POIs / notas / documentos previos...");
-  await prisma.poi.deleteMany({});
+  console.log("Limpiando notas / documentos previos...");
   await prisma.note.deleteMany({});
   await prisma.document.deleteMany({});
 
@@ -82,39 +72,7 @@ async function main() {
     orderBy: { order: "asc" },
   });
 
-  // 3. Dummy POIs: past = done, current = mixto, futuro = pendiente -----------
-  console.log("Generando POIs dummy...");
-  let poiCount = 0;
-  for (const stop of dbStops) {
-    if (stop.isCandidate || !stop.arrivalDate) continue;
-    const arr = stop.arrivalDate.toISOString().slice(0, 10);
-    const dep = stop.departureDate?.toISOString().slice(0, 10) ?? arr;
-    const isPast = dep < today;
-    const isCurrent = arr <= today && today < dep;
-
-    for (const [i, t] of POI_TEMPLATES.entries()) {
-      // Past → todo hecho. Actual → solo el alojamiento hecho. Futuro → nada.
-      const done = isPast || (isCurrent && t.type === "hospedaje");
-      await prisma.poi.create({
-        data: {
-          stopId: stop.id,
-          name: `${stop.name} — ${t.suffix}`,
-          type: t.type,
-          latitude: stop.latitude + (i - 2) * 0.004,
-          longitude: stop.longitude + (i - 2) * 0.004,
-          address: `Dirección de ejemplo ${i + 1}, ${stop.name}`,
-          url: null,
-          notes: t.reserva ? "Reserva de ejemplo (data dummy)." : "",
-          reservationRequired: t.reserva,
-          done,
-        },
-      });
-      poiCount++;
-    }
-  }
-  console.log(`  ✓ ${poiCount} POIs`);
-
-  // 4. Dummy documents (source "link", sin archivos reales) ------------------
+  // 3. Dummy documents (source "link", sin archivos reales) ------------------
   console.log("Generando documentos dummy...");
   const currentStop = dbStops.find((s) => {
     if (!s.arrivalDate) return false;

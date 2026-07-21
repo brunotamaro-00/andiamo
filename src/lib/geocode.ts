@@ -21,7 +21,7 @@ export async function geocodeCity(query: string): Promise<GeoResult[]> {
     if (!res.ok) return [];
     data = await res.json();
   } catch {
-    // Network/parse failure — degrade to no results, same as searchPlaces
+    // Network/parse failure — degrade to no results
     return [];
   }
 

@@ -6,7 +6,7 @@
 // Weather/rates now arrive server-rendered inside the page HTML.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v9";   // bumped: itinerario auto-scroll, /hoy reservas, hero inline
+const SHELL_CACHE = "andiamo-shell-v10";   // bumped: POIs removed from /hoy, /stops, /search
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];

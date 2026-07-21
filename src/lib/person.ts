@@ -2,7 +2,7 @@
  *  login is a Bruno/Katia picker (no password) and PersonSwitcher can still
  *  change the view freely. It exists so each of us sees our own share of the
  *  Spitwise ledger, and it must never gate anything else — every other surface
- *  (stops, POIs, notes, documents, guides) shows both of us exactly the same thing. */
+ *  (stops, notes, documents, guides) shows both of us exactly the same thing. */
 
 export const PERSON_COOKIE_NAME = "trip_person";
 export const PERSON_MAX_AGE = 60 * 60 * 24 * 365;

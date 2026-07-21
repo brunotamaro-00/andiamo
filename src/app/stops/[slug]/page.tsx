@@ -6,7 +6,6 @@ import { todayStr, dateToStr, daysBetween, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { Suspense } from "react";
 import { CurrencySection, CurrencyCardSkeleton } from "@/components/CurrencySection";
-import { PoiPanel } from "@/components/PoiPanel";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
 import { EditStopPanel } from "@/components/EditStopPanel";
@@ -51,9 +50,6 @@ export default async function StopPage({ params }: Props) {
     db.stop.findUnique({
       where: { slug },
       include: {
-        pois: {
-          orderBy: [{ done: "asc" }, { createdAt: "asc" }],
-        },
         notes: { orderBy: [{ pinned: "desc" }, { createdAt: "desc" }] },
         documents: { orderBy: { createdAt: "asc" } },
       },
@@ -321,17 +317,6 @@ export default async function StopPage({ params }: Props) {
             slug={stop.slug}
             notes={stop.notes.map((n) => ({ ...n, createdAt: n.createdAt }))}
             path={path}
-          />
-        </div>
-
-        {/* POIs */}
-        <div id="pois" className="scroll-mt-20">
-          <PoiPanel
-            stopId={stop.id}
-            slug={stop.slug}
-            stopLat={stop.latitude}
-            stopLng={stop.longitude}
-            pois={stop.pois as Parameters<typeof PoiPanel>[0]["pois"]}
           />
         </div>
 

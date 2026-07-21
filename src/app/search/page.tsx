@@ -6,7 +6,6 @@ import { SearchBox } from "@/components/SearchBox";
 import { RecentSearches } from "@/components/RecentSearches";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Badge } from "@/components/ui/Badge";
 import {
   Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
 } from "lucide-react";
@@ -30,7 +29,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const hasQuery = query.length >= 2;
 
   const viewer = await getPerson();
-  const [stopHits, poiHits, noteHits, docHits] = hasQuery
+  const [stopHits, noteHits, docHits] = hasQuery
     ? await Promise.all([
         db.stop.findMany({
           where: {
@@ -42,22 +41,6 @@ export default async function SearchPage({ searchParams }: Props) {
           },
           orderBy: { order: "asc" },
           select: { slug: true, name: true, country: true, countryFlag: true, ownerPerson: true },
-        }),
-        db.poi.findMany({
-          where: {
-            OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { address: { contains: query, mode: "insensitive" } },
-              { notes: { contains: query, mode: "insensitive" } },
-            ],
-          },
-          orderBy: [{ done: "asc" }, { createdAt: "asc" }],
-          select: {
-            id: true,
-            name: true,
-            done: true,
-            stop: { select: { slug: true, name: true, countryFlag: true, ownerPerson: true } },
-          },
         }),
         db.note.findMany({
           where: {
@@ -86,18 +69,17 @@ export default async function SearchPage({ searchParams }: Props) {
           },
         }),
       ])
-    : [[], [], [], []];
+    : [[], [], []];
 
-  // Person-scoped stops (and their POIs/notes/docs) only surface for their
+  // Person-scoped stops (and their notes/docs) only surface for their
   // owner; general (stopless) notes/docs always show. "Ambos" sees everything.
   const stops = stopHits.filter((s) => stopVisibleTo(s, viewer));
-  const pois = poiHits.filter((p) => stopVisibleTo(p.stop, viewer));
   const notes = noteHits.filter((n) => !n.stop || stopVisibleTo(n.stop, viewer));
   const documents = docHits.filter((d) => !d.stop || stopVisibleTo(d.stop, viewer));
 
   const guideHits = hasQuery ? searchGuides(query) : [];
 
-  const total = stops.length + pois.length + notes.length + documents.length + guideHits.length;
+  const total = stops.length + notes.length + documents.length + guideHits.length;
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -114,7 +96,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <EmptyState
               icon={Search}
               title="Buscá en todo el viaje"
-              description="Encontrá ciudades, puntos de interés y notas. Escribí al menos 2 letras."
+              description="Encontrá ciudades, notas, documentos y guías. Escribí al menos 2 letras."
             />
           </>
         )}
@@ -138,24 +120,6 @@ export default async function SearchPage({ searchParams }: Props) {
                   flag={s.countryFlag}
                   title={s.name}
                   subtitle={s.country}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {hasQuery && pois.length > 0 && (
-          <section>
-            <ResultHeading icon={MapPin} label="Puntos de interés" count={pois.length} />
-            <div className="space-y-1.5">
-              {pois.map((p) => (
-                <ResultRow
-                  key={p.id}
-                  href={`/stops/${p.stop.slug}#pois`}
-                  flag={p.stop.countryFlag}
-                  title={p.name}
-                  subtitle={p.stop.name}
-                  badge={p.done ? <Badge variant="success">hecho</Badge> : undefined}
                 />
               ))}
             </div>

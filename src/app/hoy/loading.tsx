@@ -10,8 +10,6 @@ export default function Loading() {
         <Skeleton className="h-32 rounded-xl" />
         {/* Spend strip */}
         <Skeleton className="h-16 rounded-xl" />
-        {/* Pending POIs card */}
-        <Skeleton className="h-40 rounded-xl" />
         {/* Docs / urgent */}
         <Skeleton className="h-24 rounded-xl" />
         {/* Next stop */}
