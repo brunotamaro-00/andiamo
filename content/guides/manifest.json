@@ -194,6 +194,11 @@
           "slug": "costumbres-inglaterra",
           "title": "Costumbres en Inglaterra (Londres y York)",
           "file": "reino-unido/costumbres-inglaterra.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Reino Unido (inglés)",
+          "file": "reino-unido/frases-utiles.md"
         }
       ]
     },
@@ -259,6 +264,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Países Bajos",
           "file": "paises-bajos/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Países Bajos (neerlandés)",
+          "file": "paises-bajos/frases-utiles.md"
         }
       ]
     },
@@ -402,6 +412,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Francia",
           "file": "francia/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Francia (francés)",
+          "file": "francia/frases-utiles.md"
         }
       ]
     },
@@ -516,6 +531,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Portugal",
           "file": "portugal/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Portugal (portugués)",
+          "file": "portugal/frases-utiles.md"
         }
       ]
     },
@@ -591,6 +611,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Alemania",
           "file": "alemania/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Alemania (alemán)",
+          "file": "alemania/frases-utiles.md"
         }
       ]
     },
@@ -709,6 +734,11 @@
           "file": "suiza/costumbres.md"
         },
         {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Suiza (alemán suizo)",
+          "file": "suiza/frases-utiles.md"
+        },
+        {
           "slug": "gastronomia",
           "title": "Gastronomía",
           "file": "suiza/gastronomia.md"
@@ -821,6 +851,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Austria",
           "file": "austria/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Austria (alemán)",
+          "file": "austria/frases-utiles.md"
         }
       ]
     },
@@ -886,6 +921,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Chequia",
           "file": "chequia/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Chequia (checo)",
+          "file": "chequia/frases-utiles.md"
         }
       ]
     },
@@ -956,6 +996,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Polonia",
           "file": "polonia/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Polonia (polaco)",
+          "file": "polonia/frases-utiles.md"
         }
       ]
     },
@@ -1031,6 +1076,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Hungría",
           "file": "hungria/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Hungría (húngaro)",
+          "file": "hungria/frases-utiles.md"
         }
       ]
     },
@@ -1226,6 +1276,11 @@
           "slug": "costumbres",
           "title": "Costumbres en Eslovenia",
           "file": "eslovenia/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Eslovenia (esloveno)",
+          "file": "eslovenia/frases-utiles.md"
         }
       ]
     },
@@ -1539,7 +1594,13 @@
           "dayTrips": []
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — Italia (italiano)",
+          "file": "italia/frases-utiles.md"
+        }
+      ]
     },
     {
       "order": 13,
@@ -1626,7 +1687,13 @@
           "dayTrips": []
         }
       ],
-      "countryDocs": []
+      "countryDocs": [
+        {
+          "slug": "frases-utiles",
+          "title": "Frases Útiles — España (español + catalán)",
+          "file": "espana/frases-utiles.md"
+        }
+      ]
     }
   ],
   "general": [
