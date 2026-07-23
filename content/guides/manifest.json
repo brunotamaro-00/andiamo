@@ -1281,6 +1281,11 @@
           "slug": "frases-utiles",
           "title": "Frases Útiles — Eslovenia (esloveno)",
           "file": "eslovenia/frases-utiles.md"
+        },
+        {
+          "slug": "trekkings",
+          "title": "Trekkings — Alpes Julianos / Parque Nacional del Triglav",
+          "file": "eslovenia/trekkings.md"
         }
       ]
     },
