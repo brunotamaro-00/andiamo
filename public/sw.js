@@ -1,15 +1,20 @@
-// Andiamo Service Worker v4
+// Andiamo Service Worker v5
 // Strategy summary:
 //   /api/documents/*  GET  → cache-first (offline-capable document files)
-//   Navigation + /_next/static/ → stale-while-revalidate (app shell)
-//   Everything else → network-only (auth-gated API routes)
-// Weather/rates now arrive server-rendered inside the page HTML.
+//   Navigation             → network-first (fresh data online, cached shell offline)
+//   /_next/static/         → stale-while-revalidate (immutable build assets)
+//   Everything else        → network-only (auth-gated API routes, RSC payloads)
+// Weather/rates arrive server-rendered inside the page HTML.
+//
+// "Descargar viaje" (PRECACHE_TRIP message) warms the trip cache with every
+// stop/guide page HTML + uploaded document, so airplane mode stays readable.
 
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v11";   // bumped: /hoy now redirects to the current stop (not a shell route)
+const SHELL_CACHE = "andiamo-shell-v12";   // bumped: navigation is now network-first
+const TRIP_CACHE  = "andiamo-trip-v1";     // on-demand precache of stop/guide route HTML
 const OFFLINE_URL = "/offline.html";
 
-const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE];
+const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE, TRIP_CACHE];
 
 // Shell routes to precache on install so the app works offline from first load.
 // "/" and "/hoy" are intentionally excluded: both issue a redirect (→ the
@@ -47,16 +52,28 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Logout asks for a full cache wipe so cached authenticated pages
-// can't be served after the session cookie is gone.
 self.addEventListener("message", (event) => {
-  if (event.data?.type !== "CLEAR_ALL_CACHES") return;
-  event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-      .then(() => event.ports[0]?.postMessage({ done: true }))
-  );
+  const data = event.data;
+  if (!data || typeof data !== "object") return;
+
+  // Logout asks for a full cache wipe so cached authenticated pages
+  // can't be served after the session cookie is gone.
+  if (data.type === "CLEAR_ALL_CACHES") {
+    event.waitUntil(
+      caches
+        .keys()
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        .then(() => event.ports[0]?.postMessage({ done: true }))
+    );
+    return;
+  }
+
+  // "Descargar viaje": warm the trip + docs caches with the given URLs,
+  // reporting progress back over the MessageChannel port.
+  if (data.type === "PRECACHE_TRIP") {
+    event.waitUntil(precacheTrip(data.routes ?? [], data.docs ?? [], event.ports[0]));
+    return;
+  }
 });
 
 self.addEventListener("fetch", (event) => {
@@ -69,9 +86,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── 2. Navigation — stale-while-revalidate (app shell) ───────────────────
+  // ── 2. Navigation — network-first (fresh online, cached shell offline) ────
   if (request.mode === "navigate") {
-    event.respondWith(navigateWithFallback(request));
+    event.respondWith(networkFirstNavigate(request, url));
     return;
   }
 
@@ -81,7 +98,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Everything else: network-only (auth API routes, mutations, etc.)
+  // Everything else: network-only (auth API routes, RSC payloads, mutations).
 });
 
 /** Cache-first for uploaded document files.
@@ -119,26 +136,74 @@ async function staleWhileRevalidate(cacheName, request) {
   return cached ?? (await networkFetch) ?? offlinePage();
 }
 
-/** Navigation: serve cached shell instantly, revalidate in background.
- *  Hard loads on a slow network stop waiting for the server; the fresh
- *  page replaces the cached copy for the next visit. */
-async function navigateWithFallback(request) {
-  const cache = await caches.open(SHELL_CACHE);
-  const cached = await cache.match(request);
+/** Navigation: network-first so online visits always render fresh data (the
+ *  pages are force-dynamic). The fresh HTML is cached for offline use. When the
+ *  network fails, fall back to the cached copy, then the offline page.
+ *
+ *  Offline soft navigations in the App Router fail their RSC fetch and Next
+ *  falls back to a hard navigation, which lands here and is served from cache. */
+async function networkFirstNavigate(request, url) {
+  const shell = await caches.open(SHELL_CACHE);
+  const trip = await caches.open(TRIP_CACHE);
 
-  const networkFetch = fetch(request)
-    .then((response) => {
-      // Never cache a redirected response: returning one to a navigation
-      // request fails with ERR_FAILED.
-      if (response.ok && !response.redirected) cache.put(request, response.clone());
-      return response;
-    })
-    .catch(() => null);
+  try {
+    const response = await fetch(request);
+    // Never cache a redirected response: returning one to a navigation request
+    // fails with ERR_FAILED. Store fresh HTML in the trip cache for offline.
+    if (response.ok && !response.redirected) {
+      trip.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    // Offline: serve the cached copy of this exact route if we have one.
+    const cached = (await trip.match(request)) ?? (await shell.match(request));
+    if (cached && !cached.redirected) return cached;
 
-  // A cached redirected response can't be served to a navigation either —
-  // fall through to the network in that case.
-  if (cached && !cached.redirected) return cached;
-  return (await networkFetch) ?? offlinePage();
+    // "/" and "/hoy" redirect server-side and can't be cached — offline, fall
+    // back to the itinerary as the entry point.
+    if (url.pathname === "/" || url.pathname === "/hoy") {
+      const stops = await shell.match("/stops");
+      if (stops && !stops.redirected) return stops;
+    }
+
+    return offlinePage();
+  }
+}
+
+/** Precache every trip route (HTML) and uploaded document, posting progress
+ *  ({ done, total, bytes } / { finished, bytes } / { error }) over `port`. */
+async function precacheTrip(routes, docs, port) {
+  const tripCache = await caches.open(TRIP_CACHE);
+  const docsCache = await caches.open(DOCS_CACHE);
+  const total = routes.length + docs.length;
+  let done = 0;
+  let bytes = 0;
+
+  const report = () => port?.postMessage({ done, total, bytes });
+
+  async function warm(cache, requestUrl) {
+    try {
+      const res = await fetch(requestUrl, { credentials: "same-origin" });
+      if (res.ok && !res.redirected && res.status === 200) {
+        const buf = await res.clone().arrayBuffer();
+        bytes += buf.byteLength;
+        await cache.put(requestUrl, res);
+      }
+    } catch {
+      // Skip individual failures — a partial download is still useful.
+    } finally {
+      done += 1;
+      report();
+    }
+  }
+
+  try {
+    for (const route of routes) await warm(tripCache, route);
+    for (const docUrl of docs) await warm(docsCache, docUrl);
+    port?.postMessage({ finished: true, done, total, bytes });
+  } catch (err) {
+    port?.postMessage({ error: String(err) });
+  }
 }
 
 /** Returns the offline fallback HTML page. */

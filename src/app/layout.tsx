@@ -7,6 +7,7 @@ import { Providers } from "@/components/Providers";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TabBar />
         </Providers>
         <OfflineBanner />
+        <PullToRefresh />
         <InstallPrompt />
         <ServiceWorkerRegister />
         {/* Portal target for modals — outside scroll-root so inert doesn't block modal interaction */}
