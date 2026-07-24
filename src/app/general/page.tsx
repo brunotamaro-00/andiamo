@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NotesPanel } from "@/components/NotesPanel";
 import { DocumentsPanel } from "@/components/DocumentsPanel";
+import { DownloadTripButton } from "@/components/DownloadTripButton";
 import { PageHeader } from "@/components/PageHeader";
 import { HashScroller } from "@/components/HashScroller";
 
@@ -46,6 +47,8 @@ export default async function GeneralPage() {
           })) as Parameters<typeof DocumentsPanel>[0]["documents"]}
           path="/general"
         />
+
+        <DownloadTripButton />
       </main>
     </div>
   );
