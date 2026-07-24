@@ -2,18 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 import { springNav } from "@/lib/motion";
-import { useCurrentStopSlug } from "@/components/CurrentStopContext";
 
 const TABS = [
   {
     href: "/stops",
     label: "Itinerario",
     icon: List,
-    match: (p: string) => p === "/stops",
+    // Itinerario owns the whole itinerary section: the list and any stop detail.
+    match: (p: string) => p === "/stops" || p.startsWith("/stops/"),
   },
   {
     href: "/hoy",
@@ -43,12 +44,17 @@ const TABS = [
 
 export function TabBar() {
   const pathname = usePathname();
-  const currentStopSlug = useCurrentStopSlug();
+  const onStopDetail = pathname.startsWith("/stops/");
+
+  // Remember the last stop detail visited this session, so returning to the
+  // Itinerario tab reopens it instead of the list. Tapping Itinerario while
+  // already on a stop detail goes back up to the list.
+  const [lastStopPath, setLastStopPath] = useState<string | null>(null);
+  useEffect(() => {
+    if (onStopDetail) setLastStopPath(pathname);
+  }, [onStopDetail, pathname]);
 
   if (pathname === "/login") return null;
-
-  // "Hoy" redirects to the current stop's detail, so it also owns that route.
-  const currentStopPath = currentStopSlug ? `/stops/${currentStopSlug}` : null;
 
   return (
     <nav
@@ -57,14 +63,17 @@ export function TabBar() {
     >
       <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
-          const active =
-            href === "/hoy"
-              ? match(pathname) || pathname === currentStopPath
-              : match(pathname);
+          const active = match(pathname);
+          // Itinerario reopens the last stop unless we're already on a detail
+          // (then it goes up to the list).
+          const targetHref =
+            href === "/stops" && !onStopDetail
+              ? (lastStopPath ?? "/stops")
+              : href;
           return (
             <li key={href} className="flex-1">
               <Link
-                href={href}
+                href={targetHref}
                 aria-current={active ? "page" : undefined}
                 onClick={() => { if (!active) haptics.tap(); }}
                 className={[
