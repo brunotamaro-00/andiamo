@@ -170,24 +170,33 @@ async function networkFirstNavigate(request, url) {
   }
 }
 
+// Max in-flight requests while precaching. The bottleneck is latency × N, so a
+// small pool cuts wall time without hammering the server or the connection.
+const PRECACHE_CONCURRENCY = 6;
+
 /** Precache every trip route (HTML) and uploaded document, posting progress
- *  ({ done, total, bytes } / { finished, bytes } / { error }) over `port`. */
+ *  ({ done, total, bytes } / { finished, bytes } / { error }) over `port`.
+ *  Downloads run through a fixed-size worker pool so N requests overlap. */
 async function precacheTrip(routes, docs, port) {
   const tripCache = await caches.open(TRIP_CACHE);
   const docsCache = await caches.open(DOCS_CACHE);
-  const total = routes.length + docs.length;
+  const jobs = [
+    ...routes.map((url) => ({ cache: tripCache, url })),
+    ...docs.map((url) => ({ cache: docsCache, url })),
+  ];
+  const total = jobs.length;
   let done = 0;
   let bytes = 0;
 
   const report = () => port?.postMessage({ done, total, bytes });
 
-  async function warm(cache, requestUrl) {
+  async function warm({ cache, url }) {
     try {
-      const res = await fetch(requestUrl, { credentials: "same-origin" });
+      const res = await fetch(url, { credentials: "same-origin" });
       if (res.ok && !res.redirected && res.status === 200) {
         const buf = await res.clone().arrayBuffer();
-        bytes += buf.byteLength;
-        await cache.put(requestUrl, res);
+        bytes += buf.byteLength; // single-threaded event loop → += is safe
+        await cache.put(url, res);
       }
     } catch {
       // Skip individual failures — a partial download is still useful.
@@ -197,9 +206,19 @@ async function precacheTrip(routes, docs, port) {
     }
   }
 
+  // Worker pool: each worker pulls the next job off a shared cursor until the
+  // queue drains, keeping up to PRECACHE_CONCURRENCY requests in flight.
+  let cursor = 0;
+  async function worker() {
+    while (cursor < jobs.length) {
+      const job = jobs[cursor++];
+      await warm(job);
+    }
+  }
+
   try {
-    for (const route of routes) await warm(tripCache, route);
-    for (const docUrl of docs) await warm(docsCache, docUrl);
+    const workers = Math.min(PRECACHE_CONCURRENCY, jobs.length);
+    await Promise.all(Array.from({ length: workers }, worker));
     port?.postMessage({ finished: true, done, total, bytes });
   } catch (err) {
     port?.postMessage({ error: String(err) });
