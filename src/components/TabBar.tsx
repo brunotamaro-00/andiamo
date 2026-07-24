@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 import { springNav } from "@/lib/motion";
+import { useCurrentStopSlug } from "@/components/CurrentStopContext";
 
 const TABS = [
   {
@@ -44,7 +45,13 @@ const TABS = [
 
 export function TabBar() {
   const pathname = usePathname();
+  const currentStopSlug = useCurrentStopSlug();
   const onStopDetail = pathname.startsWith("/stops/");
+
+  // The current stop's detail belongs to "Hoy"; every other stop detail (and
+  // the list) belongs to "Itinerario".
+  const currentStopPath = currentStopSlug ? `/stops/${currentStopSlug}` : null;
+  const onCurrentStop = onStopDetail && pathname === currentStopPath;
 
   // Remember the last stop detail visited this session, so returning to the
   // Itinerario tab reopens it instead of the list. Tapping Itinerario while
@@ -63,7 +70,12 @@ export function TabBar() {
     >
       <ul className="flex items-center justify-around px-1 h-16">
         {TABS.map(({ href, label, icon: Icon, match }) => {
-          const active = match(pathname);
+          const active =
+            href === "/hoy"
+              ? pathname === "/hoy" || onCurrentStop
+              : href === "/stops"
+                ? match(pathname) && !onCurrentStop
+                : match(pathname);
           // Itinerario reopens the last stop unless we're already on a detail
           // (then it goes up to the list).
           const targetHref =
