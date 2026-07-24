@@ -14,18 +14,53 @@ import { haptics } from "@/lib/haptics";
 
 const THRESHOLD = 70; // px of pull needed to trigger a refresh
 const MAX_PULL = 96; // clamp so the indicator never drifts too far
+// Safety net: router.refresh() inside a transition can leave `isPending` stuck
+// true even after the data has refreshed, which would freeze the spinner and
+// (via the touchstart guard) disable pull-to-refresh for good. This bounds the
+// spinner so it always clears; the fast path below hides it as soon as the
+// transition actually settles.
+const WATCHDOG_MS = 6000;
 
 export function PullToRefresh() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const [pull, setPull] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // Touch bookkeeping kept in refs so listeners stay stable across renders.
   const startY = useRef(0);
   const active = useRef(false); // began the drag while scrolled to the top
   const armedRef = useRef(false); // crossed the threshold this gesture
+  const refreshingRef = useRef(false); // mirror of `refreshing` for listeners
+  const watchdogRef = useRef<number | null>(null);
+  const wasPending = useRef(false);
+
+  function stopRefreshing() {
+    if (watchdogRef.current !== null) {
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
+    }
+    refreshingRef.current = false;
+    setRefreshing(false);
+  }
+
+  // Fast path: clear the spinner the moment the refresh transition settles
+  // (pending true → false). The watchdog covers the case where it never does.
+  useEffect(() => {
+    if (isPending) {
+      wasPending.current = true;
+    } else if (wasPending.current) {
+      wasPending.current = false;
+      stopRefreshing();
+    }
+  }, [isPending]);
+
+  // Clear any pending watchdog on unmount.
+  useEffect(() => () => {
+    if (watchdogRef.current !== null) clearTimeout(watchdogRef.current);
+  }, []);
 
   useEffect(() => {
     const scroller = document.getElementById("scroll-root");
@@ -33,7 +68,7 @@ export function PullToRefresh() {
 
     function onTouchStart(e: TouchEvent) {
       // Only arm when already at the very top and not mid-refresh.
-      if (scroller!.scrollTop > 0 || isPending) {
+      if (scroller!.scrollTop > 0 || refreshingRef.current) {
         active.current = false;
         return;
       }
@@ -79,6 +114,10 @@ export function PullToRefresh() {
       if (armedRef.current) {
         armedRef.current = false;
         haptics.success();
+        refreshingRef.current = true;
+        setRefreshing(true);
+        if (watchdogRef.current !== null) clearTimeout(watchdogRef.current);
+        watchdogRef.current = window.setTimeout(stopRefreshing, WATCHDOG_MS);
         startTransition(() => router.refresh());
       }
       setPull(0);
@@ -94,17 +133,17 @@ export function PullToRefresh() {
       scroller.removeEventListener("touchend", onTouchEnd);
       scroller.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, [router, isPending]);
+  }, [router]);
 
   const armed = pull >= THRESHOLD;
-  const active2 = pull > 0 || isPending;
+  const active2 = pull > 0 || refreshing;
   // Indicator glides in with the pull, then parks at a fixed spot while refreshing.
-  const translateY = isPending ? 44 : pull;
+  const translateY = refreshing ? 44 : pull;
   const progress = Math.min(pull / THRESHOLD, 1);
 
   return (
     <motion.div
-      aria-hidden={!isPending}
+      aria-hidden={!refreshing}
       className="pointer-events-none fixed inset-x-0 top-0 z-[1500] flex justify-center"
       style={{
         transform: `translateY(${translateY - 44}px)`,
@@ -115,15 +154,15 @@ export function PullToRefresh() {
       <span
         className="mt-[calc(env(safe-area-inset-top)+8px)] grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-surface text-brick card-shadow"
         role="status"
-        aria-label={isPending ? "Actualizando" : undefined}
+        aria-label={refreshing ? "Actualizando" : undefined}
       >
         <RefreshCw
           size={16}
           strokeWidth={2.5}
           aria-hidden="true"
-          className={isPending ? "animate-spin" : ""}
+          className={refreshing ? "animate-spin" : ""}
           style={
-            isPending || reduceMotion
+            refreshing || reduceMotion
               ? undefined
               : { transform: `rotate(${progress * 270}deg)`, opacity: armed ? 1 : 0.55 }
           }
