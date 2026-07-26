@@ -14,8 +14,11 @@ export async function GET(): Promise<Response> {
   }
 
   const [stops, uploadedDocs] = await Promise.all([
+    // No isLocal filter: that one belongs to the Spitwise sync (/api/stops).
+    // Pseudo-cities like Pititas are a real, visitable stop detail page — and
+    // Katia's *current* one — so excluding them here meant "Descargar viaje"
+    // skipped the very page she needs offline.
     db.stop.findMany({
-      where: { isLocal: false },
       orderBy: { order: "asc" },
       select: { slug: true },
     }),

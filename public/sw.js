@@ -1,4 +1,4 @@
-// Andiamo Service Worker v5
+// Andiamo Service Worker v6
 // Strategy summary:
 //   /api/documents/*  GET  → cache-first (offline-capable document files)
 //   Navigation             → network-first (fresh data online, cached shell offline)
@@ -9,9 +9,17 @@
 // "Descargar viaje" (PRECACHE_TRIP message) warms the trip cache with every
 // stop/guide page HTML + uploaded document, so airplane mode stays readable.
 
+// Bump CACHE_VERSION on every deploy that changes the shell or adds a route.
+// SHELL_CACHE and TRIP_CACHE are versioned *together* on purpose: cached page HTML
+// references /_next/static/<buildId>/ chunks that live in SHELL_CACHE, so evicting
+// the chunks while keeping the HTML would serve unhydratable pages offline. The
+// cost is that "Descargar viaje" must be re-run after a deploy — correct, since the
+// old HTML is unusable anyway.
+const CACHE_VERSION = "v13";
+const SHELL_CACHE = `andiamo-shell-${CACHE_VERSION}`;
+const TRIP_CACHE  = `andiamo-trip-${CACHE_VERSION}`;  // on-demand precache of stop/guide route HTML
+// Document files are addressed by immutable id and don't depend on the build.
 const DOCS_CACHE  = "andiamo-docs-v1";
-const SHELL_CACHE = "andiamo-shell-v12";   // bumped: navigation is now network-first
-const TRIP_CACHE  = "andiamo-trip-v1";     // on-demand precache of stop/guide route HTML
 const OFFLINE_URL = "/offline.html";
 
 const KNOWN_CACHES = [DOCS_CACHE, SHELL_CACHE, TRIP_CACHE];
@@ -28,13 +36,31 @@ const SHELL_ROUTES = [
   OFFLINE_URL,
 ];
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_ROUTES))
-      .then(() => self.skipWaiting())
+/** Precache the shell, skipping anything the server redirected.
+ *
+ *  All SHELL_ROUTES except /offline.html are auth-gated, and the SW registers from
+ *  the root layout — which also renders /login. Installing while logged out made
+ *  every route redirect to /login, and `cache.addAll` follows redirects: the login
+ *  HTML got stored under the "/stops" key. Those entries are `redirected: true`, so
+ *  every `!cached.redirected` check below discards them and the shell stayed
+ *  permanently poisoned. Caching only clean 200s leaves the entry missing instead,
+ *  and networkFirstNavigate re-warms it on the first authenticated visit. */
+async function precacheShell() {
+  const cache = await caches.open(SHELL_CACHE);
+  await Promise.all(
+    SHELL_ROUTES.map(async (url) => {
+      try {
+        const res = await fetch(url, { credentials: "same-origin" });
+        if (res.ok && !res.redirected) await cache.put(url, res);
+      } catch {
+        // Offline at install time — the route re-warms on the next online visit.
+      }
+    })
   );
+}
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(precacheShell().then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -79,6 +105,12 @@ self.addEventListener("message", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // Only GET is cacheable. `request.mode === "navigate"` is also true for plain
+  // <form action={serverAction}> submits (login, add note, edit doc) when they
+  // degrade to a POST navigation — passing those to cache.put() throws
+  // "Request method POST is unsupported". Let the network handle them.
+  if (request.method !== "GET") return;
 
   // ── 1. Document files — cache-first ──────────────────────────────────────
   if (url.pathname.startsWith("/api/documents/") && request.method === "GET") {
@@ -152,6 +184,11 @@ async function networkFirstNavigate(request, url) {
     // fails with ERR_FAILED. Store fresh HTML in the trip cache for offline.
     if (response.ok && !response.redirected) {
       trip.put(request, response.clone());
+      // Heal the shell: if install ran logged out, this route is missing from
+      // SHELL_CACHE (see precacheShell). An authenticated visit restores it.
+      if (SHELL_ROUTES.includes(url.pathname)) {
+        shell.put(url.pathname, response.clone());
+      }
     }
     return response;
   } catch {
@@ -160,9 +197,12 @@ async function networkFirstNavigate(request, url) {
     if (cached && !cached.redirected) return cached;
 
     // "/" and "/hoy" redirect server-side and can't be cached — offline, fall
-    // back to the itinerary as the entry point.
+    // back to the itinerary as the entry point. Check TRIP_CACHE first: that's
+    // where fresh navigations and "Descargar viaje" store /stops, so looking
+    // only at SHELL_CACHE sent users to the offline page with the whole trip
+    // sitting in cache. `start_url` is "/", so this is the PWA's cold start.
     if (url.pathname === "/" || url.pathname === "/hoy") {
-      const stops = await shell.match("/stops");
+      const stops = (await trip.match("/stops")) ?? (await shell.match("/stops"));
       if (stops && !stops.redirected) return stops;
     }
 
