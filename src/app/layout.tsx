@@ -56,16 +56,24 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // data-scroll-behavior: globals.css sets scroll-behavior: smooth on <html>; this
+  // tells Next to suppress it during route transitions (and silences the console
+  // warning it logs otherwise).
   return (
-    <html lang="es" className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}>
+    <html
+      lang="es"
+      data-scroll-behavior="smooth"
+      className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}
+    >
       <body className="h-full bg-canvas text-ink antialiased font-sans flex flex-col overflow-hidden">
+        {/* First flex child so it pushes the header down instead of overlaying it. */}
+        <OfflineBanner />
         <Providers>
           <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
             {children}
           </main>
           <TabBar />
         </Providers>
-        <OfflineBanner />
         <PullToRefresh />
         <InstallPrompt />
         <ServiceWorkerRegister />

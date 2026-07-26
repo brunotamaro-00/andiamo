@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { Plus, X, AlertCircle } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
 import { MAX_NIGHTS } from "@/app/actions/_schemas";
@@ -69,6 +69,18 @@ function AddStopModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Monotonic id of the newest in-flight geocode. Responses can land out of
+  // order, so a slow earlier search used to overwrite the current results.
+  const requestIdRef = useRef(0);
+
+  useEffect(
+    () => () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      // Invalidate anything still in flight so it can't setState after unmount.
+      requestIdRef.current += 1;
+    },
+    [],
+  );
 
   function handleQueryChange(val: string) {
     setQuery(val);
@@ -80,17 +92,20 @@ function AddStopModal({
       return;
     }
     debounceRef.current = setTimeout(async () => {
+      const requestId = ++requestIdRef.current;
       setSearching(true);
       try {
         const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
         if (!res.ok) throw new Error(`geocode ${res.status}`);
         const data = await res.json();
+        if (requestId !== requestIdRef.current) return;
         setResults(data.results ?? []);
       } catch {
+        if (requestId !== requestIdRef.current) return;
         setResults([]);
         setGeoError("No se pudo buscar. Revisá la conexión.");
       } finally {
-        setSearching(false);
+        if (requestId === requestIdRef.current) setSearching(false);
       }
     }, 400);
   }
