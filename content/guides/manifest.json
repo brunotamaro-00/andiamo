@@ -18,6 +18,11 @@
               "file": "reino-unido/edimburgo/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "reino-unido/edimburgo/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "reino-unido/edimburgo/gastronomia.md"
@@ -57,6 +62,11 @@
               "file": "reino-unido/highlands/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "reino-unido/highlands/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "reino-unido/highlands/gastronomia.md"
@@ -94,6 +104,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "reino-unido/londres/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "reino-unido/londres/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -154,6 +169,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "reino-unido/york/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "reino-unido/york/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -218,6 +238,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "paises-bajos/amsterdam/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "paises-bajos/amsterdam/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -290,6 +315,11 @@
               "file": "francia/colmar/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "francia/colmar/nightlife.md"
+            },
+            {
               "slug": "alojamiento",
               "title": "Alojamiento",
               "file": "francia/colmar/alojamiento.md"
@@ -329,6 +359,11 @@
               "file": "francia/estrasburgo/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "francia/estrasburgo/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "francia/estrasburgo/gastronomia.md"
@@ -366,6 +401,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "francia/paris/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "francia/paris/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -438,6 +478,11 @@
               "file": "portugal/lisboa/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "portugal/lisboa/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "portugal/lisboa/gastronomia.md"
@@ -498,6 +543,11 @@
               "file": "portugal/porto/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "portugal/porto/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "portugal/porto/gastronomia.md"
@@ -555,6 +605,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "alemania/friburgo/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "alemania/friburgo/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -807,6 +862,11 @@
               "file": "austria/viena/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "austria/viena/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "austria/viena/gastronomia.md"
@@ -877,6 +937,11 @@
               "file": "chequia/praga/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "chequia/praga/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "chequia/praga/gastronomia.md"
@@ -945,6 +1010,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "polonia/cracovia/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "polonia/cracovia/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -1020,6 +1090,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "hungria/budapest/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "hungria/budapest/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -1202,6 +1277,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "eslovenia/liubliana/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "eslovenia/liubliana/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -1492,6 +1572,11 @@
               "file": "italia/roma/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "italia/roma/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "italia/roma/gastronomia.md"
@@ -1625,6 +1710,11 @@
               "file": "espana/barcelona/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "espana/barcelona/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "espana/barcelona/gastronomia.md"
@@ -1662,6 +1752,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "espana/madrid/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "espana/madrid/nightlife.md"
             },
             {
               "slug": "gastronomia",

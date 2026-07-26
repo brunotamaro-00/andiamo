@@ -8,6 +8,7 @@ import {
   FileText,
   Landmark,
   MapPin,
+  Moon,
   ScrollText,
   Signpost,
   TrainFront,
@@ -36,6 +37,7 @@ export async function generateMetadata({
 
 const DOC_ICONS: Record<string, LucideIcon> = {
   actividades: Landmark,
+  nightlife: Moon,
   gastronomia: UtensilsCrossed,
   alojamiento: BedDouble,
   transporte: TrainFront,
