@@ -29,6 +29,15 @@ export function secretsMatch(a: string, b: string): boolean {
   return result === 0;
 }
 
+/** Validates the X-Api-Key header of the machine-to-machine routes (Spitwise).
+ *  Fails closed when TRIP_SHARED_API_KEY is unset, and compares in constant
+ *  time — a bare `!==` short-circuits on the first differing byte. */
+export function isValidApiKey(key: string | null): boolean {
+  const expected = process.env.TRIP_SHARED_API_KEY;
+  if (!key || !expected) return false;
+  return secretsMatch(key, expected);
+}
+
 export function isValidToken(token: string): boolean {
   const expected = getExpectedToken();
   if (token.length !== expected.length) return false;

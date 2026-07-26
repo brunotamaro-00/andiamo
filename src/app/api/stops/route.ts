@@ -1,12 +1,12 @@
 import { db } from "@/lib/db";
+import { isValidApiKey } from "@/lib/session";
 
 function toDateStr(d: Date | null): string | null {
   return d ? d.toISOString().slice(0, 10) : null;
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const key = request.headers.get("X-Api-Key");
-  if (!key || key !== process.env.TRIP_SHARED_API_KEY) {
+  if (!isValidApiKey(request.headers.get("X-Api-Key"))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   // Pseudo-cities (Pititas) live only in Andiamo's per-person view. Spitwise

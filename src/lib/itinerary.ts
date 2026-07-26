@@ -217,13 +217,17 @@ interface TempRangeTarget {
 /** Fetches and stores tempRange for the given stops; runs outside the response path. */
 async function refreshTempRanges(targets: TempRangeTarget[]): Promise<void> {
   try {
-    const updates = await Promise.all(
-      targets.map(async (t) => ({
-        ...t,
-        tempRange: await fetchTempRange(t.latitude, t.longitude, t.arrival, t.departure),
-      })),
-    );
-    const withRange = updates.filter((u) => u.tempRange != null);
+    // Sequential across stops, not Promise.all. fetchTempRange already serializes
+    // its 10 per-year requests precisely to stay under Open-Meteo's rate limit —
+    // fanning out by stop defeated that: editing tripStartDate marks every stop
+    // changed, so ~30 stops × 10 years hit the API at once, every request 429'd,
+    // and the whole refresh silently no-op'd. This runs inside after(), off the
+    // response path, so wall time doesn't matter.
+    const withRange: Array<TempRangeTarget & { tempRange: string }> = [];
+    for (const t of targets) {
+      const tempRange = await fetchTempRange(t.latitude, t.longitude, t.arrival, t.departure);
+      if (tempRange != null) withRange.push({ ...t, tempRange });
+    }
     if (withRange.length === 0) return;
 
     await db.$transaction(

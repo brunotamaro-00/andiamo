@@ -32,11 +32,17 @@ export async function shiftOrders(tx: Tx, range: OrderRange, delta: number): Pro
     select: { id: true, order: true },
     orderBy: { order: "asc" },
   });
+  if (stops.length === 0) return;
 
-  for (let i = 0; i < stops.length; i++) {
-    await tx.stop.update({ where: { id: stops[i].id }, data: { order: -(i + 2) } });
-  }
-  for (const s of stops) {
-    await tx.stop.update({ where: { id: s.id }, data: { order: s.order + delta } });
-  }
+  // Two passes, but batched per pass instead of one awaited update per stop.
+  // Sequentially that was 2N round-trips inside an interactive transaction
+  // (5s default timeout): inserting at the head of a 30-stop itinerary meant 60
+  // of them, which flirts with P2028 "Transaction already closed" over a remote
+  // DB link. Prisma sends each pass as one batch, and the passes stay ordered.
+  await Promise.all(
+    stops.map((s, i) => tx.stop.update({ where: { id: s.id }, data: { order: -(i + 2) } })),
+  );
+  await Promise.all(
+    stops.map((s) => tx.stop.update({ where: { id: s.id }, data: { order: s.order + delta } })),
+  );
 }
