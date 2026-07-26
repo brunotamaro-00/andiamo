@@ -179,9 +179,10 @@ export default async function StopPage({ params }: Props) {
             <div className="flex items-center gap-2 shrink-0">
               {daysLeft !== null && (
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-brick">
-                  {daysLeft === 0
-                    ? "Última noche"
-                    : `${daysLeft} ${daysLeft === 1 ? "día" : "días"} acá`}
+                  {/* isActive requires arrival <= today < departure, so daysLeft is
+                      never 0 here: on the last night it's exactly 1. Keying "Última
+                      noche" off 0 made it unreachable and showed "1 día acá". */}
+                  {daysLeft === 1 ? "Última noche" : `${daysLeft} días acá`}
                 </p>
               )}
               {isActive && tripPhase === "before" && (

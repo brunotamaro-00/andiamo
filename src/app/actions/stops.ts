@@ -73,6 +73,11 @@ export async function createStop(formData: FormData) {
 
 /** Reorder transaction: park the moved stop, shift the affected range, place it. */
 async function applyMove(id: string, afterOrder: number): Promise<void> {
+  // afterOrder arrives as a function argument, not FormData, so no Zod schema
+  // guards it. A value below 0 makes the shift range swallow the parked stop
+  // itself (PARKED_ORDER = -1) and hands it a negative order. 0 means "first".
+  if (!Number.isInteger(afterOrder) || afterOrder < 0) return;
+
   await db.$transaction(async (tx) => {
     const stop = await tx.stop.findUnique({ where: { id }, select: { order: true } });
     if (!stop) return;

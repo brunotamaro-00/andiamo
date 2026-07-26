@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { isValidApiKey } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { DocumentKind } from "@/generated/prisma/enums";
@@ -19,8 +20,7 @@ const KIND_VALUES = new Set<string>(Object.values(DocumentKind));
  * cookie gate in proxy.ts excludes /api/integration for this reason.
  */
 export async function POST(req: NextRequest) {
-  const key = req.headers.get("X-Api-Key");
-  if (!key || key !== process.env.TRIP_SHARED_API_KEY) {
+  if (!isValidApiKey(req.headers.get("X-Api-Key"))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
