@@ -7,6 +7,7 @@ import {
   ArrowUpRight, Trash2, Plus, Upload, AlertCircle, Loader2, Download, Pencil,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { DocumentKind } from "@/generated/prisma/enums";
 import { createDocumentLink, updateDocument, deleteDocument } from "@/app/actions/documents";
 import { haptics } from "@/lib/haptics";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
@@ -39,10 +40,13 @@ interface Document {
   docDate: string | null;
 }
 
+// `satisfies Record<DocumentKind, string>` makes the compiler reject a missing kind:
+// DOCUMENT_KINDS feeds the edit <select>, so a kind without an <option> made the
+// browser fall back to the first one and silently rewrite the document on save.
 const KIND_LABEL: Record<string, string> = {
-  checkin: "Check-in", ticket: "Entrada",
+  checkin: "Check-in", voucher: "Voucher", ticket: "Entrada",
   carRental: "Auto", train: "Tren", insurance: "Seguro", flight: "Vuelo", other: "Otro",
-};
+} satisfies Record<DocumentKind, string>;
 
 const KIND_ICON: Record<string, LucideIcon> = {
   checkin:   BedDouble,
@@ -53,9 +57,10 @@ const KIND_ICON: Record<string, LucideIcon> = {
   insurance: ShieldCheck,
   flight:    Plane,
   other:     FileText,
-};
+} satisfies Record<DocumentKind, LucideIcon>;
 
-const DOCUMENT_KINDS = Object.keys(KIND_LABEL) as (keyof typeof KIND_LABEL)[];
+// Ordered by the schema enum, so the <select> can never drift from the DB.
+const DOCUMENT_KINDS: string[] = Object.values(DocumentKind);
 
 /** Format a YYYY-MM-DD entry/reservation date for display (UTC-anchored). */
 function formatDocDate(dateStr: string | null): string | null {
