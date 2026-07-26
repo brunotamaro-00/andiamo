@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import { db } from "@/lib/db";
+import { db, isRecordMissing } from "@/lib/db";
 import { notifyStopsChanged } from "@/lib/spitwise";
 import { requireAuth } from "@/lib/auth";
 import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency";
@@ -109,10 +109,17 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
   });
   if (!current) return { error: "Parada no encontrada" };
 
-  await db.stop.update({
-    where: { id },
-    data: { name, nights, isCandidate },
-  });
+  try {
+    await db.stop.update({
+      where: { id },
+      data: { name, nights, isCandidate },
+    });
+  } catch (e) {
+    // The findUnique above is not a lock: the stop can be deleted in between,
+    // and an uncaught P2025 here would 500 instead of returning { error }.
+    if (isRecordMissing(e)) return { error: "Parada no encontrada" };
+    throw e;
+  }
 
   if (afterOrder !== undefined) {
     await applyMove(id, afterOrder);
@@ -131,7 +138,10 @@ export async function deleteStop(id: string) {
     where: { id },
     select: { order: true, documents: { select: { storagePath: true } } },
   });
-  if (!stop) return;
+  // Already gone (double-tap, or deleted in another tab) — that's the desired
+  // state, so redirect like the success path. Returning undefined left the
+  // caller with no error, no redirect and an open modal stuck on "Borrando…".
+  if (!stop) redirect("/stops");
 
   await db.$transaction(async (tx) => {
     // Clear any manual current-stop override that pointed at the deleted stop

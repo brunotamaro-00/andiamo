@@ -28,4 +28,9 @@ export async function setPerson(value: string): Promise<{ error: string } | void
 
   // Spend surface: every stop detail panel reflects the new person view.
   revalidatePath("/stops/[slug]", "page");
+  // Person also swaps which *stops* are visible (stopVisibleTo — the Pititas
+  // swap), so the itinerary list and search results change too. Without these,
+  // staleTimes.dynamic kept showing the previous person's stops for up to 30s.
+  revalidatePath("/stops");
+  revalidatePath("/search");
 }

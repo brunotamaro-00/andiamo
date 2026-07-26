@@ -98,7 +98,7 @@ function EditModal({
   }
 
   return (
-    <Modal title="Editar ciudad" onClose={onClose}>
+    <Modal title="Editar ciudad" onClose={onClose} locked={isPending}>
       <form action={handleSave} className="space-y-3">
         <Field label="Nombre" name="name" defaultValue={name} required />
 
