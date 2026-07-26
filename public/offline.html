@@ -37,10 +37,20 @@
       max-width: 20rem;
       line-height: 1.6;
     }
-    button {
+    .actions {
       margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    button, .link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
       background: #C44428;
-      color: white;
+      color: #FFFFFF;
       border: none;
       padding: 0.625rem 1.5rem;
       font-size: 0.875rem;
@@ -50,14 +60,27 @@
       cursor: pointer;
       border-radius: 2px;
       box-shadow: 3px 3px 0 #1B1A17;
+      text-decoration: none;
+      font-family: inherit;
     }
-    button:active { transform: translate(3px,3px); box-shadow: none; }
+    .link {
+      background: transparent;
+      color: #1B1A17;
+      border: 2px solid #1B1A17;
+      box-shadow: none;
+    }
+    button:active, .link:active { transform: translate(3px,3px); box-shadow: none; }
   </style>
 </head>
 <body>
   <div class="logo">Andiamo ✈</div>
   <h1>Sin conexión</h1>
   <p>Necesitás internet para cargar esta página. Las que ya visitaste siguen disponibles.</p>
-  <button onclick="location.reload()">Reintentar</button>
+  <!-- The itinerary is precached (SHELL_ROUTES + "Descargar viaje"), so offer it as
+       a way out instead of leaving reload() as the only action on a dead end. -->
+  <div class="actions">
+    <button onclick="location.reload()">Reintentar</button>
+    <a class="link" href="/stops">Ver itinerario guardado</a>
+  </div>
 </body>
 </html>

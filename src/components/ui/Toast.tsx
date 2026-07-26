@@ -84,7 +84,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                     "flex items-center gap-2 max-w-sm rounded-full px-4 py-2.5 card-shadow-lg",
                     current.kind === "success"
                       ? "bg-ink text-canvas"
-                      : "bg-danger text-white",
+                      : "bg-danger text-surface",
                   ].join(" ")}
                 >
                   {current.kind === "success" ? (

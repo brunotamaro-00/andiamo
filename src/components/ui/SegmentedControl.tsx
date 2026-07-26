@@ -41,7 +41,7 @@ export function SegmentedControl<V extends string>({
             aria-checked={active}
             onClick={() => onChange(opt.value)}
             className={[
-              "relative flex-1 min-h-[36px] px-3 rounded-full text-xs font-extrabold uppercase tracking-[0.08em]",
+              "relative flex-1 min-h-[44px] px-3 rounded-full text-xs font-extrabold uppercase tracking-[0.08em]",
               "transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
               active ? "text-surface" : "text-ink-2 hover:text-ink",
             ].join(" ")}

@@ -6,8 +6,6 @@ export default function Loading() {
     <div className="min-h-screen bg-canvas">
       <HeaderSkeleton />
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
-        {/* Reservas shortcut */}
-        <Skeleton className="h-16 rounded-xl" />
         {/* "El viaje" list */}
         <Skeleton className="h-40 rounded-xl" />
         {/* Country guides */}

@@ -6,7 +6,7 @@ type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
   primary: [
-    "bg-brick text-white hover:bg-brick-hover active:bg-brick-press",
+    "bg-brick text-surface hover:bg-brick-hover active:bg-brick-press",
     "font-display uppercase tracking-wide border border-transparent",
     "rounded-[6px] hard-shadow-ink",
     "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",

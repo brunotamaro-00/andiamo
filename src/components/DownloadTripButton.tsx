@@ -16,6 +16,11 @@ import { haptics } from "@/lib/haptics";
 
 const LS_KEY = "andiamo:trip-downloaded";
 
+/** Give up if the service worker goes this long without reporting progress.
+ *  Generous: the pool reports after every single file, so real silence means
+ *  the SW is gone, not that the download is slow. */
+const STALL_TIMEOUT_MS = 30_000;
+
 interface DownloadedMeta {
   at: number;
   bytes: number;
@@ -89,9 +94,25 @@ export function DownloadTripButton() {
 
       await new Promise<void>((resolve, reject) => {
         const channel = new MessageChannel();
+
+        // Stall watchdog. If the SW dies, gets replaced mid-download, or never
+        // posts { finished }, this promise used to hang forever and left the
+        // button stuck on "Descargando…" with no way to retry but a reload.
+        // Reset on every message, so a slow-but-progressing download is fine.
+        let stallTimer: ReturnType<typeof setTimeout>;
+        const armWatchdog = () => {
+          clearTimeout(stallTimer);
+          stallTimer = setTimeout(() => {
+            channel.port1.onmessage = null;
+            reject(new Error("stalled"));
+          }, STALL_TIMEOUT_MS);
+        };
+
         channel.port1.onmessage = (event) => {
           const data = event.data;
+          armWatchdog();
           if (data?.error) {
+            clearTimeout(stallTimer);
             reject(new Error(data.error));
             return;
           }
@@ -99,6 +120,7 @@ export function DownloadTripButton() {
             setProgress({ done: data.done, total: data.total, bytes: data.bytes ?? 0 });
           }
           if (data?.finished) {
+            clearTimeout(stallTimer);
             const saved: DownloadedMeta = { at: Date.now(), bytes: data.bytes ?? 0 };
             try {
               localStorage.setItem(LS_KEY, JSON.stringify(saved));
@@ -109,14 +131,20 @@ export function DownloadTripButton() {
             resolve();
           }
         };
+
+        armWatchdog();
         controller.postMessage({ type: "PRECACHE_TRIP", routes, docs }, [channel.port2]);
       });
 
       haptics.success();
       toast("Viaje descargado para offline");
-    } catch {
+    } catch (e) {
       haptics.error();
-      setError("No se pudo descargar todo. Revisá la conexión e intentá de nuevo.");
+      setError(
+        e instanceof Error && e.message === "stalled"
+          ? "La descarga se quedó sin respuesta. Recargá la app e intentá de nuevo."
+          : "No se pudo descargar todo. Revisá la conexión e intentá de nuevo.",
+      );
     } finally {
       setStatus("idle");
       setProgress(null);

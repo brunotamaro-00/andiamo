@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, Loader2 } from "lucide-react";
 import { addRecentSearch } from "@/lib/recent-searches";
@@ -10,6 +10,12 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
   const [value, setValue] = useState(initialQuery);
   const [isPending, startTransition] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // A pending debounce would otherwise fire after the user navigated away and
+  // router.replace() would yank them back to /search.
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
 
   function update(next: string) {
     setValue(next);

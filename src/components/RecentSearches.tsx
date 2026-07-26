@@ -30,7 +30,7 @@ export function RecentSearches() {
           <Link
             key={q}
             href={`/search?q=${encodeURIComponent(q)}`}
-            className="inline-flex items-center min-h-[36px] px-3.5 rounded-full border border-border bg-surface text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            className="inline-flex items-center min-h-[44px] px-3.5 rounded-full border border-border bg-surface text-sm text-ink-2 hover:border-border-strong hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
           >
             {q}
           </Link>

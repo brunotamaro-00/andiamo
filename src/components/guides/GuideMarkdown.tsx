@@ -41,7 +41,7 @@ function TaskCheck({ state }: { state: "done" | "todo" | "maybe" }) {
   if (state === "done") {
     return (
       <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-[3px] bg-success align-middle shrink-0">
-        <Check size={11} strokeWidth={3} className="text-white" aria-hidden="true" />
+        <Check size={11} strokeWidth={3} className="text-surface" aria-hidden="true" />
         <span className="sr-only">hecho</span>
       </span>
     );
@@ -49,7 +49,7 @@ function TaskCheck({ state }: { state: "done" | "todo" | "maybe" }) {
   if (state === "maybe") {
     return (
       <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-[3px] bg-special align-middle shrink-0">
-        <HelpCircle size={11} strokeWidth={3} className="text-white" aria-hidden="true" />
+        <HelpCircle size={11} strokeWidth={3} className="text-surface" aria-hidden="true" />
         <span className="sr-only">quizás</span>
       </span>
     );
