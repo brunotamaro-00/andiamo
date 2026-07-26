@@ -4,16 +4,25 @@ import { useState, useTransition } from "react";
 import { setPerson } from "@/app/actions/person";
 import { PEOPLE, personLabel, type PersonView } from "@/lib/person";
 import { Modal } from "@/components/ui/Modal";
+import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 
 /** Header chip showing who is viewing the expenses, with a modal to switch.
  *  Only the Spitwise spend surfaces read this — everything else is shared. */
 export function PersonSwitcher({ person }: { person: PersonView }) {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const choose = (value: string) => {
     startTransition(async () => {
-      await setPerson(value);
+      // setPerson resolves { error } instead of throwing — keep the sheet open
+      // and surface it rather than reporting a switch that never happened.
+      const result = await setPerson(value);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      setError(null);
       setOpen(false);
     });
   };
@@ -39,10 +48,11 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
       </button>
 
       {open && (
-        <Modal title="¿Quién sos?" onClose={() => setOpen(false)}>
+        <Modal title="¿Quién sos?" onClose={() => setOpen(false)} locked={isPending}>
           <p className="text-sm text-ink-2 mb-4">
             Define de quién son los gastos que ves. El resto del viaje es igual para los dos.
           </p>
+          <MutationErrorBanner message={error} />
           <div className="space-y-2">
             {options.map((opt, i) => {
               const active = (person ?? "ambos") === opt.value;

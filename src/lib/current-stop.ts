@@ -49,10 +49,13 @@ export function computeCurrentStopSlug(
     }
   }
 
-  // If trip hasn't started yet, return first stop
-  const firstArrival = stops[0]?.arrivalDate ? dateToStr(stops[0].arrivalDate) : null;
-  if (firstArrival && today < firstArrival) {
-    return stops[0]?.slug ?? null;
+  // If the trip hasn't started yet, return the first stop that has dates.
+  // Looking only at stops[0] meant that a first stop without dates (valid —
+  // computeItinerary leaves them null with no tripStartDate) fell through to the
+  // "trip ended" branch below and pointed at the *last* stop mid-trip.
+  const firstWithDate = stops.find((s) => s.arrivalDate);
+  if (firstWithDate?.arrivalDate && today < dateToStr(firstWithDate.arrivalDate)) {
+    return firstWithDate.slug;
   }
 
   // If trip ended or no dates, return last stop with dates

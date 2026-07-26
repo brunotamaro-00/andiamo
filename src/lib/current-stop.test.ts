@@ -51,6 +51,26 @@ describe("computeCurrentStopSlug", () => {
     expect(computeCurrentStopSlug(trip(), null, "2026-07-01")).toBe("roma");
   });
 
+  // Regression: the "trip hasn't started" branch only looked at stops[0], so an
+  // undated first stop fell through to the "trip ended" branch and sent /hoy to
+  // the *last* stop months before departure.
+  it("returns the first dated stop when earlier stops have no dates", () => {
+    const stops = [
+      stop("brujas", 1, null, null),
+      stop("paris", 2, "2026-06-01", "2026-06-04"),
+      stop("roma", 3, "2026-06-07", "2026-06-10"),
+    ];
+    expect(computeCurrentStopSlug(stops, null, "2026-05-20")).toBe("paris");
+  });
+
+  it("still falls back to the last dated stop once the trip is over", () => {
+    const stops = [
+      stop("brujas", 1, null, null),
+      stop("paris", 2, "2026-06-01", "2026-06-04"),
+    ];
+    expect(computeCurrentStopSlug(stops, null, "2026-07-01")).toBe("paris");
+  });
+
   it("honours the manual override", () => {
     expect(computeCurrentStopSlug(trip(), "id-paris", "2026-06-05")).toBe("paris");
   });

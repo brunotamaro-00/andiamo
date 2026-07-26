@@ -44,8 +44,15 @@ export async function createNote(formData: FormData) {
 export async function toggleNotePin(id: string, path: string) {
   await requireAuth();
   const note = await db.note.findUnique({ where: { id }, select: { pinned: true } });
-  if (!note) return;
-  await db.note.update({ where: { id }, data: { pinned: !note.pinned } });
+  // Returning undefined read as success to useOptimisticList, which kept the
+  // optimistic pin on screen even though nothing was written.
+  if (!note) return { error: "Nota no encontrada" };
+  try {
+    await db.note.update({ where: { id }, data: { pinned: !note.pinned } });
+  } catch (e) {
+    if (isRecordMissing(e)) return { error: "Nota no encontrada" };
+    throw e;
+  }
   revalidatePath(path);
   after(() => notifyNotesChanged());
 }

@@ -118,7 +118,7 @@ function AddStopModal({
   const maxOrder = stops.reduce((m, s) => Math.max(m, s.order), 0);
 
   return (
-    <Modal title="Agregar ciudad" onClose={onClose}>
+    <Modal title="Agregar ciudad" onClose={onClose} locked={isPending}>
       {/* City search */}
       <div>
         <Label>Buscar ciudad</Label>
