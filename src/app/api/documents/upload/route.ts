@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { DocumentKind } from "@/generated/prisma/enums";
+import { db } from "@/lib/db";
 import {
   labelFromFileName,
   parseDocDate,
+  parseDocKind,
   persistUploadedDocument,
   validateUploadFile,
 } from "@/lib/document-upload";
@@ -19,21 +20,33 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null;
   const label = ((formData.get("label") as string) ?? "").trim();
   const note = ((formData.get("note") as string) ?? "").trim();
-  const kind = (formData.get("kind") as DocumentKind) ?? "other";
+  // Untrusted: an out-of-enum value used to reach db.document.create and blow up
+  // *after* the file was already in R2, 500ing without a JSON body.
+  const kind = parseDocKind(formData.get("kind"));
   const stopId = (formData.get("stopId") as string) || null;
   const docDate = parseDocDate((formData.get("docDate") as string) ?? "");
 
   const invalid = validateUploadFile(file);
   if (invalid) return Response.json({ error: invalid.error }, { status: invalid.status });
 
-  const doc = await persistUploadedDocument({
-    file: file!,
-    label: label || labelFromFileName(file!.name),
-    note: note || null,
-    kind,
-    stopId,
-    docDate,
-  });
+  if (stopId && !(await db.stop.findUnique({ where: { id: stopId }, select: { id: true } }))) {
+    return Response.json({ error: "La parada no existe" }, { status: 422 });
+  }
 
-  return Response.json({ id: doc.id });
+  try {
+    const doc = await persistUploadedDocument({
+      file: file!,
+      label: label || labelFromFileName(file!.name),
+      note: note || null,
+      kind,
+      stopId,
+      docDate,
+    });
+    return Response.json({ id: doc.id });
+  } catch (e) {
+    // persistUploadedDocument already rolled the R2 object back. Answer with JSON
+    // so the client shows a real message instead of "No se pudo subir el archivo".
+    console.error("[documents/upload] persist failed:", e);
+    return Response.json({ error: "No se pudo guardar el documento" }, { status: 500 });
+  }
 }

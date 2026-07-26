@@ -31,6 +31,8 @@ export async function createDocumentLink(formData: FormData) {
   }
 
   revalidatePath(slug ? `/stops/${slug}` : "/general");
+  // /search indexes document.label — notes.ts already does this.
+  revalidatePath("/search");
 }
 
 export async function updateDocument(id: string, formData: FormData, path: string) {
@@ -58,21 +60,30 @@ export async function updateDocument(id: string, formData: FormData, path: strin
   }
 
   revalidatePath(path);
+  revalidatePath("/search");
 }
 
 export async function deleteDocument(id: string, path: string) {
   await requireAuth();
-  // Also delete file from disk if uploaded
+
   const doc = await db.document.findUnique({ where: { id }, select: { storagePath: true } });
-  if (doc?.storagePath) {
-    const { deleteFromR2 } = await import("@/lib/r2");
-    await deleteFromR2(doc.storagePath).catch(() => {});
-  }
+
+  // DB first, R2 after — same order as deleteStop. Deleting the file first meant
+  // that any DB failure other than "already gone" left the row pointing at a
+  // storagePath that no longer existed, so /api/documents/[id] 404'd forever.
+  // The reverse leaves at worst an orphaned file, which is recoverable.
   try {
     await db.document.delete({ where: { id } });
   } catch (e) {
     // Already gone (double-tap delete) — the desired state holds
     if (!isRecordMissing(e)) throw e;
   }
+
+  if (doc?.storagePath) {
+    const { deleteFromR2 } = await import("@/lib/r2");
+    await deleteFromR2(doc.storagePath).catch(() => {});
+  }
+
   revalidatePath(path);
+  revalidatePath("/search");
 }

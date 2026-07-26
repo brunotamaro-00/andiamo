@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef } from "react";
 import { Plus, X, AlertCircle } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
+import { MAX_NIGHTS } from "@/app/actions/_schemas";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Field, SelectField, inputClass } from "@/components/ui/Field";
@@ -211,6 +212,7 @@ function AddStopModal({
             inputMode="numeric"
             defaultValue={3}
             min={0}
+            max={MAX_NIGHTS}
             required
           />
 
