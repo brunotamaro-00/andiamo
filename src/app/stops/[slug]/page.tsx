@@ -75,8 +75,11 @@ export default async function StopPage({ params }: Props) {
   ]);
 
   if (!stop) notFound();
-  // A person-scoped stop is invisible to the other viewer — don't leak it even
-  // by direct URL (Bruno → /stops/pititas 404s, Katia → /stops/lisboa 404s).
+  // Keeps the URL consistent with the list for the current view (Bruno →
+  // /stops/pititas 404s, Katia → /stops/lisboa 404s). NOT a privacy boundary:
+  // person is a view preference (see lib/person.ts), PersonSwitcher flips to
+  // "Ambos" freely, both people share one session token, and the mutations
+  // don't check stopVisibleTo at all. Don't rely on this to hide anything.
   if (!stopVisibleTo(stop, viewer)) notFound();
 
   const currentSlug = computeCurrentStopSlug(

@@ -34,12 +34,6 @@ export type SpendDetail = {
   generated_at: string;
 };
 
-export type TripSpend = {
-  total_usd: string;
-  today_usd: string;
-  movement_count: number;
-};
-
 function baseUrl(): string {
   return process.env.SPITWISE_URL || process.env.BOTARDO_URL || "";
 }
@@ -54,28 +48,6 @@ function env(): { base: string; key: string } | null {
 /** Public Spitwise URL for deep links ("" when unconfigured — callers hide the link). */
 export function spitwisePublicUrl(): string {
   return baseUrl();
-}
-
-export async function fetchStopSpend(
-  slug: string,
-): Promise<{ total_usd: string } | null> {
-  const cfg = env();
-  if (!cfg) return null;
-  try {
-    const res = await fetch(
-      `${cfg.base}/api/v1/cities/spend?slug=${encodeURIComponent(slug)}`,
-      {
-        headers: { "X-Api-Key": cfg.key },
-        next: { revalidate: 300 },
-      },
-    );
-    if (!res.ok) return null;
-    const arr = (await res.json()) as Array<{ slug: string; total_usd: string }>;
-    const hit = arr.find((c) => c.slug === slug);
-    return hit ? { total_usd: hit.total_usd } : { total_usd: "0.00" };
-  } catch {
-    return null;
-  }
 }
 
 /** `?user=` makes Spitwise return that person's share (half of a shared
@@ -105,21 +77,6 @@ export async function fetchStopSpendDetail(
     );
     if (!res.ok) return null;
     return (await res.json()) as SpendDetail;
-  } catch {
-    return null;
-  }
-}
-
-export async function fetchTripSpend(person: PersonView = null): Promise<TripSpend | null> {
-  const cfg = env();
-  if (!cfg) return null;
-  try {
-    const res = await fetch(`${cfg.base}/api/v1/trip/spend?${withUser({}, person)}`, {
-      headers: { "X-Api-Key": cfg.key },
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as TripSpend;
   } catch {
     return null;
   }
