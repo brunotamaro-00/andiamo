@@ -4,6 +4,12 @@
  * Usage: parse(formData, Schema) → typed result or throws ActionError.
  */
 import { z } from "zod";
+import { DocumentKind } from "@/generated/prisma/enums";
+
+/** Derived from the Prisma enum so the schema can't drift from the DB. */
+const documentKindEnum = z.enum(
+  Object.values(DocumentKind) as [DocumentKind, ...DocumentKind[]],
+);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -20,14 +26,24 @@ const optionalUrl = z
     { message: "La URL debe comenzar con http:// o https://" },
   );
 
+/** Upper bound for `nights`. Without one, a pasted long number reaches addDaysStr(),
+ *  where new Date(ms).toISOString() throws RangeError on an out-of-range date. Since
+ *  updateStop persists before recalculateItinerary() runs, the poisoned value stays
+ *  committed and every later stop mutation 500s. 365 is well past any real stay. */
+export const MAX_NIGHTS = 365;
+
 /** Non-negative integer — a negative value (e.g. nights) would corrupt the itinerary cursor. */
-const intStr = (fallback: number) =>
+const intStr = (fallback: number, max?: number) =>
   z.string().transform((v, ctx) => {
     const t = v.trim();
     if (!t) return fallback;
     const n = parseInt(t, 10);
     if (!Number.isFinite(n) || !/^\d+$/.test(t)) {
       ctx.addIssue({ code: "custom", message: "Número inválido" });
+      return z.NEVER;
+    }
+    if (max !== undefined && n > max) {
+      ctx.addIssue({ code: "custom", message: `Máximo ${max}` });
       return z.NEVER;
     }
     return n;
@@ -65,13 +81,13 @@ export const CreateStopSchema = z.object({
   latitude: coordStr(-90, 90),
   longitude: coordStr(-180, 180),
   timezone: z.string().transform((v) => v.trim() || "auto"),
-  nights: intStr(0),
+  nights: intStr(0, MAX_NIGHTS),
   insertAfterOrder: intStr(0),
 });
 
 export const UpdateStopSchema = z.object({
   name: requiredStr,
-  nights: intStr(0),
+  nights: intStr(0, MAX_NIGHTS),
   isCandidate: boolStr,
 });
 
@@ -100,7 +116,7 @@ export const CreateDocumentLinkSchema = z.object({
   stopId: z.string().transform((v) => v || null).nullable().optional(),
   label: requiredStr,
   note: z.string().transform((v) => v.trim()).default(""),
-  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
+  kind: documentKindEnum.catch("other"),
   docDate: optionalDateStr,
   url: z
     .string()
@@ -116,7 +132,7 @@ export const CreateDocumentLinkSchema = z.object({
 export const UpdateDocumentSchema = z.object({
   label: requiredStr,
   note: z.string().transform((v) => v.trim()).default(""),
-  kind: z.enum(["checkin", "voucher", "ticket", "carRental", "train", "insurance", "flight", "other"]).catch("other"),
+  kind: documentKindEnum.catch("other"),
   docDate: optionalDateStr,
   url: optionalUrl,
 });

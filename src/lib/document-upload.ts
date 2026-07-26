@@ -1,6 +1,14 @@
 import { db } from "@/lib/db";
-import { uploadToR2 } from "@/lib/r2";
+import { uploadToR2, deleteFromR2 } from "@/lib/r2";
 import { DocumentKind } from "@/generated/prisma/enums";
+
+/** Valid DocumentKind values, derived from the Prisma enum. */
+const KIND_VALUES = new Set<string>(Object.values(DocumentKind));
+
+/** Narrow an untrusted `kind` to the enum, falling back to "other". */
+export function parseDocKind(raw: unknown): DocumentKind {
+  return (KIND_VALUES.has(String(raw)) ? raw : "other") as DocumentKind;
+}
 
 /** Keep in sync with the client-side validation in DocumentsPanel. */
 export const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
@@ -53,18 +61,26 @@ export async function persistUploadedDocument(params: {
   const buffer = Buffer.from(await file.arrayBuffer());
   await uploadToR2(key, buffer, file.type);
 
-  return db.document.create({
-    data: {
-      stopId: params.stopId,
-      label: params.label,
-      note: params.note,
-      kind: params.kind,
-      source: "upload",
-      fileName: file.name,
-      mimeType: file.type,
-      sizeBytes: file.size,
-      storagePath: key,
-      docDate: params.docDate,
-    },
-  });
+  try {
+    return await db.document.create({
+      data: {
+        stopId: params.stopId,
+        label: params.label,
+        note: params.note,
+        kind: params.kind,
+        source: "upload",
+        fileName: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+        storagePath: key,
+        docDate: params.docDate,
+      },
+    });
+  } catch (e) {
+    // The file is already in R2 at this point. Without this rollback a failed
+    // insert (e.g. P2003 from a stopId deleted concurrently) left the object
+    // orphaned in the bucket forever, with no row to ever reference it.
+    await deleteFromR2(key).catch(() => {});
+    throw e;
+  }
 }

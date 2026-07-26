@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Pencil } from "lucide-react";
 import { updateStop, deleteStop } from "@/app/actions/stops";
+import { MAX_NIGHTS } from "@/app/actions/_schemas";
 import { haptics } from "@/lib/haptics";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
@@ -108,6 +109,7 @@ function EditModal({
           inputMode="numeric"
           defaultValue={nights}
           min={0}
+          max={MAX_NIGHTS}
         />
 
         {/* Arrival — always calculated from trip start + nights + order */}

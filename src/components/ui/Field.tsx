@@ -25,6 +25,7 @@ interface FieldProps {
   value?: string | number;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   min?: string | number;
+  max?: string | number;
   autoFocus?: boolean;
   accept?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];

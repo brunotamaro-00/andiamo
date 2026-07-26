@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseForm, CreateStopSchema, UpdateStopSchema } from "./_schemas";
+import {
+  parseForm,
+  CreateStopSchema,
+  UpdateStopSchema,
+  CreateDocumentLinkSchema,
+  UpdateDocumentSchema,
+  MAX_NIGHTS,
+} from "./_schemas";
+import { addDaysStr } from "@/lib/trip";
 
 function fd(entries: Record<string, string>): FormData {
   const form = new FormData();
@@ -81,5 +89,77 @@ describe("UpdateStopSchema", () => {
 
   it("rejects negative nights", () => {
     expect(parseForm(fd({ ...validUpdate, nights: "-1" }), UpdateStopSchema).ok).toBe(false);
+  });
+});
+
+describe("nights upper bound", () => {
+  // Regression: nights was unbounded, updateStop persisted before
+  // recalculateItinerary() ran, and the poisoned row then made every later stop
+  // mutation throw — because addDaysStr blows up on an out-of-range date.
+  it("addDaysStr throws once the offset leaves the Date range", () => {
+    expect(() => addDaysStr("2026-05-31", 100_000_000)).toThrow(RangeError);
+  });
+
+  it("accepts nights at the limit", () => {
+    const result = parseForm(fd({ ...validUpdate, nights: String(MAX_NIGHTS) }), UpdateStopSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.nights).toBe(MAX_NIGHTS);
+  });
+
+  it("rejects nights past the limit, on create and on update", () => {
+    expect(parseForm(fd({ ...validUpdate, nights: "100000000" }), UpdateStopSchema).ok).toBe(false);
+    expect(parseForm(fd({ ...validCreate, nights: "100000000" }), CreateStopSchema).ok).toBe(false);
+    expect(parseForm(fd({ ...validUpdate, nights: String(MAX_NIGHTS + 1) }), UpdateStopSchema).ok).toBe(false);
+  });
+});
+
+const validLink = {
+  label: "Hostel Praga",
+  note: "",
+  kind: "voucher",
+  docDate: "2026-07-24",
+  url: "https://example.com/voucher.pdf",
+};
+
+describe("CreateDocumentLinkSchema", () => {
+  it("accepts every kind the DB enum allows — voucher included", () => {
+    const result = parseForm(fd(validLink), CreateDocumentLinkSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.kind).toBe("voucher");
+  });
+
+  it("falls back to \"other\" on an unknown kind instead of failing", () => {
+    const result = parseForm(fd({ ...validLink, kind: "bogus" }), CreateDocumentLinkSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.kind).toBe("other");
+  });
+
+  it("requires a well-formed URL", () => {
+    expect(parseForm(fd({ ...validLink, url: "" }), CreateDocumentLinkSchema).ok).toBe(false);
+    expect(parseForm(fd({ ...validLink, url: "ftp://x.com/a" }), CreateDocumentLinkSchema).ok).toBe(false);
+  });
+
+  it("rejects a malformed docDate but allows an empty one", () => {
+    expect(parseForm(fd({ ...validLink, docDate: "24-07-2026" }), CreateDocumentLinkSchema).ok).toBe(false);
+    const empty = parseForm(fd({ ...validLink, docDate: "" }), CreateDocumentLinkSchema);
+    expect(empty.ok).toBe(true);
+    if (empty.ok) expect(empty.data.docDate).toBeNull();
+  });
+});
+
+describe("UpdateDocumentSchema", () => {
+  it("keeps an absent url undefined so uploads retain their file", () => {
+    const result = parseForm(fd({ label: "Voucher", note: "", kind: "voucher", docDate: "" }), UpdateDocumentSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.url).toBeUndefined();
+  });
+
+  // Known limitation, asserted so a future change is deliberate: an emptied URL
+  // field collapses to undefined, which updateDocument skips — so a link
+  // document's URL can be replaced but not cleared through the form.
+  it("collapses an emptied url to undefined (cannot clear a link's URL)", () => {
+    const result = parseForm(fd({ ...validLink, url: "" }), UpdateDocumentSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.url).toBeUndefined();
   });
 });
