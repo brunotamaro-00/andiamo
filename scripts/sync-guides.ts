@@ -41,6 +41,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
 /** Canonical order of the standard per-city docs; extras follow alphabetically. */
 const DOC_ORDER = [
   "actividades",
+  "nightlife",
   "gastronomia",
   "alojamiento",
   "transporte",
@@ -53,6 +54,7 @@ const REGION_CONTAINERS = new Set(["Sur de Italia"]);
 
 const PRETTY_NAMES: Record<string, string> = {
   actividades: "Actividades",
+  nightlife: "Nightlife",
   gastronomia: "Gastronomía",
   alojamiento: "Alojamiento",
   transporte: "Transporte",
