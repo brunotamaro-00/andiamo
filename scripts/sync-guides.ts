@@ -11,7 +11,8 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { slugify } from "../src/lib/slug";
-import type { Guide, GuideCountry, GuideDoc, GuideManifest } from "../src/lib/guide-types";
+import { guideDocs } from "../src/lib/guide-types";
+import type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "../src/lib/guide-types";
 
 const SOURCE =
   process.argv[2] ?? process.env.ITINERARY_DIR ?? "/Users/brunotamaro/Desktop/Trip/Itinerary";
@@ -100,14 +101,68 @@ function docSortKey(slug: string): [number, string] {
   return [idx === -1 ? DOC_ORDER.length : idx, slug];
 }
 
-/** Copies one markdown file into DEST and returns its manifest entry. */
-function copyDoc(sourceFile: string, destRelDir: string, titleOverride?: string): GuideDoc {
-  const slug = slugify(path.basename(sourceFile, ".md"));
-  const relFile = path.posix.join(destRelDir, `${slug}.md`);
+/** Copies one markdown file into DEST and returns its manifest entry.
+ *  `slugPrefix` namespaces city docs so `/guias/sicilia/palermo-transporte`
+ *  can't collide with the region-level `/guias/sicilia/transporte`. */
+function copyDoc(
+  sourceFile: string,
+  destRelDir: string,
+  opts: { titleOverride?: string; slugPrefix?: string } = {}
+): GuideDoc {
+  const baseSlug = slugify(path.basename(sourceFile, ".md"));
+  const relFile = path.posix.join(destRelDir, `${baseSlug}.md`);
   const destFile = path.join(DEST, relFile);
   mkdirSync(path.dirname(destFile), { recursive: true });
   cpSync(sourceFile, destFile);
-  return { slug, title: titleOverride ?? titleFor(sourceFile), file: relFile };
+  return {
+    slug: opts.slugPrefix ? `${opts.slugPrefix}-${baseSlug}` : baseSlug,
+    title: opts.titleOverride ?? titleFor(sourceFile),
+    file: relFile,
+  };
+}
+
+function sortDocs(docs: GuideDoc[], slugPrefix = ""): GuideDoc[] {
+  const strip = (slug: string) => (slugPrefix ? slug.slice(slugPrefix.length + 1) : slug);
+  return docs.sort((a, b) => {
+    const [ka, sa] = docSortKey(strip(a.slug));
+    const [kb, sb] = docSortKey(strip(b.slug));
+    return ka - kb || sa.localeCompare(sb);
+  });
+}
+
+/** Copies the `Day_trips/` folder of a city or region, if it has one. */
+function buildDayTrips(sourceDir: string, destRelDir: string, slugPrefix?: string): GuideDoc[] {
+  const { dirs } = listDir(sourceDir);
+  const trips: GuideDoc[] = [];
+  for (const sub of dirs) {
+    if (sub.toLowerCase() !== "day_trips") continue;
+    const { files } = listDir(path.join(sourceDir, sub));
+    for (const f of files) {
+      trips.push(
+        copyDoc(path.join(sourceDir, sub, f), path.posix.join(destRelDir, "day-trips"), { slugPrefix })
+      );
+    }
+  }
+  return trips.sort((a, b) => a.title.localeCompare(b.title, "es"));
+}
+
+/** A subfolder of a guide that isn't `Day_trips/` is a city group: its own
+ *  standard docs plus its own day trips, nested under the regional guide. */
+function buildCity(sourceDir: string, guideDestRelDir: string): GuideCity | null {
+  const dirName = path.basename(sourceDir);
+  const citySlug = slugify(dirName);
+  const destRelDir = path.posix.join(guideDestRelDir, citySlug);
+  const { files } = listDir(sourceDir);
+
+  const docs = sortDocs(
+    files.map((f) => copyDoc(path.join(sourceDir, f), destRelDir, { slugPrefix: citySlug })),
+    citySlug
+  );
+  const dayTrips = buildDayTrips(sourceDir, destRelDir, citySlug);
+
+  // Never invent content for an empty folder (e.g. a city stub in Itinerary).
+  if (docs.length === 0 && dayTrips.length === 0) return null;
+  return { slug: citySlug, title: dirName, docs, dayTrips };
 }
 
 function buildGuide(sourceDir: string, country: { name: string; flag: string; slug: string }): Guide {
@@ -116,25 +171,26 @@ function buildGuide(sourceDir: string, country: { name: string; flag: string; sl
   const destRelDir = path.posix.join(country.slug, guideSlug);
   const { dirs, files } = listDir(sourceDir);
 
-  const docs = files
-    .map((f) => copyDoc(path.join(sourceDir, f), destRelDir))
-    .sort((a, b) => {
-      const [ka, sa] = docSortKey(a.slug);
-      const [kb, sb] = docSortKey(b.slug);
-      return ka - kb || sa.localeCompare(sb);
-    });
+  const docs = sortDocs(files.map((f) => copyDoc(path.join(sourceDir, f), destRelDir)));
+  const dayTrips = buildDayTrips(sourceDir, destRelDir);
 
-  const dayTrips: GuideDoc[] = [];
+  const cities: GuideCity[] = [];
   for (const sub of dirs) {
-    if (sub.toLowerCase() !== "day_trips") continue;
-    const { files: tripFiles } = listDir(path.join(sourceDir, sub));
-    for (const f of tripFiles) {
-      dayTrips.push(copyDoc(path.join(sourceDir, sub, f), path.posix.join(destRelDir, "day-trips")));
-    }
+    if (sub.toLowerCase() === "day_trips") continue;
+    const city = buildCity(path.join(sourceDir, sub), destRelDir);
+    if (city) cities.push(city);
   }
-  dayTrips.sort((a, b) => a.title.localeCompare(b.title, "es"));
+  cities.sort((a, b) => a.title.localeCompare(b.title, "es"));
 
-  return { slug: guideSlug, title: dirName, country: country.name, countryFlag: country.flag, docs, dayTrips };
+  return {
+    slug: guideSlug,
+    title: dirName,
+    country: country.name,
+    countryFlag: country.flag,
+    docs,
+    dayTrips,
+    cities,
+  };
 }
 
 function main() {
@@ -157,7 +213,7 @@ function main() {
   // ── Trip-wide docs ────────────────────────────────────────────────────────
   for (const f of rootFiles) {
     const override = f === "README.md" ? "Resumen del viaje" : undefined;
-    manifest.general.push(copyDoc(path.join(SOURCE, f), "_general", override));
+    manifest.general.push(copyDoc(path.join(SOURCE, f), "_general", { titleOverride: override }));
   }
   if (rootDirs.includes("recursos")) {
     const { files } = listDir(path.join(SOURCE, "recursos"));
@@ -202,6 +258,7 @@ function main() {
           country.guides.push(buildGuide(path.join(fullCityDir, sub), country));
         }
         if (regionFiles.length > 0) {
+          // Decision hub only (README + opciones) — no cities, no day trips.
           const regionSlug = slugify(cityDir);
           const docs = regionFiles.map((f) =>
             copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
@@ -213,6 +270,7 @@ function main() {
             countryFlag: country.flag,
             docs,
             dayTrips: [],
+            cities: [],
           });
         }
       } else {
@@ -233,9 +291,11 @@ function main() {
     console.error(`Duplicate guide slugs: ${dupGuides.join(", ")}`);
     process.exit(1);
   }
+  // Doc slugs must be unique across the whole guide (region docs, region day
+  // trips and every city's docs share the /guias/[guide]/[doc] namespace).
   for (const c of manifest.countries) {
     for (const g of c.guides) {
-      const all = [...g.docs, ...g.dayTrips].map((d) => d.slug);
+      const all = guideDocs(g).map((d) => d.slug);
       const dup = all.filter((s, i) => all.indexOf(s) !== i);
       if (dup.length > 0) {
         console.error(`Duplicate doc slugs in guide "${g.slug}": ${dup.join(", ")}`);
@@ -247,12 +307,13 @@ function main() {
     manifest.general.length +
     manifest.resources.length +
     manifest.countries.reduce(
-      (n, c) =>
-        n +
-        c.countryDocs.length +
-        c.guides.reduce((m, g) => m + g.docs.length + g.dayTrips.length, 0),
+      (n, c) => n + c.countryDocs.length + c.guides.reduce((m, g) => m + guideDocs(g).length, 0),
       0
     );
+  const totalCities = manifest.countries.reduce(
+    (n, c) => n + c.guides.reduce((m, g) => m + g.cities.length, 0),
+    0
+  );
   if (manifest.countries.length === 0 || totalDocs === 0) {
     console.error("Manifest is empty — wrong source dir?");
     process.exit(1);
@@ -261,7 +322,8 @@ function main() {
   writeFileSync(path.join(DEST, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
   console.log(
     `Synced ${totalDocs} docs — ${manifest.countries.length} countries, ${guideSlugs.length} guides, ` +
-      `${manifest.general.length} general, ${manifest.resources.length} resources.`
+      `${totalCities} nested cities, ${manifest.general.length} general, ` +
+      `${manifest.resources.length} resources.`
   );
 }
 

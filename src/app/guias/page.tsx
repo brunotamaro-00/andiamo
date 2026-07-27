@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
-import { getManifest } from "@/lib/guides";
+import { getManifest, guideDocs } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
 
@@ -43,7 +43,10 @@ export default function GuidesIndexPage() {
             </p>
             <div className="space-y-2">
               {country.guides.map((guide) => {
-                const docCount = guide.docs.length + guide.dayTrips.length;
+                const all = guideDocs(guide);
+                const tripCount =
+                  guide.dayTrips.length +
+                  guide.cities.reduce((n, c) => n + c.dayTrips.length, 0);
                 return (
                   <Link
                     key={guide.slug}
@@ -56,9 +59,16 @@ export default function GuidesIndexPage() {
                         {guide.title}
                       </p>
                       <p className="text-[11px] text-ink-3 font-medium mt-0.5">
-                        {docCount} {docCount === 1 ? "documento" : "documentos"}
-                        {guide.dayTrips.length > 0 && ` · ${guide.dayTrips.length} day trips`}
+                        {all.length} {all.length === 1 ? "documento" : "documentos"}
+                        {tripCount > 0 && ` · ${tripCount} day trips`}
                       </p>
+                      {/* Regional guide: name the cities it groups, so the
+                          South reads as "Sicilia → Palermo, Catania…" */}
+                      {guide.cities.length > 0 && (
+                        <p className="text-[11px] text-ink-2 font-semibold mt-1 truncate">
+                          {guide.cities.map((c) => c.title).join(" · ")}
+                        </p>
+                      )}
                     </div>
                     <ChevronRight size={15} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
                   </Link>

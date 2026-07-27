@@ -1,9 +1,10 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import manifestJson from "../../content/guides/manifest.json";
-import type { Guide, GuideDoc, GuideManifest } from "./guide-types";
+import type { Guide, GuideCity, GuideDoc, GuideManifest } from "./guide-types";
 
-export type { Guide, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
+export type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
+export { guideDocs } from "./guide-types";
 
 const manifest = manifestJson as GuideManifest;
 
@@ -17,6 +18,7 @@ const PSEUDO_GUIDES: Guide[] = [
     countryFlag: "🌍",
     docs: manifest.general,
     dayTrips: [],
+    cities: [],
   },
   {
     slug: "recursos",
@@ -25,6 +27,7 @@ const PSEUDO_GUIDES: Guide[] = [
     countryFlag: "🎒",
     docs: manifest.resources,
     dayTrips: [],
+    cities: [],
   },
   // Loose country-level docs (e.g. the Slovenia regional README)
   ...manifest.countries
@@ -36,6 +39,7 @@ const PSEUDO_GUIDES: Guide[] = [
       countryFlag: c.flag,
       docs: c.countryDocs,
       dayTrips: [],
+      cities: [],
     })),
 ];
 
@@ -51,17 +55,33 @@ export function getGuide(slug: string): Guide | null {
   return getAllGuides().find((g) => g.slug === slug) ?? null;
 }
 
-export function getDoc(
-  guideSlug: string,
-  docSlug: string
-): { guide: Guide; doc: GuideDoc; isDayTrip: boolean } | null {
+export interface GuideDocHit {
+  guide: Guide;
+  doc: GuideDoc;
+  isDayTrip: boolean;
+  /** Set when the doc belongs to a city group nested in a regional guide. */
+  city?: GuideCity;
+}
+
+export function getDoc(guideSlug: string, docSlug: string): GuideDocHit | null {
   const guide = getGuide(guideSlug);
   if (!guide) return null;
   const doc = guide.docs.find((d) => d.slug === docSlug);
   if (doc) return { guide, doc, isDayTrip: false };
   const trip = guide.dayTrips.find((d) => d.slug === docSlug);
   if (trip) return { guide, doc: trip, isDayTrip: true };
+  for (const city of guide.cities) {
+    const cityDoc = city.docs.find((d) => d.slug === docSlug);
+    if (cityDoc) return { guide, doc: cityDoc, isDayTrip: false, city };
+    const cityTrip = city.dayTrips.find((d) => d.slug === docSlug);
+    if (cityTrip) return { guide, doc: cityTrip, isDayTrip: true, city };
+  }
   return null;
+}
+
+/** The city group inside `guide` whose slug matches, if any. */
+export function getGuideCity(guide: Guide, citySlug: string): GuideCity | null {
+  return guide.cities.find((c) => c.slug === citySlug) ?? null;
 }
 
 export async function readDocMarkdown(file: string): Promise<string> {
@@ -70,7 +90,17 @@ export async function readDocMarkdown(file: string): Promise<string> {
 
 /** Explicit stop-slug → guide-slugs map (first entry is the primary guide).
  *  Needed because stops and guide folders don't align 1:1 — e.g. three
- *  Scotland stops share the Highlands guide. */
+ *  Scotland stops share the Highlands guide.
+ *
+ *  In the South the guide is the *region* (Sicilia / Puglia / Calabria) and
+ *  cities are groups inside it, because the November route is still
+ *  tentative. Southern stops therefore map to a regional guide plus the
+ *  `sur-de-italia` decision hub; `STOP_TO_GUIDE_CITY` narrows the stop card
+ *  to that stop's city group. Nápoles stays outside the South container and
+ *  keeps Costa Amalfitana as its secondary guide.
+ *
+ *  Only real stop slugs belong here — `stopSlugsForGuide` renders them as
+ *  /stops/[slug] links, so a phantom key would produce a dead link. */
 export const STOP_TO_GUIDES: Record<string, string[]> = {
   londres: ["londres"],
   york: ["york"],
@@ -105,6 +135,24 @@ export const STOP_TO_GUIDES: Record<string, string[]> = {
   madrid: ["madrid"],
 };
 
+/** Stop slug → city group inside its primary guide. Lets a city-level stop
+ *  (Bari) surface the Bari docs of the regional Puglia guide instead of only
+ *  the region-wide ones. Stops that *are* the region (or guides with no
+ *  cities) simply have no entry. */
+export const STOP_TO_GUIDE_CITY: Record<string, string> = {
+  bari: "bari",
+  catania: "catania",
+  palermo: "palermo",
+};
+
+/** The city group a stop points at, when its primary guide has one. */
+export function guideCityForStop(stopSlug: string): GuideCity | null {
+  const citySlug = STOP_TO_GUIDE_CITY[stopSlug];
+  if (!citySlug) return null;
+  const [primary] = guidesForStop(stopSlug);
+  return primary ? getGuideCity(primary, citySlug) : null;
+}
+
 export function guidesForStop(stopSlug: string): Guide[] {
   const slugs = STOP_TO_GUIDES[stopSlug] ?? [];
   return slugs
@@ -127,9 +175,11 @@ export interface GuideSearchHit {
   guide: Guide;
   /** Absent when the guide itself (not one of its docs) matched. */
   doc?: GuideDoc;
+  /** City group the matched doc lives in, for the result subtitle. */
+  city?: GuideCity;
 }
 
-/** Diacritic-insensitive search over guide, doc and day-trip titles. */
+/** Diacritic-insensitive search over guide, city, doc and day-trip titles. */
 export function searchGuides(query: string, limit = 12): GuideSearchHit[] {
   const needle = normalize(query.trim());
   if (needle.length < 2) return [];
@@ -142,6 +192,16 @@ export function searchGuides(query: string, limit = 12): GuideSearchHit[] {
     for (const doc of [...guide.docs, ...guide.dayTrips]) {
       if (normalize(doc.title).includes(needle)) {
         hits.push({ guide, doc });
+      }
+    }
+    for (const city of guide.cities) {
+      const cityMatches = normalize(city.title).includes(needle);
+      for (const doc of [...city.docs, ...city.dayTrips]) {
+        // A city name matches all of its docs — otherwise "Palermo" would
+        // find nothing, since cities have no page of their own.
+        if (cityMatches || normalize(doc.title).includes(needle)) {
+          hits.push({ guide, doc, city });
+        }
       }
     }
     if (hits.length >= limit) break;

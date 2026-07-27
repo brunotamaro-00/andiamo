@@ -2,11 +2,14 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  STOP_TO_GUIDE_CITY,
   STOP_TO_GUIDES,
   getAllGuides,
   getDoc,
   getGuide,
   getManifest,
+  guideCityForStop,
+  guideDocs,
   guidesForStop,
   searchGuides,
 } from "./guides";
@@ -36,7 +39,7 @@ describe("guide manifest", () => {
 
   it("has unique doc slugs within each guide and at least one doc per guide", () => {
     for (const guide of getAllGuides()) {
-      const all = [...guide.docs, ...guide.dayTrips].map((d) => d.slug);
+      const all = guideDocs(guide).map((d) => d.slug);
       expect(all.length, `guide ${guide.slug} has no docs`).toBeGreaterThan(0);
       expect(new Set(all).size, `duplicate doc slugs in ${guide.slug}`).toBe(all.length);
     }
@@ -45,9 +48,80 @@ describe("guide manifest", () => {
   it("every manifest file exists on disk", () => {
     const base = path.join(process.cwd(), "content", "guides");
     for (const guide of getAllGuides()) {
-      for (const doc of [...guide.docs, ...guide.dayTrips]) {
+      for (const doc of guideDocs(guide)) {
         expect(existsSync(path.join(base, doc.file)), `missing ${doc.file}`).toBe(true);
       }
+    }
+  });
+
+  it("never emits an empty city group", () => {
+    for (const guide of getAllGuides()) {
+      for (const city of guide.cities) {
+        expect(
+          city.docs.length + city.dayTrips.length,
+          `empty city ${guide.slug}/${city.slug}`
+        ).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
+describe("regional guides (Sur de Italia)", () => {
+  it("keeps the southern regions as guides with nested cities", () => {
+    for (const [region, cities] of [
+      ["sicilia", ["agrigento", "catania", "noto", "palermo", "ragusa", "siracusa"]],
+      ["puglia", ["bari", "lecce", "matera", "ostuni"]],
+      ["calabria", ["reggio-calabria", "scilla", "tropea"]],
+    ] as const) {
+      const guide = getGuide(region);
+      expect(guide, `missing regional guide ${region}`).not.toBeNull();
+      expect(guide!.cities.map((c) => c.slug)).toEqual([...cities]);
+      // Region-wide docs live at the root of the guide, not duplicated per city
+      expect(guide!.docs.map((d) => d.slug)).toContain("transporte");
+    }
+  });
+
+  it("keeps sur-de-italia as a decision hub with no cities", () => {
+    const hub = getGuide("sur-de-italia");
+    expect(hub?.cities).toEqual([]);
+    expect(hub!.docs.length).toBeGreaterThan(0);
+  });
+
+  it("keeps Costa Amalfitana reachable from Nápoles, outside the southern stops", () => {
+    expect(STOP_TO_GUIDES.napoles).toEqual(["napoles", "costa-amalfitana"]);
+    const amalfi = getGuide("costa-amalfitana");
+    expect(amalfi?.cities.map((c) => c.slug)).toEqual(["amalfi", "sorrento"]);
+    // Nápoles itself is not part of the Sur de Italia container
+    expect(getGuide("napoles")?.cities).toEqual([]);
+  });
+
+  it("namespaces city doc slugs so they don't collide with region docs", () => {
+    const sicilia = getGuide("sicilia")!;
+    const palermo = sicilia.cities.find((c) => c.slug === "palermo")!;
+    expect(palermo.docs.map((d) => d.slug)).toContain("palermo-transporte");
+    expect(getDoc("sicilia", "transporte")?.city).toBeUndefined();
+    expect(getDoc("sicilia", "palermo-transporte")?.city?.slug).toBe("palermo");
+  });
+
+  it("resolves a city day trip and marks it as one", () => {
+    const hit = getDoc("sicilia", "catania-etna");
+    expect(hit?.isDayTrip).toBe(true);
+    expect(hit?.city?.title).toBe("Catania");
+  });
+});
+
+describe("STOP_TO_GUIDE_CITY", () => {
+  it("points a city stop at the matching city group of its regional guide", () => {
+    expect(guideCityForStop("bari")?.slug).toBe("bari");
+    expect(guideCityForStop("catania")?.slug).toBe("catania");
+    expect(guideCityForStop("palermo")?.slug).toBe("palermo");
+    expect(guideCityForStop("roma")).toBeNull();
+  });
+
+  it("only names cities that exist in the stop's primary guide", () => {
+    for (const stopSlug of Object.keys(STOP_TO_GUIDE_CITY)) {
+      expect(STOP_TO_GUIDES[stopSlug], `${stopSlug} has no guide`).toBeDefined();
+      expect(guideCityForStop(stopSlug), `${stopSlug} → unknown city group`).not.toBeNull();
     }
   });
 });

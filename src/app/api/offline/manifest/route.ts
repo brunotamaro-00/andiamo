@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { getAllGuides } from "@/lib/guides";
+import { getAllGuides, guideDocs } from "@/lib/guides";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,10 +34,11 @@ export async function GET(): Promise<Response> {
     "/search",
     "/guias",
     ...stops.map((s) => `/stops/${s.slug}`),
+    // guideDocs() also walks the city groups nested in the regional guides
+    // (Sicilia, Puglia…) — otherwise most of the South would stay online-only.
     ...getAllGuides().flatMap((g) => [
       `/guias/${g.slug}`,
-      ...g.docs.map((d) => `/guias/${g.slug}/${d.slug}`),
-      ...g.dayTrips.map((d) => `/guias/${g.slug}/${d.slug}`),
+      ...guideDocs(g).map((d) => `/guias/${g.slug}/${d.slug}`),
     ]),
   ];
 

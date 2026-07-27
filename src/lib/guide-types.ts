@@ -8,13 +8,39 @@ export interface GuideDoc {
   file: string;
 }
 
+/** A city nested inside a regional guide (Palermo inside Sicilia). Cities are
+ *  navigation groups, not guides: they have no route of their own, so their
+ *  doc slugs are prefixed with the city slug to stay unique inside
+ *  /guias/[guide]/[doc]. */
+export interface GuideCity {
+  slug: string;
+  title: string;
+  docs: GuideDoc[];
+  dayTrips: GuideDoc[];
+}
+
 export interface Guide {
   slug: string;
   title: string;
   country: string;
   countryFlag: string;
+  /** Guide-level docs. On a regional guide these are the region-wide docs
+   *  (transporte / gastronomía / contexto de toda la región). */
   docs: GuideDoc[];
   dayTrips: GuideDoc[];
+  /** Nested city groups. Empty for the flat city guides (Roma, París…). */
+  cities: GuideCity[];
+}
+
+/** Every doc reachable under /guias/[guide]/… — region-level docs and day
+ *  trips plus each nested city's. Order: region docs, region day trips, then
+ *  per city (docs then day trips), matching how the guide page renders. */
+export function guideDocs(guide: Guide): GuideDoc[] {
+  return [
+    ...guide.docs,
+    ...guide.dayTrips,
+    ...guide.cities.flatMap((c) => [...c.docs, ...c.dayTrips]),
+  ];
 }
 
 export interface GuideCountry {
