@@ -20,7 +20,7 @@ const SEEDED_STOP_SLUGS = [
   "edimburgo-2", "amsterdam", "paris", "lisboa", "porto", "estrasburgo",
   "colmar", "friburgo", "interlaken", "grindelwald", "lauterbrunnen",
   "innsbruck", "viena", "praga", "cracovia", "budapest", "liubliana",
-  "florencia", "roma", "napoles", "bari", "catania", "palermo",
+  "florencia", "roma", "napoles", "puglia", "calabria", "sicilia",
   "barcelona", "madrid",
 ];
 
@@ -81,6 +81,12 @@ describe("regional guides (Sur de Italia)", () => {
     }
   });
 
+  it("gives each regional stop its own guide plus the decision hub", () => {
+    for (const region of ["puglia", "calabria", "sicilia"]) {
+      expect(guidesForStop(region).map((g) => g.slug)).toEqual([region, "sur-de-italia"]);
+    }
+  });
+
   it("keeps sur-de-italia as a decision hub with no cities", () => {
     const hub = getGuide("sur-de-italia");
     expect(hub?.cities).toEqual([]);
@@ -111,17 +117,17 @@ describe("regional guides (Sur de Italia)", () => {
 });
 
 describe("STOP_TO_GUIDE_CITY", () => {
-  it("points a city stop at the matching city group of its regional guide", () => {
-    expect(guideCityForStop("bari")?.slug).toBe("bari");
-    expect(guideCityForStop("catania")?.slug).toBe("catania");
-    expect(guideCityForStop("palermo")?.slug).toBe("palermo");
-    expect(guideCityForStop("roma")).toBeNull();
-  });
-
   it("only names cities that exist in the stop's primary guide", () => {
     for (const stopSlug of Object.keys(STOP_TO_GUIDE_CITY)) {
       expect(STOP_TO_GUIDES[stopSlug], `${stopSlug} has no guide`).toBeDefined();
       expect(guideCityForStop(stopSlug), `${stopSlug} → unknown city group`).not.toBeNull();
+    }
+  });
+
+  it("leaves regional stops without a city, so they show the whole region", () => {
+    for (const stopSlug of ["puglia", "calabria", "sicilia"]) {
+      expect(guideCityForStop(stopSlug)).toBeNull();
+      expect(guidesForStop(stopSlug)[0]?.cities.length).toBeGreaterThan(0);
     }
   });
 });

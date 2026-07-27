@@ -382,6 +382,21 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
         </div>
       )}
 
+      {/* The stop *is* the region: point at the city groups inside its guide */}
+      {!city && primary.cities.length > 0 && (
+        <Link
+          href={`/guias/${primary.slug}`}
+          className="block mt-3 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+        >
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+            {primary.cities.length} ciudades en la guía
+          </p>
+          <p className="text-xs font-semibold text-ink-2 mt-0.5">
+            {primary.cities.map((c) => c.title).join(" · ")}
+          </p>
+        </Link>
+      )}
+
       {regionChips.length > 0 && (
         <div className="mt-3">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
