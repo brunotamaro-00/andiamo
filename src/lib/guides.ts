@@ -128,22 +128,21 @@ export const STOP_TO_GUIDES: Record<string, string[]> = {
   florencia: ["florencia"],
   roma: ["roma"],
   napoles: ["napoles", "costa-amalfitana"],
-  bari: ["puglia", "sur-de-italia"],
-  catania: ["sicilia", "sur-de-italia"],
-  palermo: ["sicilia", "sur-de-italia"],
+  puglia: ["puglia", "sur-de-italia"],
+  calabria: ["calabria", "sur-de-italia"],
+  sicilia: ["sicilia", "sur-de-italia"],
   barcelona: ["barcelona"],
   madrid: ["madrid"],
 };
 
-/** Stop slug → city group inside its primary guide. Lets a city-level stop
- *  (Bari) surface the Bari docs of the regional Puglia guide instead of only
- *  the region-wide ones. Stops that *are* the region (or guides with no
- *  cities) simply have no entry. */
-export const STOP_TO_GUIDE_CITY: Record<string, string> = {
-  bari: "bari",
-  catania: "catania",
-  palermo: "palermo",
-};
+/** Stop slug → city group inside its primary guide, for the day a Southern
+ *  base stops being tentative and becomes a city stop of its own (a `bari`
+ *  stop would map to `"bari"` and surface Bari's docs on the stop card
+ *  instead of only Puglia's region-wide ones).
+ *
+ *  Empty today: the Southern stops *are* the regions, so their card shows
+ *  the region docs plus every city group via the guide page. */
+export const STOP_TO_GUIDE_CITY: Record<string, string> = {};
 
 /** The city group a stop points at, when its primary guide has one. */
 export function guideCityForStop(stopSlug: string): GuideCity | null {

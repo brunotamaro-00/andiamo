@@ -200,24 +200,28 @@ export const STOPS: StopInput[] = [
     arrivalDate: "2026-10-27", departureDate: "2026-10-29", nights: 2,
     latitude: 40.8518, longitude: 14.2681, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "14-20°C",
   },
+  // Sur de Italia: tres rutas alternativas para noviembre, todas tentativas y
+  // en paralelo (isCandidate no consume el cursor del itinerario). La guía de
+  // cada una es la región; sus ciudades son grupos internos (ver guides.ts).
+  // Coordenadas = ciudad puerta de entrada de cada región.
   {
-    country: "Italia", countryFlag: "🇮🇹", name: "Bari", slug: "bari",
+    country: "Italia", countryFlag: "🇮🇹", name: "Puglia", slug: "puglia",
     category: "Ciudad", priceLevel: "$",
-    arrivalDate: null, departureDate: null, nights: 0,
+    arrivalDate: null, departureDate: null, nights: 3,
     latitude: 41.1171, longitude: 16.8719, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "15-21°C",
     isCandidate: true,
   },
   {
-    country: "Italia", countryFlag: "🇮🇹", name: "Catania", slug: "catania",
+    country: "Italia", countryFlag: "🇮🇹", name: "Calabria", slug: "calabria",
     category: "Ciudad", priceLevel: "$",
-    arrivalDate: null, departureDate: null, nights: 0,
-    latitude: 37.5079, longitude: 15.0830, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "18-24°C",
+    arrivalDate: null, departureDate: null, nights: 3,
+    latitude: 38.6768, longitude: 15.8977, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "14-20°C",
     isCandidate: true,
   },
   {
-    country: "Italia", countryFlag: "🇮🇹", name: "Palermo", slug: "palermo",
+    country: "Italia", countryFlag: "🇮🇹", name: "Sicilia", slug: "sicilia",
     category: "Ciudad", priceLevel: "$",
-    arrivalDate: null, departureDate: null, nights: 0,
+    arrivalDate: null, departureDate: null, nights: 3,
     latitude: 38.1157, longitude: 13.3615, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "18-24°C",
     isCandidate: true,
   },
