@@ -130,13 +130,19 @@ export default async function SearchPage({ searchParams }: Props) {
           <section>
             <ResultHeading icon={BookOpen} label="Guías" count={guideHits.length} />
             <div className="space-y-1.5">
-              {guideHits.map(({ guide, doc }) => (
+              {guideHits.map(({ guide, doc, city }) => (
                 <ResultRow
                   key={doc ? `${guide.slug}/${doc.slug}` : guide.slug}
                   href={doc ? `/guias/${guide.slug}/${doc.slug}` : `/guias/${guide.slug}`}
                   flag={guide.countryFlag}
                   title={doc ? doc.title : guide.title}
-                  subtitle={doc ? `Guía de ${guide.title}` : guide.country}
+                  subtitle={
+                    doc
+                      ? city
+                        ? `${city.title} · Guía de ${guide.title}`
+                        : `Guía de ${guide.title}`
+                      : guide.country
+                  }
                 />
               ))}
             </div>

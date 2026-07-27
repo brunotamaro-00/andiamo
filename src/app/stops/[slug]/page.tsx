@@ -11,7 +11,7 @@ import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
-import { guidesForStop } from "@/lib/guides";
+import { guideCityForStop, guidesForStop } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { CurrentStopSync } from "@/components/CurrentStopContext";
 import { PageHeader } from "@/components/PageHeader";
@@ -339,10 +339,18 @@ export default async function StopPage({ params }: Props) {
 
 /** Small inline badge for dates/temp ranges */
 /** Card linking a stop to its guide hub, with quick chips per document.
- *  Extra guides (e.g. Costa Amalfitana from Nápoles) render as small links. */
+ *  Extra guides (e.g. Costa Amalfitana from Nápoles) render as small links.
+ *  When the stop is a city inside a regional guide (Bari inside Puglia), the
+ *  chips are that city's docs and the region-wide ones follow. */
 function GuideCard({ stopSlug }: { stopSlug: string }) {
   const [primary, ...extras] = guidesForStop(stopSlug);
   if (!primary) return null;
+
+  const city = guideCityForStop(stopSlug);
+  // City docs are the specific ones; the guide's own docs are region-wide and
+  // repeat the same names ("Transporte"), so they get their own labelled row.
+  const chips = city ? city.docs : primary.docs;
+  const regionChips = city ? primary.docs : [];
 
   return (
     <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
@@ -354,15 +362,15 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Guía</p>
           <p className="font-display uppercase text-[17px] leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
-            {primary.title}
+            {city ? `${primary.title} · ${city.title}` : primary.title}
           </p>
         </div>
         <ChevronRight size={15} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
       </Link>
 
-      {primary.docs.length > 0 && (
+      {chips.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {primary.docs.map((doc) => (
+          {chips.map((doc) => (
             <Link
               key={doc.slug}
               href={`/guias/${primary.slug}/${doc.slug}`}
@@ -371,6 +379,25 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
               {doc.title}
             </Link>
           ))}
+        </div>
+      )}
+
+      {regionChips.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
+            Toda {primary.title}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {regionChips.map((doc) => (
+              <Link
+                key={doc.slug}
+                href={`/guias/${primary.slug}/${doc.slug}`}
+                className="rounded-full border border-border px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+              >
+                {doc.title}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

@@ -16,6 +16,10 @@ export interface ExportDoc {
   country: string;
   countryFlag: string;
   kind: ExportDocKind;
+  /** City group inside a regional guide (Palermo inside Sicilia), when the
+   *  doc is scoped to a city rather than the whole region. */
+  citySlug?: string;
+  cityTitle?: string;
   file: string;
   content: string;
 }
@@ -32,6 +36,8 @@ interface DocSource {
   country: string;
   countryFlag: string;
   kind: ExportDocKind;
+  citySlug?: string;
+  cityTitle?: string;
   doc: GuideDoc;
 }
 
@@ -49,6 +55,13 @@ function collectSources(): DocSource[] {
       };
       for (const doc of guide.docs) sources.push({ ...base, kind: "city", doc });
       for (const doc of guide.dayTrips) sources.push({ ...base, kind: "daytrip", doc });
+      // Cities nested in a regional guide keep the same kinds — they're still
+      // city docs and day trips — but carry the city they belong to.
+      for (const city of guide.cities) {
+        const inCity = { ...base, citySlug: city.slug, cityTitle: city.title };
+        for (const doc of city.docs) sources.push({ ...inCity, kind: "city", doc });
+        for (const doc of city.dayTrips) sources.push({ ...inCity, kind: "daytrip", doc });
+      }
     }
     // Loose country-level docs are served under a pseudo-guide with the
     // country's slug (mirrors PSEUDO_GUIDES in guides.ts).
@@ -104,6 +117,7 @@ export function buildGuidesExport(): Promise<GuidesExport> {
         country: src.country,
         countryFlag: src.countryFlag,
         kind: src.kind,
+        ...(src.citySlug ? { citySlug: src.citySlug, cityTitle: src.cityTitle } : {}),
         file: src.doc.file,
         content,
       });

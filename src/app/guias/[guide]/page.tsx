@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
+import type { GuideDoc } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
 
@@ -45,12 +46,70 @@ const DOC_ICONS: Record<string, LucideIcon> = {
   "contexto-historico": ScrollText,
 };
 
+/** City docs carry a `<city>-` slug prefix so they stay unique inside the
+ *  guide's route namespace; the icon lookup uses the bare doc kind. */
+function iconFor(docSlug: string, cityPrefix?: string): LucideIcon {
+  const bare = cityPrefix && docSlug.startsWith(`${cityPrefix}-`)
+    ? docSlug.slice(cityPrefix.length + 1)
+    : docSlug;
+  return DOC_ICONS[bare] ?? FileText;
+}
+
+function DocGrid({
+  guideSlug,
+  docs,
+  cityPrefix,
+}: {
+  guideSlug: string;
+  docs: GuideDoc[];
+  cityPrefix?: string;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {docs.map((doc) => {
+        const Icon = iconFor(doc.slug, cityPrefix);
+        return (
+          <Link
+            key={doc.slug}
+            href={`/guias/${guideSlug}/${doc.slug}`}
+            className="flex flex-col gap-2 bg-surface rounded-xl border border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+          >
+            <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
+            <span className="text-[13px] font-extrabold text-ink leading-snug">{doc.title}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function DayTripList({ guideSlug, docs }: { guideSlug: string; docs: GuideDoc[] }) {
+  return (
+    <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+      {docs.map((doc) => (
+        <Link
+          key={doc.slug}
+          href={`/guias/${guideSlug}/${doc.slug}`}
+          className="flex items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
+        >
+          <Signpost size={16} strokeWidth={1.5} className="text-gold-ink shrink-0" aria-hidden="true" />
+          <span className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">{doc.title}</span>
+          <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+const SECTION_LABEL = "text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2";
+
 export default async function GuidePage({ params }: { params: Promise<{ guide: string }> }) {
   const { guide: slug } = await params;
   const guide = getGuide(slug);
   if (!guide) notFound();
 
   const relatedStops = stopSlugsForGuide(slug);
+  const isRegional = guide.cities.length > 0;
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -74,61 +133,55 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
             </h2>
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-0.5">
               {guide.country}
+              {isRegional &&
+                ` · ${guide.cities.length} ${guide.cities.length === 1 ? "ciudad" : "ciudades"}`}
             </p>
           </div>
         </div>
 
-        {/* Docs grid */}
-        <section className="animate-fade-in stagger-1">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
-            Guía
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {guide.docs.map((doc) => {
-              const Icon = DOC_ICONS[doc.slug] ?? FileText;
-              return (
-                <Link
-                  key={doc.slug}
-                  href={`/guias/${guide.slug}/${doc.slug}`}
-                  className="flex flex-col gap-2 bg-surface rounded-xl border border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
-                >
-                  <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
-                  <span className="text-[13px] font-extrabold text-ink leading-snug">
-                    {doc.title}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Day trips */}
-        {guide.dayTrips.length > 0 && (
-          <section className="animate-fade-in stagger-2">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
-              Day trips
-            </p>
-            <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
-              {guide.dayTrips.map((doc) => (
-                <Link
-                  key={doc.slug}
-                  href={`/guias/${guide.slug}/${doc.slug}`}
-                  className="flex items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
-                >
-                  <Signpost size={16} strokeWidth={1.5} className="text-gold-ink shrink-0" aria-hidden="true" />
-                  <span className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">
-                    {doc.title}
-                  </span>
-                  <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
+        {/* Guide-level docs — region-wide on a regional guide */}
+        {guide.docs.length > 0 && (
+          <section className="animate-fade-in stagger-1">
+            <p className={SECTION_LABEL}>{isRegional ? "Toda la región" : "Guía"}</p>
+            <DocGrid guideSlug={guide.slug} docs={guide.docs} />
           </section>
         )}
 
+        {/* Guide-level day trips */}
+        {guide.dayTrips.length > 0 && (
+          <section className="animate-fade-in stagger-2">
+            <p className={SECTION_LABEL}>Day trips</p>
+            <DayTripList guideSlug={guide.slug} docs={guide.dayTrips} />
+          </section>
+        )}
+
+        {/* Cities nested in a regional guide (Palermo, Catania… in Sicilia) */}
+        {guide.cities.map((city, idx) => (
+          <section
+            key={city.slug}
+            className={`animate-fade-in ${idx < 5 ? `stagger-${idx + 2}` : "stagger-6"} rounded-xl border-2 border-border bg-surface-2/60 px-3 py-3 space-y-3`}
+          >
+            <h3 className="font-display uppercase text-lg leading-tight text-ink tracking-wide flex items-center gap-2">
+              <MapPin size={15} strokeWidth={2} className="text-brick shrink-0" aria-hidden="true" />
+              {city.title}
+            </h3>
+
+            {city.docs.length > 0 && (
+              <DocGrid guideSlug={guide.slug} docs={city.docs} cityPrefix={city.slug} />
+            )}
+
+            {city.dayTrips.length > 0 && (
+              <div>
+                <p className={SECTION_LABEL}>Day trips desde {city.title}</p>
+                <DayTripList guideSlug={guide.slug} docs={city.dayTrips} />
+              </div>
+            )}
+          </section>
+        ))}
+
         {/* Related stops */}
         {relatedStops.length > 0 && (
-          <section className="animate-fade-in stagger-3">
+          <section className="animate-fade-in">
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
               Paradas relacionadas
             </p>
