@@ -1722,6 +1722,41 @@
           "cities": []
         },
         {
+          "slug": "itinerarios",
+          "title": "Itinerarios",
+          "country": "Italia",
+          "countryFlag": "🇮🇹",
+          "docs": [
+            {
+              "slug": "a-full-puglia",
+              "title": "Escenario A — Full Puglia + Matera",
+              "file": "italia/itinerarios/a-full-puglia.md"
+            },
+            {
+              "slug": "b-full-sicilia",
+              "title": "Escenario B — Vuelta completa a Sicilia",
+              "file": "italia/itinerarios/b-full-sicilia.md"
+            },
+            {
+              "slug": "c-puglia-y-sicilia-este",
+              "title": "Escenario C — Puglia + Sicilia este",
+              "file": "italia/itinerarios/c-puglia-y-sicilia-este.md"
+            },
+            {
+              "slug": "d-puglia-calabria-sicilia",
+              "title": "Escenario D — Puglia → Calabria → Sicilia (road trip)",
+              "file": "italia/itinerarios/d-puglia-calabria-sicilia.md"
+            },
+            {
+              "slug": "e-sicilia-este-lento",
+              "title": "Escenario E — Sicilia este, ritmo lento",
+              "file": "italia/itinerarios/e-sicilia-este-lento.md"
+            }
+          ],
+          "dayTrips": [],
+          "cities": []
+        },
+        {
           "slug": "napoles",
           "title": "Napoles",
           "country": "Italia",
@@ -2372,7 +2407,7 @@
             },
             {
               "slug": "sur-de-italia-opciones",
-              "title": "Sur de Italia — Análisis Comparativo de Opciones (Reddit Reality Check)",
+              "title": "Sur de Italia — Tablero de decisión",
               "file": "italia/sur-de-italia/sur-de-italia-opciones.md"
             }
           ],
