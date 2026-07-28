@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { pathToFileURL } from "node:url";
 import { PrismaClient, DocumentKind } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { STOPS } from "./seed";
@@ -6,7 +7,9 @@ import { STOP_DUMMY } from "./seed-dev-content";
 import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
 
 /**
- * seed-dev.ts — DEV-ONLY dummy data for local navigation/testing.
+ * seed-dev.ts — dummy data for local navigation/testing, and the shared engine
+ * behind the public demo seed (`seed-demo.ts`, which only swaps the document
+ * URL). Keep the logic here; the two entry points are thin on purpose.
  *
  * Rebases the whole itinerary around TODAY so the trip appears to be at its
  * midpoint (currently in Viena), which lets the "during" phase of /hoy and
@@ -19,6 +22,15 @@ import { todayStr, addDaysStr, daysBetween } from "../src/lib/trip";
  * Stops are upserted (slugs preserved). Run the real seed (`npm run db:seed`)
  * to restore the production dataset.
  */
+
+export type DummySeedOptions = {
+  /** Where every dummy document points. Absolute: `/api/documents/[id]` answers
+   *  a link document with `Response.redirect`, which rejects a relative URL. */
+  docUrl: string;
+};
+
+/** Local dev: nothing to open, the point is only that the row exists. */
+const DEV_DOC_URL = "https://example.com/andiamo-dummy";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -49,8 +61,8 @@ function pickN<T>(items: T[], n: number): T[] {
   return shuffled(items).slice(0, Math.min(n, items.length));
 }
 
-async function main() {
-  console.log(`Seeding DEV data — hoy=${today}, offset=${OFFSET}d (Viena = parada actual)\n`);
+export async function seedDummyData({ docUrl }: DummySeedOptions) {
+  console.log(`Seeding dummy data — hoy=${today}, offset=${OFFSET}d (Viena = parada actual)\n`);
 
   console.log("Reescribiendo fechas de paradas...");
   for (let i = 0; i < STOPS.length; i++) {
@@ -134,7 +146,7 @@ async function main() {
         kind: d.kind,
         note: d.note ?? null,
         source: "link",
-        externalUrl: "https://example.com/andiamo-dummy",
+        externalUrl: docUrl,
         docDate: d.docDate ? new Date(d.docDate) : null,
       },
     });
@@ -157,7 +169,7 @@ async function main() {
           kind: d.kind,
           note: d.note,
           source: "link",
-          externalUrl: "https://example.com/andiamo-dummy",
+          externalUrl: docUrl,
         },
       });
       stopDocCount++;
@@ -229,9 +241,20 @@ async function main() {
   console.log("Guías markdown: content/guides (npm run guides:sync desde Itinerary).");
 }
 
-main()
-  .catch((e) => {
+/** Entry point shared by `db:seed:dev` and `db:seed:demo`. */
+export async function runDummySeed(options: DummySeedOptions) {
+  try {
+    await seedDummyData(options);
+  } catch (e) {
     console.error(e);
     process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Only when invoked as `tsx prisma/seed-dev.ts` — importing this module from
+// seed-demo.ts must not run the dev variant as a side effect.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await runDummySeed({ docUrl: DEV_DOC_URL });
+}
