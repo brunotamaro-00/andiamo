@@ -8,6 +8,7 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE, SITE_URL } from "@/lib/brand";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -31,18 +32,39 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  title: "Andiamo — Tu guía de viaje",
-  description: "Guía personal de viaje — Andiamo",
+  metadataBase: new URL(SITE_URL),
+  title: BRAND_TITLE,
+  description: BRAND_TAGLINE,
+  applicationName: BRAND_NAME,
   robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Andiamo" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: BRAND_NAME },
   icons: {
     icon: [
+      // El tile crema con borde lee mejor que el SVG suelto a 16px (pestañas,
+      // tarjeta de link de Word). El SVG queda como versión vectorial.
+      { url: "/brand/mark-tile-96.png", sizes: "96x96", type: "image/png" },
       { url: "/logo.svg", type: "image/svg+xml" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  // La preview social se define acá y en /login (la página que ve el crawler,
+  // porque / redirige). Ambas apuntan al mismo lockup.
+  openGraph: {
+    type: "website",
+    siteName: BRAND_NAME,
+    title: BRAND_TITLE,
+    description: BRAND_TAGLINE,
+    locale: "es_ES",
+    images: [{ url: BRAND_OG_IMAGE, width: 1200, height: 630, alt: BRAND_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND_TITLE,
+    description: BRAND_TAGLINE,
+    images: [BRAND_OG_IMAGE],
   },
 };
 

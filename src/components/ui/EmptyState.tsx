@@ -1,7 +1,9 @@
 import type { LucideIcon } from "lucide-react";
+import { Mark } from "@/components/Brand";
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  /** Ícono específico del contexto. Sin él cae en la mano de la marca, apagada. */
+  icon?: LucideIcon;
   title: string;
   description?: string;
   action?: React.ReactNode;
@@ -26,7 +28,11 @@ export function EmptyState({
         className="flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-2 border border-border mb-4"
         aria-hidden="true"
       >
-        <Icon size={20} strokeWidth={1.5} className="text-ink-3" />
+        {Icon ? (
+          <Icon size={20} strokeWidth={1.5} className="text-ink-3" />
+        ) : (
+          <Mark className="w-4 text-ink-faint" />
+        )}
       </div>
       <p className="text-sm font-semibold text-ink">{title}</p>
       {description && (

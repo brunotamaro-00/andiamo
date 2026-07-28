@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { BrandLink } from "@/components/BrandLink";
-import { Wordmark } from "@/components/Wordmark";
+import { Wordmark } from "@/components/Brand";
 import { LogoutButton } from "@/components/LogoutButton";
 import { StickyHeader } from "@/components/StickyHeader";
 
