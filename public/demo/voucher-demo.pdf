@@ -1,0 +1,41 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 675 >>
+stream
+BT
+/F1 22 Tf 1 0 0 1 72 720 Tm (Andiamo - Documento de demo) Tj
+/F1 11 Tf 1 0 0 1 72 686 Tm (Este es un voucher ficticio del deploy publico demo.andiamo.lat.) Tj
+/F1 11 Tf 1 0 0 1 72 668 Tm (No corresponde a ninguna reserva real.) Tj
+/F1 11 Tf 1 0 0 1 72 630 Tm (Andiamo es una PWA de itinerario de viaje: paradas, notas, documentos,) Tj
+/F1 11 Tf 1 0 0 1 72 612 Tm (clima y guias offline. Se integra con Spitwise, que lleva los gastos) Tj
+/F1 11 Tf 1 0 0 1 72 594 Tm (del viaje y le devuelve el gasto por ciudad.) Tj
+/F1 11 Tf 1 0 0 1 72 556 Tm (Stack: Next.js 16 - React 19 - TypeScript - Tailwind v4 - Prisma 7) Tj
+/F1 11 Tf 1 0 0 1 72 538 Tm (PostgreSQL - Railway.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000967 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1037
+%%EOF

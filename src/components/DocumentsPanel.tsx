@@ -21,6 +21,7 @@ import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useToast } from "@/components/ui/Toast";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { IS_DEMO } from "@/lib/demo";
 import { rowActionBtn as actionBtn } from "@/components/ui/row-action";
 
 /* Keep in sync with the server route validation. */
@@ -171,6 +172,9 @@ function DownloadDocButton({
 }
 
 export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanelProps) {
+  // The demo deploy has no R2 credentials, so /api/documents/upload would 500.
+  // Adding by link still works, which is what the demo seed uses anyway.
+  const addMode = IS_DEMO ? "link" : "upload";
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -243,7 +247,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         title="Documentos"
         count={optimisticDocs.length > 0 ? optimisticDocs.length : undefined}
         action={
-          <Button variant="ghost" size="sm" onClick={() => setMode("upload")}>
+          <Button variant="ghost" size="sm" onClick={() => setMode(addMode)}>
             <Plus size={13} strokeWidth={1.5} aria-hidden="true" />
             Agregar
           </Button>
@@ -256,9 +260,13 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
         <EmptyState
           icon={FileText}
           title="Sin documentos"
-          description="Guardá entradas, reservas y seguros. Subí PDFs/imágenes o pegá un link."
+          description={
+            IS_DEMO
+              ? "Guardá entradas, reservas y seguros pegando un link."
+              : "Guardá entradas, reservas y seguros. Subí PDFs/imágenes o pegá un link."
+          }
           action={
-            <Button variant="primary" size="sm" onClick={() => setMode("upload")}>
+            <Button variant="primary" size="sm" onClick={() => setMode(addMode)}>
               <Upload size={13} strokeWidth={1.5} aria-hidden="true" />
               Agregar documento
             </Button>
@@ -469,15 +477,19 @@ function AddDocumentModal({
 
   return (
     <Modal title="Agregar documento" onClose={onClose} locked={busy}>
-      <SegmentedControl
-        label="Tipo de documento"
-        value={mode}
-        onChange={(v) => { if (!busy) setMode(v); }}
-        options={[
-          { value: "upload", label: "Archivo" },
-          { value: "link", label: "Link" },
-        ]}
-      />
+      {/* Demo: only the link form exists, so the picker would offer a broken
+          option (no R2 credentials on that deploy). */}
+      {IS_DEMO ? null : (
+        <SegmentedControl
+          label="Tipo de documento"
+          value={mode}
+          onChange={(v) => { if (!busy) setMode(v); }}
+          options={[
+            { value: "upload", label: "Archivo" },
+            { value: "link", label: "Link" },
+          ]}
+        />
+      )}
       {mode === "link" ? (
         <LinkForm onSubmit={onSubmitLink} onClose={onClose} />
       ) : (

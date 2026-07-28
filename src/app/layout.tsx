@@ -7,6 +7,7 @@ import { Providers } from "@/components/Providers";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { DemoBanner } from "@/components/DemoBanner";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE, SITE_URL } from "@/lib/brand";
 
@@ -88,7 +89,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`h-full ${anton.variable} ${hanken.variable} ${archivo.variable}`}
     >
       <body className="h-full bg-canvas text-ink antialiased font-sans flex flex-col overflow-hidden">
-        {/* First flex child so it pushes the header down instead of overlaying it. */}
+        {/* First flex children so they push the header down instead of overlaying it. */}
+        <DemoBanner />
         <OfflineBanner />
         <Providers>
           <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
