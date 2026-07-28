@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { runDummySeed } from "./seed-dev";
+import { runDummySeed } from "./seed-dummy";
 
 /**
  * seed-demo.ts — dataset del deploy público (demo.andiamo.lat).
@@ -17,4 +17,4 @@ import { runDummySeed } from "./seed-dev";
 // que rechaza URLs relativas — de ahí el origen completo.
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://demo.andiamo.lat").replace(/\/$/, "");
 
-await runDummySeed({ docUrl: `${SITE}/demo/voucher-demo.pdf` });
+runDummySeed({ docUrl: `${SITE}/demo/voucher-demo.pdf` });
