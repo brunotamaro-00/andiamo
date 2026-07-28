@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 
 // Warm cream — used for the splash-screen background (branding).
 const CREAM = "#F3ECD8";
@@ -8,9 +9,9 @@ const THEME = "#FFFFFF";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Andiamo",
-    short_name: "Andiamo",
-    description: "Tu guía personal de viaje — Andiamo",
+    name: BRAND_NAME,
+    short_name: BRAND_NAME,
+    description: BRAND_TAGLINE,
     lang: "es",
     start_url: "/",
     scope: "/",

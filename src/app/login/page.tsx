@@ -1,12 +1,33 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { login } from "@/app/actions/auth";
-import { Wordmark } from "@/components/Wordmark";
+import { Lockup } from "@/components/Brand";
 import { Label } from "@/components/ui/Label";
 import { isAuthenticated } from "@/lib/auth";
+import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE } from "@/lib/brand";
 import { PEOPLE, personLabel } from "@/lib/person";
 
-export const metadata: Metadata = { title: "Acceder · Andiamo" };
+// `/` redirige acá cuando no hay sesión, así que ESTA es la página que ve un
+// crawler al desplegar la tarjeta del link (Word, WhatsApp, Slack). El título
+// tiene que ser el de la marca, no "Acceder".
+export const metadata: Metadata = {
+  title: BRAND_TITLE,
+  description: BRAND_TAGLINE,
+  openGraph: {
+    type: "website",
+    siteName: BRAND_NAME,
+    title: BRAND_TITLE,
+    description: BRAND_TAGLINE,
+    locale: "es_ES",
+    images: [{ url: BRAND_OG_IMAGE, width: 1200, height: 630, alt: BRAND_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND_TITLE,
+    description: BRAND_TAGLINE,
+    images: [BRAND_OG_IMAGE],
+  },
+};
 
 interface Props {
   searchParams: Promise<{ error?: string; from?: string }>;
@@ -23,11 +44,8 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-canvas px-4 gap-10">
-      <div className="text-center animate-slide-up">
-        <Wordmark size="lg" />
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-2">
-          Tu guía de viaje personal
-        </p>
+      <div className="animate-slide-up">
+        <Lockup size="xl" tagline={BRAND_TAGLINE} />
       </div>
 
       <form

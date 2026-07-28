@@ -115,9 +115,13 @@ All section labels, headers, and metadata use:
 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
 ```
 
-### Wordmark
+### Marca
 
-`<Wordmark size="sm" | "lg" />` — inline SVG hand logo in `#C44428` (brick) + "Andiamo" in Anton, `text-ink`, uppercase, `tracking-tight` (no transform distortion). Required in every page header.
+Todo vive en `src/components/Brand.tsx` (inline SVG, cero requests, funciona offline sin el SW): `<Wordmark size="sm" | "lg" | "xl" tone>` — mano en brick + "Andiamo" en Anton, uppercase, `tracking-tight`; **obligatorio en el header de cada pantalla**. Además `<Mark>` (la mano sola, pintada con `currentColor`), `<Lockup>` (login/404) y `<BrandDots>` (acento decorativo, tres puntos decrecientes). `tone="dark"` = mano y texto en crema.
+
+Los assets rasterizados (favicon, iconos PWA, `og-image`) **se generan**, no se editan: master en `brand/logo-master.svg` → `npm run brand:build` (`scripts/build-brand.ts`, usa `ImageResponse` de `next/og`, sin deps nuevas) → `public/brand/*`, `public/icon-*`, `src/app/favicon.ico`. Los PNG se commitean. Detalle completo en `BRAND.md`.
+
+Copy de marca (título, tagline, `SITE_URL`, path del og-image) en `src/lib/brand.ts` — no duplicar strings. La tarjeta de link (Word/WhatsApp/Slack) depende de tres cosas frágiles: `metadataBase` en `layout.tsx` (si no, `og:image` sale relativo y los crawlers lo tiran), la metadata repetida en `login/page.tsx` (`/` redirige ahí sin sesión, así que **esa** es la página que ve el crawler) y `"/brand/"` en `PUBLIC_PATHS` de `src/proxy.ts` (si no, la imagen contesta 307 a `/login`).
 
 ### Style conventions
 

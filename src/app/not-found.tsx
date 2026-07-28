@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Wordmark } from "@/components/Wordmark";
+import { Lockup } from "@/components/Brand";
+import { BRAND_TAGLINE } from "@/lib/brand";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-canvas flex flex-col items-center justify-center px-6 text-center gap-6">
-      <Wordmark size="lg" />
+      <Lockup size="lg" tagline={BRAND_TAGLINE} />
 
       <div className="space-y-1">
         <p className="font-numeral text-[72px] leading-none text-border font-black select-none">

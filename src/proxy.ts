@@ -4,7 +4,10 @@ import { SESSION_COOKIE_NAME, isValidToken } from "@/lib/session";
 
 // /sw.js must be public: browsers refuse to register a service worker whose
 // script is behind a redirect, so the PWA could never install pre-login.
-const PUBLIC_PATHS = ["/login", "/_next", "/favicon.ico", "/manifest.json", "/manifest.webmanifest", "/icon-", "/apple-icon", "/robots.txt", "/sw.js", "/offline.html", "/logo.svg"];
+// /brand must be public too: the og:image is fetched by link-preview crawlers
+// (Word, WhatsApp, Slack) with no cookie — behind the gate they'd get a 307 to
+// /login and the preview card would render empty.
+const PUBLIC_PATHS = ["/login", "/_next", "/favicon.ico", "/manifest.json", "/manifest.webmanifest", "/icon-", "/apple-icon", "/brand/", "/robots.txt", "/sw.js", "/offline.html", "/logo.svg"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
