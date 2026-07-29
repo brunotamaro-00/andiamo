@@ -16,18 +16,17 @@ export function DemoBanner() {
   return (
     <div
       role="status"
-      className="shrink-0 bg-gold-bg border-b-2 border-gold/40 px-4 pb-1.5 pt-[calc(0.375rem+env(safe-area-inset-top))] flex items-center justify-center gap-2"
+      className="shrink-0 bg-gold border-b-2 border-gold-ink/25 px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-gold-ink"
     >
-      <FlaskConical size={12} strokeWidth={2} aria-hidden="true" className="text-gold-ink shrink-0" />
-      <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-gold-ink">
-        Demo · datos ficticios
-      </span>
+      <FlaskConical size={13} strokeWidth={2.5} aria-hidden="true" className="shrink-0" />
+      <span className="text-[12px] font-extrabold uppercase tracking-[0.08em]">Demo pública</span>
+      <span className="text-[12px] font-semibold">datos inventados, no es un viaje real</span>
       {spitwise ? (
         <a
           href={spitwise}
-          className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-brick-ink underline underline-offset-2"
+          className="text-[12px] font-extrabold uppercase tracking-[0.08em] underline underline-offset-2 decoration-2"
         >
-          Ver Spitwise
+          Ver Spitwise ↗
         </a>
       ) : null}
     </div>

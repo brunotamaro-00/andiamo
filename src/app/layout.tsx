@@ -8,6 +8,9 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { DemoBanner } from "@/components/DemoBanner";
+import { DemoIntro } from "@/components/DemoIntro";
+import { IS_DEMO } from "@/lib/demo";
+import { spitwisePublicUrl } from "@/lib/spitwise";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE, SITE_URL } from "@/lib/brand";
 
@@ -92,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* First flex children so they push the header down instead of overlaying it. */}
         <DemoBanner />
         <OfflineBanner />
+        {IS_DEMO ? <DemoIntro spitwiseUrl={spitwisePublicUrl()} /> : null}
         <Providers>
           <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
             {children}
