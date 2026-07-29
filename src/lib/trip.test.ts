@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDaysStr, dateToStr, daysBetween, strToDate, todayStr, tripDayNumber, TRIP_TIMEZONE } from "./trip";
+import { addDaysStr, dateToStr, daysBetween, itineraryNights, strToDate, todayStr, tripDayNumber, TRIP_TIMEZONE } from "./trip";
 
 describe("todayStr", () => {
   it("returns a YYYY-MM-DD string", () => {
@@ -61,5 +61,53 @@ describe("tripDayNumber", () => {
     expect(tripDayNumber(null, "2026-06-01")).toBeNull();
     expect(tripDayNumber("2026-06-01", undefined)).toBeNull();
     expect(tripDayNumber(null, null)).toBeNull();
+  });
+});
+
+describe("itineraryNights", () => {
+  const stop = (arrival: string | null, departure: string | null) => ({
+    arrivalDate: arrival ? strToDate(arrival) : null,
+    departureDate: departure ? strToDate(departure) : null,
+  });
+
+  it("counts nights, not dates — departure is exclusive", () => {
+    expect(itineraryNights([stop("2026-08-05", "2026-08-13")])).toBe(8);
+  });
+
+  it("adds consecutive stops without double-counting the handover day", () => {
+    // Salida de una == llegada de la siguiente: esa fecha es una sola noche.
+    expect(
+      itineraryNights([stop("2026-08-05", "2026-08-13"), stop("2026-08-13", "2026-08-15")]),
+    ).toBe(10);
+  });
+
+  it("dedups overlapping stops", () => {
+    // Dos viajeros en paradas paralelas no duplican las noches del viaje.
+    expect(
+      itineraryNights([stop("2026-09-04", "2026-09-12"), stop("2026-09-04", "2026-09-09")]),
+    ).toBe(8);
+  });
+
+  it("does not fill the gap between stops", () => {
+    // La diferencia con el span de calendario: 10 días sin parada asignada
+    // (el tramo tentativo entre Nápoles y Barcelona) no son noches del viaje.
+    expect(
+      itineraryNights([stop("2026-10-27", "2026-10-29"), stop("2026-11-08", "2026-11-13")]),
+    ).toBe(7);
+  });
+
+  it("ignores stops without dates and zero-night transit stops", () => {
+    expect(
+      itineraryNights([
+        stop("2026-08-05", "2026-08-13"),
+        stop(null, null),
+        stop("2026-08-20", null),
+        stop("2026-08-20", "2026-08-20"),
+      ]),
+    ).toBe(8);
+  });
+
+  it("returns 0 for an empty itinerary", () => {
+    expect(itineraryNights([])).toBe(0);
   });
 });

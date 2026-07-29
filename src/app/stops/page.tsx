@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr } from "@/lib/trip";
+import { todayStr, dateToStr, itineraryNights } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
@@ -37,11 +37,10 @@ export default async function StopsPage() {
   const realStops = stops.filter((s) => !s.isLocal);
   const confirmedWithDates = realStops.filter((s) => !s.isFlexMargin && !s.isCandidate);
   const tripStartDate = confirmedWithDates.find((s) => s.arrivalDate)?.arrivalDate ?? null;
-  const tripEndDate = [...confirmedWithDates].reverse().find((s) => s.departureDate)?.departureDate ?? null;
-  const tripDays =
-    tripStartDate && tripEndDate
-      ? Math.round((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24))
-      : null;
+  // Noches con parada asignada, no el span de calendario: los días del tramo que
+  // todavía es tentativo no se cuentan. Misma definición que Spitwise, para que
+  // las dos apps muestren el mismo número (ver itineraryNights).
+  const tripNights = itineraryNights(confirmedWithDates);
   const today = todayStr();
 
   const tripStartValue = tripStartSetting?.value ?? "";
@@ -75,8 +74,8 @@ export default async function StopsPage() {
             value={confirmedWithDates.length.toString()}
           />
           <Stat
-            label="Días"
-            value={tripDays?.toString() ?? "—"}
+            label="Noches"
+            value={tripNights > 0 ? tripNights.toString() : "—"}
             highlight
           />
           <Stat
