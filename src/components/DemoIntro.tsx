@@ -30,7 +30,7 @@ function alreadySeen(): boolean {
   }
 }
 
-export function DemoIntro({ spitwiseUrl }: { spitwiseUrl: string }) {
+export function DemoIntro() {
   const hydrated = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
   const [dismissed, setDismissed] = useState(false);
 
@@ -56,13 +56,15 @@ export function DemoIntro({ spitwiseUrl }: { spitwiseUrl: string }) {
         regeneran cada noche. Podés editar, agregar y borrar lo que quieras.
       </p>
       <p className="text-sm text-ink-2 leading-relaxed">
-        Se integra en vivo con{" "}
-        <a href={spitwiseUrl} className="font-semibold text-brick underline underline-offset-2">
-          Spitwise
-        </a>
-        , mi app de gastos: el gasto de cada ciudad que ves acá sale de su API.
+        Se integra en vivo con <strong className="text-ink">Spitwise</strong>, mi app de gastos:
+        el gasto de cada ciudad que ves acá sale de su API. El link está arriba, en la barra.
       </p>
-      <Button onClick={dismiss} className="w-full" autoFocus>
+      {/* Único foco del diálogo. Con un link acá adentro, el foco inicial caía
+          ahí (React 19 no emite el atributo `autofocus`, así que el fallback de
+          Modal agarra el primer focusable) y un Enter se llevaba al visitante a
+          la otra app en vez de cerrar. El cross-link vive en el banner, que
+          además queda visible siempre. */}
+      <Button onClick={dismiss} className="w-full">
         Entrar a la demo
       </Button>
     </Modal>
