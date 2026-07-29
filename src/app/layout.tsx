@@ -5,7 +5,6 @@ import "flag-icons/css/flag-icons.min.css";
 import { TabBar } from "@/components/TabBar";
 import { Providers } from "@/components/Providers";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
-import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { DemoBanner } from "@/components/DemoBanner";
 import { DemoIntro } from "@/components/DemoIntro";
@@ -102,7 +101,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TabBar />
         </Providers>
         <PullToRefresh />
-        <InstallPrompt />
         <ServiceWorkerRegister />
         {/* Portal target for modals — outside scroll-root so inert doesn't block modal interaction */}
         <div id="modal-root" />

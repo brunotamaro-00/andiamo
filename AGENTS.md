@@ -138,7 +138,7 @@ Copy de marca (título, tagline, `SITE_URL`, path del og-image) en `src/lib/bran
 - Transitions: `duration-150`
 - Focus rings: `ring-brick/40`
 - TabBar: `border-t-2 border-ink` top rule; active label uppercase extrabold brick (`text-brick`); active pill = `motion.span layoutId="tab-pill"`
-- Fixed bottom overlays: offset with `env(safe-area-inset-bottom)` so they don't cover the TabBar (see `InstallPrompt`)
+- Fixed bottom overlays: offset with `env(safe-area-inset-bottom)` so they don't cover the TabBar
 - `Modal` focuses `[autofocus]` first, then the body's first focusable — put `autoFocus` on the primary input. On mobile it's a bottom sheet with drag-to-dismiss (handle + header zone); `locked` blocks all close paths during mutations.
 - `loading.tsx` skeletons must mirror the real layout (use `HeaderSkeleton` + `rounded-xl` cards) — no shape jumps on hydrate
 - Segmented choices (2–4 options): `SegmentedControl` from `ui/` instead of adjacent buttons or a select
