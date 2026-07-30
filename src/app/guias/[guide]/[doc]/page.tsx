@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getAllGuides, getDoc, guideDocs, readDocMarkdown } from "@/lib/guides";
+import { demoDocMarkdown } from "@/lib/guides-demo";
+import { IS_DEMO } from "@/lib/demo";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
@@ -41,7 +43,15 @@ export default async function GuideDocPage({
   const found = getDoc(guideSlug, docSlug);
   if (!found) notFound();
 
-  const markdown = stripLeadingH1(await readDocMarkdown(found.doc.file));
+  // The demo shows the file's structure, never the real research (guides-demo.ts)
+  const markdown = IS_DEMO
+    ? demoDocMarkdown({
+        docSlug: found.doc.slug,
+        cityPrefix: found.city?.slug,
+        place: found.city?.title ?? found.guide.title,
+        isDayTrip: found.isDayTrip,
+      })
+    : stripLeadingH1(await readDocMarkdown(found.doc.file));
 
   return (
     <div className="min-h-screen bg-canvas">

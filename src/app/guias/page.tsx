@@ -15,7 +15,8 @@ export default function GuidesIndexPage() {
       <PageHeader subtitle="Guías del viaje" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
-        {/* Trip-wide docs */}
+        {/* Trip-wide docs — empty in the demo, which drops them entirely */}
+        {manifest.general.length + manifest.resources.length > 0 && (
         <section className="animate-fade-in">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2 flex items-center gap-1.5">
             <Globe size={12} strokeWidth={2} aria-hidden="true" />
@@ -30,6 +31,7 @@ export default function GuidesIndexPage() {
             ))}
           </div>
         </section>
+        )}
 
         {/* Per-country guides */}
         {manifest.countries.map((country, idx) => (

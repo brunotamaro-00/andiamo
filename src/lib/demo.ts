@@ -9,6 +9,9 @@
  *  - a persistent banner marking the data as fictional (`DemoBanner`)
  *  - no file uploads: the demo service has no R2 credentials, so a POST to
  *    /api/documents/upload would 500. Adding documents by link still works.
+ *  - guides keep their whole structure but every doc renders a standard
+ *    placeholder instead of the real research (`guides-demo.ts`), and the
+ *    trip-wide "El viaje" docs are dropped entirely (`guides.ts`).
  *
  *  Everything else stays writable on purpose — a visitor should be able to feel
  *  the product. A nightly cron re-seeds the demo database.

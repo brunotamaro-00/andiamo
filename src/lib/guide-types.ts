@@ -43,6 +43,16 @@ export function guideDocs(guide: Guide): GuideDoc[] {
   ];
 }
 
+/** Doc kind behind a slug: the bare tail once the `<city>-` prefix that keeps
+ *  city docs unique inside /guias/[guide]/[doc] is removed
+ *  (`palermo-transporte` → `transporte`). Drives the doc icon and, in the
+ *  demo, which placeholder template a doc renders. */
+export function docKind(docSlug: string, cityPrefix?: string): string {
+  return cityPrefix && docSlug.startsWith(`${cityPrefix}-`)
+    ? docSlug.slice(cityPrefix.length + 1)
+    : docSlug;
+}
+
 export interface GuideCountry {
   order: number;
   slug: string;

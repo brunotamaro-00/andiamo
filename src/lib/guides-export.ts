@@ -4,6 +4,8 @@
 
 import { createHash } from "node:crypto";
 import { getManifest, readDocMarkdown, STOP_TO_GUIDES } from "./guides";
+import { demoDocMarkdown } from "./guides-demo";
+import { IS_DEMO } from "./demo";
 import type { GuideDoc } from "./guide-types";
 
 export type ExportDocKind = "city" | "daytrip" | "country" | "general" | "resource";
@@ -106,8 +108,18 @@ export function buildGuidesExport(): Promise<GuidesExport> {
   exportCache ??= (async () => {
     const docs: ExportDoc[] = [];
     for (const src of collectSources()) {
-      // A manifest entry whose file is missing on disk must not break the export
-      const content = await readDocMarkdown(src.doc.file).catch(() => null);
+      // The demo's markdown is a placeholder template: this route is the only
+      // other reader of the real corpus, so without this the demo's WhatsApp
+      // bot would answer with the real research the demo pages hide.
+      const content = IS_DEMO
+        ? demoDocMarkdown({
+            docSlug: src.doc.slug,
+            cityPrefix: src.citySlug,
+            place: src.cityTitle ?? src.guideTitle,
+            isDayTrip: src.kind === "daytrip",
+          })
+        : // A manifest entry whose file is missing on disk must not break the export
+          await readDocMarkdown(src.doc.file).catch(() => null);
       if (content === null) continue;
       docs.push({
         guideSlug: src.guideSlug,

@@ -15,7 +15,7 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import { getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
+import { docKind, getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
 import type { GuideDoc } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
@@ -49,10 +49,7 @@ const DOC_ICONS: Record<string, LucideIcon> = {
 /** City docs carry a `<city>-` slug prefix so they stay unique inside the
  *  guide's route namespace; the icon lookup uses the bare doc kind. */
 function iconFor(docSlug: string, cityPrefix?: string): LucideIcon {
-  const bare = cityPrefix && docSlug.startsWith(`${cityPrefix}-`)
-    ? docSlug.slice(cityPrefix.length + 1)
-    : docSlug;
-  return DOC_ICONS[bare] ?? FileText;
+  return DOC_ICONS[docKind(docSlug, cityPrefix)] ?? FileText;
 }
 
 function DocGrid({

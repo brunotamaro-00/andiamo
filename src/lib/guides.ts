@@ -1,34 +1,48 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import manifestJson from "../../content/guides/manifest.json";
+import { IS_DEMO } from "./demo";
 import type { Guide, GuideCity, GuideDoc, GuideManifest } from "./guide-types";
 
 export type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
-export { guideDocs } from "./guide-types";
+export { docKind, guideDocs } from "./guide-types";
 
-const manifest = manifestJson as GuideManifest;
+const source = manifestJson as GuideManifest;
+
+/** The demo drops the trip-wide docs ("El viaje": panel de reservas, presupuesto,
+ *  Eurail, packing list) — they're personal logistics, not structure worth
+ *  showing. Emptying them here is the single lever: it also removes their
+ *  routes (generateStaticParams + dynamicParams:false → 404), the offline
+ *  precache entries, the search hits and the Spitwise export rows. */
+const manifest: GuideManifest = IS_DEMO
+  ? { ...source, general: [], resources: [] }
+  : source;
 
 /** Trip-wide docs and resources exposed as pseudo-guides so they share the
  *  /guias/[guide]/[doc] routes. */
 const PSEUDO_GUIDES: Guide[] = [
-  {
-    slug: "general",
-    title: "El viaje",
-    country: "General",
-    countryFlag: "🌍",
-    docs: manifest.general,
-    dayTrips: [],
-    cities: [],
-  },
-  {
-    slug: "recursos",
-    title: "Recursos",
-    country: "General",
-    countryFlag: "🎒",
-    docs: manifest.resources,
-    dayTrips: [],
-    cities: [],
-  },
+  ...(IS_DEMO
+    ? []
+    : [
+        {
+          slug: "general",
+          title: "El viaje",
+          country: "General",
+          countryFlag: "🌍",
+          docs: manifest.general,
+          dayTrips: [],
+          cities: [],
+        },
+        {
+          slug: "recursos",
+          title: "Recursos",
+          country: "General",
+          countryFlag: "🎒",
+          docs: manifest.resources,
+          dayTrips: [],
+          cities: [],
+        },
+      ]),
   // Loose country-level docs (e.g. the Slovenia regional README)
   ...manifest.countries
     .filter((c) => c.countryDocs.length > 0)
