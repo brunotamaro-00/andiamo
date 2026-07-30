@@ -3,7 +3,7 @@
 
 ## What this app is
 
-Personal PWA travel guide for a ~30-stop Europe trip (Aug–Nov 2026) — branded **Andiamo**. Private couple app: `/login` is a Bruno/Katia picker (no password). Main routes (5-tab TabBar):
+Personal PWA travel guide for a ~30-stop Europe trip (Aug–Nov 2026) — branded **Andiamo**. Private couple app: `/login` asks for a shared password (`LOGIN_PASSWORDS`) plus a Bruno/Katia picker. Main routes (5-tab TabBar):
 
 - `/hoy` — **not a dashboard**: it resolves the current stop (per viewer + today's date via `computeCurrentStopSlug`) and redirects to `/stops/[slug]`. `/` redirects here. The old phase-aware dashboard was removed deliberately — don't reintroduce it without asking.
 - `/stops` — itinerary timeline with stats, TodayCard, add/edit/reorder stops; `/stops/[slug]` detail: notes, documents, currency, guide links.
@@ -23,7 +23,11 @@ Personal PWA travel guide for a ~30-stop Europe trip (Aug–Nov 2026) — brande
 
 ## Auth
 
-Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives in `src/proxy.ts` (Next.js 16's middleware convention — the file is named `proxy.ts` and exports a `proxy` function). Its matcher excludes `api/documents`, `api/stops`, `api/notes`, `api/guides` and `api/integration`: the first validates the session cookie itself, the rest authenticate with `X-Api-Key` via `isValidApiKey()` (`lib/session.ts`, constant-time, fails closed when the env var is unset). `/api/*` requests with an invalid session get a **401 JSON** response (never a redirect — clients `fetch` these). As defense-in-depth, Server Actions and auth-gated pages also call `requireAuth()` from `@/lib/auth`. Login sets `trip_session` (90 days) + `trip_person` when the user taps Bruno or Katia — no password.
+Custom HMAC cookie auth. Logic in `src/lib/session.ts`. Edge enforcement lives in `src/proxy.ts` (Next.js 16's middleware convention — the file is named `proxy.ts` and exports a `proxy` function). Its matcher excludes `api/documents`, `api/stops`, `api/notes`, `api/guides` and `api/integration`: the first validates the session cookie itself, the rest authenticate with `X-Api-Key` via `isValidApiKey()` (`lib/session.ts`, constant-time, fails closed when the env var is unset). `/api/*` requests with an invalid session get a **401 JSON** response (never a redirect — clients `fetch` these). As defense-in-depth, Server Actions and auth-gated pages also call `requireAuth()` from `@/lib/auth`. Login sets `trip_session` (90 days) + `trip_person` when the user taps Bruno or Katia.
+
+**Password gate** — `andiamo.lat` is printed on a CV, so `/login` is a public door. `src/lib/login-passwords.ts` validates the form field against `LOGIN_PASSWORDS` (comma-separated list, so a password can be rotated without locking anyone out), constant-time against *every* entry and failing closed when unset. It is a separate module from `session.ts` on purpose: that one is bundled for the edge by `proxy.ts`, and the login secret has no business there. `src/lib/login-throttle.ts` adds an in-process 8-failures/10-min limit per IP (single standalone process, so a module-level Map is enough) plus a 300 ms delay on failure. **`IS_DEMO` short-circuits the whole gate** — the public demo is meant to be walked into. Person stays a *view preference*, not a security boundary.
+
+The `/login` screen is also the portfolio's front door: in production the primary card is the CTA to `DEMO_URL`, and the password sits below it. Recruiters coming from the CV are most of the traffic on that URL — don't demote that CTA. The chips are ordered with the last-used person first (the `trip_person` cookie survives session expiry but not an explicit logout), because Enter in the password field submits the *first* submit button.
 
 ## Architecture patterns
 

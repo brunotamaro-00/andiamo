@@ -30,6 +30,11 @@ interface FieldProps {
   accept?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
+  autoComplete?: string;
+  /** Wires the input to an external error region (`role="alert"`) — the hint
+   *  below is for static help text, not for validation feedback. */
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean;
   hint?: string;
 }
 

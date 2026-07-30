@@ -17,3 +17,8 @@
  *  the product. A nightly cron re-seeds the demo database.
  */
 export const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
+
+/** Where production's `/login` sends whoever arrives from the CV. Production is
+ *  password-gated, so this link is the only way in for a visitor — it is the
+ *  primary call to action on that screen, not a footnote. */
+export const DEMO_URL = process.env.NEXT_PUBLIC_DEMO_URL ?? "https://demo.andiamo.lat";

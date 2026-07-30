@@ -19,7 +19,7 @@
 // Los assets de public/brand/* NO se precachean a propósito: la app dibuja la
 // marca con SVG inline (src/components/Brand.tsx) y esos PNG son solo para
 // crawlers y para el sistema operativo, que no pasan por el service worker.
-const CACHE_VERSION = "v14";
+const CACHE_VERSION = "v15";
 const SHELL_CACHE = `andiamo-shell-${CACHE_VERSION}`;
 const TRIP_CACHE  = `andiamo-trip-${CACHE_VERSION}`;  // on-demand precache of stop/guide route HTML
 // Document files are addressed by immutable id and don't depend on the build.
