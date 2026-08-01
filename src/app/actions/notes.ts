@@ -54,6 +54,8 @@ export async function toggleNotePin(id: string, path: string) {
     throw e;
   }
   revalidatePath(path);
+  // /search renders pinned notes first — same rule as every other note mutation.
+  revalidatePath("/search");
   after(() => notifyNotesChanged());
 }
 

@@ -299,11 +299,13 @@ function NoteEditor({
   const [status, setStatus] = useState<SaveStatus>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
-  // The debounced save reads these on unmount, when the state closure is stale.
+  // The unmount flush below reads these, when the state closure is stale.
   const latest = useRef({ title, body });
-  latest.current = { title, body };
   const save = useRef(onSave);
-  save.current = onSave;
+  useEffect(() => {
+    latest.current = { title, body };
+    save.current = onSave;
+  });
 
   /* Actually flush the pending save on unmount — this used to only clear the
      timer, so anything typed in the last 700 ms was silently dropped. The sheet

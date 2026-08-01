@@ -16,6 +16,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!doc) return Response.json({ error: "Not found" }, { status: 404 });
 
   if (doc.source === "link" && doc.externalUrl) {
+    // Response.redirect throws TypeError on a non-absolute URL, which would 500
+    // instead of failing cleanly. The create/update schemas enforce http(s),
+    // but seeds and any future writer bypass them.
+    if (!/^https?:\/\//i.test(doc.externalUrl)) {
+      return Response.json({ error: "El link guardado no es válido" }, { status: 422 });
+    }
     return Response.redirect(doc.externalUrl);
   }
 

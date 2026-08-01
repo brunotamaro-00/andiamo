@@ -151,7 +151,7 @@ export function Modal({ title, onClose, children, locked = false }: ModalProps) 
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [titleId]);
 
   const content = (
     <AnimatePresence onExitComplete={onClose}>
