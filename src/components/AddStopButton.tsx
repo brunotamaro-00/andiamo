@@ -1,13 +1,21 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
-import { Plus, X, AlertCircle } from "lucide-react";
+import { Plus, AlertCircle, RotateCcw } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
-import { MAX_NIGHTS } from "@/app/actions/_schemas";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField, inputClass } from "@/components/ui/Field";
+import { inputClass } from "@/components/ui/Field";
 import { Label } from "@/components/ui/Label";
+import { NightsStepper } from "@/components/ui/NightsStepper";
+import { ToggleRow } from "@/components/ui/ToggleRow";
+import { flagFromCountryCode } from "@/lib/country-currency";
+import {
+  ItineraryPositionPicker,
+  PositionField,
+  PositionPickerFooter,
+} from "@/components/ItineraryPositionPicker";
+import { afterOrderForSlot, type SpineStop } from "@/lib/itinerary-slots";
 
 interface GeoResult {
   name: string;
@@ -19,18 +27,13 @@ interface GeoResult {
   timezone: string;
 }
 
-interface StopOption {
-  id: string;
-  order: number;
-  name: string;
-  countryFlag: string;
-}
-
 interface Props {
-  stops: StopOption[];
+  /** The itinerary spine — see `itinerarySpine()` in `@/lib/itinerary-slots`. */
+  stops: SpineStop[];
+  tripStartStr: string | null;
 }
 
-export function AddStopButton({ stops }: Props) {
+export function AddStopButton(props: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,23 +53,30 @@ export function AddStopButton({ stops }: Props) {
         <Plus size={14} strokeWidth={1.5} aria-hidden="true" />
         Agregar ciudad
       </button>
-      {open && <AddStopModal stops={stops} onClose={() => setOpen(false)} />}
+      {open && <AddStopModal {...props} onClose={() => setOpen(false)} />}
     </>
   );
 }
 
+/** Sheet steps. The city search and the position picker are full-body views,
+ *  not extra fields — stacking them into one scroll is what made this form
+ *  repeat the city name twice and hide the position behind an OS dropdown. */
+type Step = "search" | "detail" | "position";
+
 function AddStopModal({
-  stops, onClose,
-}: {
-  stops: StopOption[];
-  onClose: () => void;
-}) {
+  stops, tripStartStr, onClose,
+}: Props & { onClose: () => void }) {
+  const [step, setStep] = useState<Step>("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeoResult[]>([]);
   const [selected, setSelected] = useState<GeoResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [nights, setNights] = useState(3);
+  const [isCandidate, setIsCandidate] = useState(false);
+  // Default: at the end of the trip — the overwhelmingly common case.
+  const [slot, setSlot] = useState(stops.length);
   const [isPending, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Monotonic id of the newest in-flight geocode. Responses can land out of
@@ -84,7 +94,6 @@ function AddStopModal({
 
   function handleQueryChange(val: string) {
     setQuery(val);
-    setSelected(null);
     setGeoError(null);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (val.length < 2) {
@@ -121,6 +130,8 @@ function AddStopModal({
     // the literal "undefined", which the schema rejects. Empty means "unknown"
     // and falls back to the trip timezone.
     formData.set("timezone", selected.timezone ?? "");
+    formData.set("isCandidate", isCandidate ? "true" : "false");
+    formData.set("insertAfterOrder", String(afterOrderForSlot(stops, slot)));
     setSubmitError(null);
     // async callback: keeps isPending true until the action resolves
     startTransition(async () => {
@@ -133,11 +144,105 @@ function AddStopModal({
     });
   }
 
-  const maxOrder = stops.reduce((m, s) => Math.max(m, s.order), 0);
+  const moving = {
+    name: selected?.name ?? "",
+    // Mirrors what `createStop` derives server-side, so the preview shows the
+    // same flag the stop will end up with.
+    countryFlag: selected ? flagFromCountryCode(selected.countryCode) : "",
+    nights,
+    isCandidate,
+  };
+
+  if (step === "position") {
+    return (
+      <Modal
+        title="Posición"
+        onClose={onClose}
+        onBack={() => setStep("detail")}
+        locked={isPending}
+      >
+        <ItineraryPositionPicker
+          spine={stops}
+          moving={moving}
+          slot={slot}
+          onChange={setSlot}
+          tripStartStr={tripStartStr}
+        />
+        <PositionPickerFooter onDone={() => setStep("detail")} />
+      </Modal>
+    );
+  }
+
+  if (step === "detail" && selected) {
+    return (
+      <Modal title="Agregar ciudad" onClose={onClose} locked={isPending}>
+        {/* The chosen city as the header of its own form — it used to sit in a
+            chip *below* the search box that still held the same name. */}
+        <div className="flex items-center gap-3 rounded-xl border-2 border-ink bg-surface px-3 py-3 card-shadow">
+          <span className="min-w-0 flex-1">
+            <span className="block truncate font-display text-base uppercase tracking-tight text-ink">
+              {selected.name}
+            </span>
+            <span className="mt-0.5 block truncate text-[11px] text-ink-3">
+              {selected.admin1 ? `${selected.admin1} · ` : ""}
+              {selected.country}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setStep("search");
+              setResults([]);
+            }}
+            // Quiet on purpose: inside a border-2 card, a second heavy frame
+            // would compete with the city name for the focal point.
+            className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full px-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+          >
+            <RotateCcw size={12} strokeWidth={2} aria-hidden="true" />
+            Cambiar
+          </button>
+        </div>
+
+        <form action={handleSubmit} className="space-y-3">
+          {submitError && (
+            <p className="text-xs text-danger flex items-center gap-1.5" role="alert">
+              <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+              {submitError}
+            </p>
+          )}
+
+          <NightsStepper value={nights} onChange={setNights} />
+
+          <PositionField
+            spine={stops}
+            moving={moving}
+            slot={slot}
+            tripStartStr={tripStartStr}
+            onOpen={() => setStep("position")}
+          />
+
+          <ToggleRow
+            label="Tentativa (sin decidir)"
+            hint="Recibe fechas pero no corre al resto del viaje."
+            checked={isCandidate}
+            onChange={setIsCandidate}
+          />
+
+          <div className="flex gap-2">
+            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" className="flex-1" loading={isPending}>
+              {isPending ? "Agregando..." : "Agregar"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    );
+  }
 
   return (
-    <Modal title="Agregar ciudad" onClose={onClose} locked={isPending}>
-      {/* City search */}
+    <Modal title="Agregar ciudad" onClose={onClose}>
       <div>
         <Label>Buscar ciudad</Label>
         <input
@@ -146,12 +251,11 @@ function AddStopModal({
           onChange={(e) => handleQueryChange(e.target.value)}
           placeholder="Ej: Brujas, Estocolmo, Dubrovnik..."
           autoFocus
+          enterKeyHint="search"
           aria-label="Buscar ciudad"
           className={inputClass}
         />
-        {searching && (
-          <p className="text-xs text-ink-3 mt-1">Buscando...</p>
-        )}
+        {searching && <p className="text-xs text-ink-3 mt-1">Buscando...</p>}
         {geoError && (
           <p className="text-xs text-danger flex items-center gap-1.5 mt-1" role="alert">
             <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
@@ -163,14 +267,13 @@ function AddStopModal({
             ? "Buscando ciudades"
             : results.length > 0
             ? `${results.length} ciudades encontradas`
-            : query.length >= 2 && !selected
+            : query.length >= 2
             ? "Sin resultados"
             : ""}
         </p>
       </div>
 
-      {/* Search results */}
-      {!selected && results.length > 0 && (
+      {results.length > 0 && (
         <div className="space-y-1">
           {results.map((r, i) => (
             <button
@@ -179,7 +282,7 @@ function AddStopModal({
               onClick={() => {
                 setSelected(r);
                 setResults([]);
-                setQuery(r.name);
+                setStep("detail");
               }}
               className="w-full text-left px-3 py-2.5 rounded-lg bg-surface-2 hover:bg-border transition-colors border border-border hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
             >
@@ -194,78 +297,15 @@ function AddStopModal({
         </div>
       )}
 
-      {/* Selected city chip */}
       {selected && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-brick-bg border border-brick-border/40 rounded-lg">
-          <span className="text-sm font-medium text-brick-ink flex-1">
-            {selected.name}
-          </span>
-          <span className="text-xs text-ink-2">{selected.country}</span>
-          <button
-            onClick={() => {
-              setSelected(null);
-              setQuery("");
-            }}
-            aria-label="Quitar ciudad seleccionada"
-            className="h-11 w-11 -my-2 flex items-center justify-center rounded-lg text-ink-3 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-          >
-            <X size={14} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-        </div>
-      )}
-
-      {/* Form — only visible when a city is selected */}
-      {selected && (
-        <form action={handleSubmit} className="space-y-3">
-          {submitError && (
-            <p className="text-xs text-danger flex items-center gap-1.5" role="alert">
-              <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
-              {submitError}
-            </p>
-          )}
-          <Field
-            label="Noches"
-            name="nights"
-            type="number"
-            inputMode="numeric"
-            defaultValue={3}
-            min={0}
-            max={MAX_NIGHTS}
-            required
-          />
-
-          <SelectField
-            label="Insertar después de"
-            name="insertAfterOrder"
-            defaultValue={String(maxOrder)}
-          >
-            <option value="0">Al principio</option>
-            {stops.map((s) => (
-              <option key={s.id} value={s.order}>
-                Después de {s.name}
-              </option>
-            ))}
-          </SelectField>
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              className="flex-1"
-              onClick={onClose}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              className="flex-1"
-              loading={isPending}
-            >
-              {isPending ? "Agregando..." : "Agregar"}
-            </Button>
-          </div>
-        </form>
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          onClick={() => setStep("detail")}
+        >
+          Volver a {selected.name}
+        </Button>
       )}
     </Modal>
   );

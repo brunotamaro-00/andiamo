@@ -21,6 +21,7 @@ import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
+import { itinerarySpine } from "@/lib/itinerary-slots";
 import { Flag } from "@/components/Flag";
 import StopSpendPanel, { SpendPanelSkeleton } from "@/components/StopSpendPanel";
 
@@ -47,7 +48,7 @@ export default async function StopPage({ params }: Props) {
 
   // All three queries are independent and run concurrently. The stop list is
   // fetched once and shared by the current-stop, trip-day, and nav derivations.
-  const [stop, allStopsRaw, currentOverride, viewer] = await Promise.all([
+  const [stop, allStopsRaw, currentOverride, tripStartSetting, viewer] = await Promise.all([
     db.stop.findUnique({
       where: { slug },
       include: {
@@ -66,12 +67,14 @@ export default async function StopPage({ params }: Props) {
         countryFlag: true,
         isCandidate: true,
         isFlexMargin: true,
+        isLocal: true,
         arrivalDate: true,
         departureDate: true,
         ownerPerson: true,
       },
     }),
     db.setting.findUnique({ where: { key: "manualCurrentStopId" } }),
+    db.setting.findUnique({ where: { key: "tripStartDate" } }),
     getPerson(),
   ]);
 
@@ -103,7 +106,12 @@ export default async function StopPage({ params }: Props) {
 
   const prevStop = otherStops.filter((s) => s.order < stop.order).at(-1);
   const nextStop = otherStops.find((s) => s.order > stop.order);
-  const allStops = otherStops;
+  // Position picker input: the full sequence minus this stop. Person-agnostic
+  // on purpose (see `itinerarySpine`), unlike the prev/next nav above.
+  const spine = itinerarySpine(allStopsRaw, stop.id);
+  const tripStartStr =
+    tripStartSetting?.value ||
+    (firstDatedArrival ? dateToStr(firstDatedArrival) : null);
 
   const isActive = slug === currentSlug;
 
@@ -226,12 +234,13 @@ export default async function StopPage({ params }: Props) {
                 stopId={stop.id}
                 slug={stop.slug}
                 name={stop.name}
-                arrivalDate={stop.arrivalDate}
-                departureDate={stop.departureDate}
+                countryFlag={stop.countryFlag}
                 nights={stop.nights}
                 isCandidate={stop.isCandidate}
+                isLocal={stop.isLocal}
                 currentOrder={stop.order}
-                allStops={allStops}
+                allStops={spine}
+                tripStartStr={tripStartStr}
               />
             </div>
           </div>

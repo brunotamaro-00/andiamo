@@ -3,37 +3,40 @@
 import { useState, useTransition } from "react";
 import { Pencil } from "lucide-react";
 import { updateStop, deleteStop } from "@/app/actions/stops";
-import { MAX_NIGHTS } from "@/app/actions/_schemas";
 import { haptics } from "@/lib/haptics";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Field, SelectField } from "@/components/ui/Field";
+import { Field } from "@/components/ui/Field";
+import { NightsStepper } from "@/components/ui/NightsStepper";
+import { ToggleRow } from "@/components/ui/ToggleRow";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-
-interface StopOption {
-  id: string;
-  name: string;
-  order: number;
-  countryFlag: string;
-}
+import {
+  ItineraryPositionPicker,
+  PositionField,
+  PositionPickerFooter,
+} from "@/components/ItineraryPositionPicker";
+import {
+  afterOrderForSlot,
+  currentSlotIndex,
+  type SpineStop,
+} from "@/lib/itinerary-slots";
 
 interface Props {
   stopId: string;
   slug: string;
   name: string;
-  arrivalDate: Date | null;
-  departureDate: Date | null;
+  countryFlag: string;
   nights: number;
   isCandidate: boolean;
+  /** Pseudo-cities (Pititas) run in parallel to the sequence — excluded from
+   *  `recalculateItinerary`, so they must not move the preview's cursor. */
+  isLocal?: boolean;
   currentOrder: number;
-  allStops: StopOption[];
-}
-
-function formatDateDisplay(d: Date | null): string {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  /** The itinerary spine WITHOUT this stop. */
+  allStops: SpineStop[];
+  tripStartStr: string | null;
 }
 
 export function EditStopPanel(props: Props) {
@@ -52,17 +55,29 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, departureDate, nights, isCandidate,
-  allStops, onClose,
+  stopId, name, countryFlag, nights: initialNights, isCandidate, isLocal,
+  currentOrder, allStops, tripStartStr, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
-  // "keep" sentinel: allStops has order gaps (excludes this stop and flex margins),
-  // so currentOrder - 1 may not match any rendered option
-  const [selectedAfterOrder, setSelectedAfterOrder] = useState("keep");
+  const [nights, setNights] = useState(initialNights);
+  const [editedName, setEditedName] = useState(name);
+  // The gap this stop already occupies. Preselecting it retires the old
+  // "Mantener posición actual" sentinel: leave it alone and nothing moves.
+  const homeSlot = currentSlotIndex(allStops, currentOrder);
+  const [slot, setSlot] = useState(homeSlot);
+
+  const moving = {
+    name: editedName,
+    countryFlag,
+    nights,
+    isCandidate: candidateChecked,
+    countsTowardCursor: !isLocal,
+  };
 
   function handleSave(formData: FormData) {
     formData.set("isCandidate", candidateChecked ? "true" : "false");
@@ -70,7 +85,7 @@ function EditModal({
     startTransition(async () => {
       try {
         const afterOrder =
-          selectedAfterOrder === "keep" ? undefined : parseInt(selectedAfterOrder, 10);
+          slot === homeSlot ? undefined : afterOrderForSlot(allStops, slot);
         const result = await updateStop(stopId, formData, afterOrder);
         if (result?.error) { setMutationError(result.error); return; }
         haptics.success();
@@ -97,59 +112,56 @@ function EditModal({
     });
   }
 
+  if (showPicker) {
+    return (
+      <Modal
+        title="Posición"
+        onClose={onClose}
+        onBack={() => setShowPicker(false)}
+        locked={isPending}
+      >
+        <ItineraryPositionPicker
+          spine={allStops}
+          moving={moving}
+          slot={slot}
+          onChange={setSlot}
+          tripStartStr={tripStartStr}
+        />
+        <PositionPickerFooter onDone={() => setShowPicker(false)} />
+      </Modal>
+    );
+  }
+
   return (
     <Modal title="Editar ciudad" onClose={onClose} locked={isPending}>
       <form action={handleSave} className="space-y-3">
-        <Field label="Nombre" name="name" defaultValue={name} required />
-
         <Field
-          label="Noches"
-          name="nights"
-          type="number"
-          inputMode="numeric"
-          defaultValue={nights}
-          min={0}
-          max={MAX_NIGHTS}
+          label="Nombre"
+          name="name"
+          value={editedName}
+          onChange={(e) => setEditedName(e.target.value)}
+          required
         />
 
-        {/* Arrival — always calculated from trip start + nights + order */}
-        <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 leading-none mb-1">
-            Llegada
-          </p>
-          <p className="text-sm text-ink">
-            {formatDateDisplay(arrivalDate)}
-            {departureDate && (
-              <span className="text-ink-3"> → {formatDateDisplay(departureDate)}</span>
-            )}
-            <span className="ml-1.5 text-xs text-ink-3">· calculada</span>
-          </p>
-        </div>
+        <NightsStepper value={nights} onChange={setNights} />
 
-        <SelectField
-          label="Posición en itinerario"
-          name="afterOrder"
-          value={selectedAfterOrder}
-          onChange={(e) => setSelectedAfterOrder(e.target.value)}
-        >
-          <option value="keep">Mantener posición actual</option>
-          <option value="0">Al principio</option>
-          {allStops.map((s) => (
-            <option key={s.id} value={String(s.order)}>
-              Después de {s.name}
-            </option>
-          ))}
-        </SelectField>
+        {/* No "Llegada" field: the date is derived from tripStartDate + order +
+            nights and can't be typed. It now shows where it belongs — inside
+            the position picker, as the consequence of the position. */}
+        <PositionField
+          spine={allStops}
+          moving={moving}
+          slot={slot}
+          tripStartStr={tripStartStr}
+          onOpen={() => setShowPicker(true)}
+        />
 
-        <label className="flex items-center gap-2 min-h-[44px] text-sm text-ink-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={candidateChecked}
-            onChange={(e) => setCandidateChecked(e.target.checked)}
-            className="h-5 w-5 shrink-0 rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
-          />
-          Tentativa (sin decidir)
-        </label>
+        <ToggleRow
+          label="Tentativa (sin decidir)"
+          hint="Recibe fechas pero no corre al resto del viaje."
+          checked={candidateChecked}
+          onChange={setCandidateChecked}
+        />
 
         <div className="flex gap-2">
           <Button

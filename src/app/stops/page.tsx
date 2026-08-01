@@ -6,6 +6,7 @@ import { todayStr, dateToStr, itineraryNights } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
+import { itinerarySpine } from "@/lib/itinerary-slots";
 import { AddStopButton } from "@/components/AddStopButton";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
@@ -189,11 +190,12 @@ export default async function StopsPage() {
             })}
         </div>
 
-        {/* Add stop */}
+        {/* Add stop — the spine comes from `allStops`, not the person-filtered
+            list: the position picker previews the dates the server will write,
+            and that walk doesn't know about the person swap. */}
         <AddStopButton
-          stops={stops
-            .filter((s) => !s.isFlexMargin)
-            .map((s) => ({ id: s.id, order: s.order, name: s.name, countryFlag: s.countryFlag }))}
+          stops={itinerarySpine(allStops)}
+          tripStartStr={tripStartValue || tripStartFallback || null}
         />
 
         {/* Trip start editor — below fold, low noise */}

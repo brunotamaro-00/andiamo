@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import {
   AnimatePresence,
   motion,
@@ -69,9 +69,12 @@ interface ModalProps {
   children: React.ReactNode;
   /** Blocks every close path (drag, Escape, backdrop, X) while a mutation is in flight. */
   locked?: boolean;
+  /** When set, the header grows a back chevron — for sheets that swap their body
+   *  between steps (city form ⇄ position picker) instead of stacking a second modal. */
+  onBack?: () => void;
 }
 
-export function Modal({ title, onClose, children, locked = false }: ModalProps) {
+export function Modal({ title, onClose, children, locked = false, onBack }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -197,9 +200,20 @@ export function Modal({ title, onClose, children, locked = false }: ModalProps) 
                 <div className="h-1 w-10 rounded-full bg-border-strong" />
               </div>
               <div className="flex items-center justify-between px-5 pt-3 sm:pt-5 pb-4 border-b border-border">
-                <h3 id={titleId} className="font-display text-[15px] uppercase tracking-wide text-ink leading-none">
-                  {title}
-                </h3>
+                <div className="flex items-center gap-1 min-w-0">
+                  {onBack && (
+                    <IconButton
+                      label="Volver"
+                      icon={ChevronLeft}
+                      onClick={onBack}
+                      disabled={locked}
+                      className="-ml-3 shrink-0"
+                    />
+                  )}
+                  <h3 id={titleId} className="font-display text-[15px] uppercase tracking-wide text-ink leading-none truncate">
+                    {title}
+                  </h3>
+                </div>
                 <IconButton label="Cerrar" icon={X} onClick={requestClose} />
               </div>
             </div>
