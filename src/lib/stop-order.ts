@@ -6,7 +6,7 @@
  */
 
 import type { PrismaClient } from "@/generated/prisma/client";
-type Tx = Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0];
+export type Tx = Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0];
 
 /** Temporary slot for a stop being moved — real orders are always positive. */
 export const PARKED_ORDER = -1;

@@ -26,6 +26,12 @@ model Stop {
   tempRange     String?
   isCandidate   Boolean    @default(false)
   isFlexMargin  Boolean    @default(false)
+  /// Fixed date: the itinerary walk *jumps* the cursor to this stop's
+  /// arrivalDate instead of deriving it from the previous stop's departure.
+  /// This is what lets the itinerary hold a gap (the unbooked days between
+  /// Nápoles and Barcelona) and what protects a stop with a bought ticket from
+  /// being dragged by an edit upstream of it. See computeItinerary.
+  isAnchored    Boolean    @default(false)
   /// Who this stop belongs to. null = shared (default, every stop today).
   /// A person value ("bruno"/"katia") makes it a *person-scoped* stop: visible
   /// only to that viewer (and to "Ambos"), hidden from the other. See Pititas.

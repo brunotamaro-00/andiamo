@@ -13,12 +13,20 @@ interface StopOverrides {
   id: string;
   nights?: number;
   isCandidate?: boolean;
+  anchor?: string;
 }
 
 let orderCounter = 0;
 
-function stop({ id, nights = 0, isCandidate = false }: StopOverrides) {
-  return { id, order: ++orderCounter, nights, isCandidate };
+function stop({ id, nights = 0, isCandidate = false, anchor }: StopOverrides) {
+  return {
+    id,
+    order: ++orderCounter,
+    nights,
+    isCandidate,
+    isAnchored: anchor != null,
+    arrivalDate: anchor ? new Date(`${anchor}T00:00:00.000Z`) : null,
+  };
 }
 
 function iso(result: { arrival: Date | null; departure: Date | null }) {
@@ -96,6 +104,91 @@ describe("computeItinerary", () => {
   it("handles an empty stop list", () => {
     expect(computeItinerary([], "2026-06-01").size).toBe(0);
     expect(computeItinerary([], null).size).toBe(0);
+  });
+
+  // Anchors. Before these existed the cursor was strictly contiguous, so the ten
+  // unbooked days between Nápoles and Barcelona got eaten and Barcelona slid ten
+  // days earlier than the flight that was already paid for.
+  describe("anchored stops", () => {
+    it("jumps the cursor to an anchored stop, preserving the gap before it", () => {
+      const stops = [
+        stop({ id: "napoles", nights: 2 }),
+        stop({ id: "barcelona", nights: 5, anchor: "2026-11-08" }),
+        stop({ id: "madrid", nights: 5 }),
+      ];
+      const result = computeItinerary(stops, "2026-10-27");
+      expect(iso(result.get("napoles")!)).toEqual({
+        arrival: "2026-10-27",
+        departure: "2026-10-29",
+      });
+      expect(iso(result.get("barcelona")!)).toEqual({
+        arrival: "2026-11-08",
+        departure: "2026-11-13",
+      });
+      // Everything after the anchor chains from it, not from the gap.
+      expect(iso(result.get("madrid")!)).toEqual({
+        arrival: "2026-11-13",
+        departure: "2026-11-18",
+      });
+    });
+
+    it("shields an anchored stop from an edit upstream of it", () => {
+      const build = (firstNights: number) => [
+        stop({ id: "a", nights: firstNights }),
+        stop({ id: "flight", nights: 3, anchor: "2026-07-01" }),
+      ];
+      orderCounter = 0;
+      const before = computeItinerary(build(2), "2026-06-01");
+      orderCounter = 0;
+      const after = computeItinerary(build(9), "2026-06-01");
+      expect(iso(before.get("flight")!)).toEqual(iso(after.get("flight")!));
+    });
+
+    it("does not let an anchored candidate advance the cursor", () => {
+      // Grindelwald runs *instead of* Interlaken, not after it.
+      const stops = [
+        stop({ id: "interlaken", nights: 4 }),
+        stop({ id: "grindelwald", nights: 4, isCandidate: true, anchor: "2026-09-19" }),
+        stop({ id: "viena", nights: 5 }),
+      ];
+      const result = computeItinerary(stops, "2026-09-19");
+      expect(iso(result.get("grindelwald")!)).toEqual({
+        arrival: "2026-09-19",
+        departure: "2026-09-23",
+      });
+      expect(iso(result.get("viena")!)).toEqual({
+        arrival: "2026-09-23",
+        departure: "2026-09-28",
+      });
+    });
+
+    it("ignores an anchor with no date to anchor to", () => {
+      const stops = [
+        { id: "a", order: 1, nights: 2, isCandidate: false },
+        { id: "b", order: 2, nights: 2, isCandidate: false, isAnchored: true, arrivalDate: null },
+      ];
+      const result = computeItinerary(stops, "2026-06-01");
+      expect(iso(result.get("b")!)).toEqual({ arrival: "2026-06-03", departure: "2026-06-05" });
+    });
+
+    it("is a fixed point: recomputing an anchored itinerary changes nothing", () => {
+      const stops = [
+        stop({ id: "londres", nights: 8, anchor: "2026-08-05" }),
+        stop({ id: "york", nights: 2 }),
+        stop({ id: "napoles", nights: 2 }),
+        stop({ id: "barcelona", nights: 5, anchor: "2026-11-08" }),
+      ];
+      const first = computeItinerary(stops, "2026-08-05");
+      // Feed the computed dates back in as if they had been persisted.
+      const persisted = stops.map((s) => ({
+        ...s,
+        arrivalDate: first.get(s.id)!.arrival,
+      }));
+      const second = computeItinerary(persisted, "2026-08-05");
+      for (const s of stops) {
+        expect(iso(second.get(s.id)!)).toEqual(iso(first.get(s.id)!));
+      }
+    });
   });
 });
 

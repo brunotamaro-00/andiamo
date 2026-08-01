@@ -148,9 +148,21 @@ export default async function StopPage({ params }: Props) {
       )
     : null;
 
+  // "Current" is not the same as "here": on a day covered by no stay window —
+  // the unbooked stretch after Nápoles, a transit day — the current stop is the
+  // *next* one. Verify today is really inside [arrival, departure) before
+  // counting down, or the page tells you you have 13 días acá in a city you
+  // haven't reached.
+  const isHere =
+    isActive &&
+    stop.arrivalDate != null &&
+    stop.departureDate != null &&
+    dateToStr(stop.arrivalDate) <= today &&
+    today < dateToStr(stop.departureDate);
+
   // Top-right countdown while staying at this stop
   const daysLeft =
-    isActive && tripPhase === "during" && stop.departureDate
+    isHere && stop.departureDate
       ? Math.max(0, daysBetween(today, dateToStr(stop.departureDate)))
       : null;
 
@@ -188,7 +200,7 @@ export default async function StopPage({ params }: Props) {
                   {daysLeft === 1 ? "Última noche" : `${daysLeft} días acá`}
                 </p>
               )}
-              {isActive && tripPhase === "before" && (
+              {isActive && !isHere && tripPhase !== "after" && (
                 <Badge variant="special">Próxima parada</Badge>
               )}
               {stop.isCandidate && <Badge variant="special">tentativa</Badge>}
@@ -203,8 +215,12 @@ export default async function StopPage({ params }: Props) {
               </h1>
               <p className="text-sm text-ink-2">{stop.country}</p>
             </div>
-            {/* Compact edit trigger in the header's top-right slot */}
-            <div className="ml-auto shrink-0 [&_button]:h-auto [&_button]:w-auto [&_button]:p-0 [&_button]:text-border-strong [&_button]:hover:bg-transparent [&_button]:hover:text-ink">
+            {/* Edit trigger in the header's top-right slot. It used to override
+                IconButton's w-11/h-11 down to the bare 15px icon, which measured
+                15×15 on a phone — a third of the 44px floor, for the only way
+                into "editar ciudad". Keep the quiet look, keep the target: the
+                negative margins hold the visual density. */}
+            <div className="ml-auto shrink-0 -m-2 [&_button]:text-border-strong [&_button]:hover:bg-transparent [&_button]:hover:text-ink">
               <EditStopPanel
                 stopId={stop.id}
                 slug={stop.slug}
@@ -213,6 +229,7 @@ export default async function StopPage({ params }: Props) {
                 departureDate={stop.departureDate}
                 nights={stop.nights}
                 isCandidate={stop.isCandidate}
+                isAnchored={stop.isAnchored}
                 currentOrder={stop.order}
                 allStops={allStops}
               />

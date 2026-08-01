@@ -117,7 +117,10 @@ function AddStopModal({
     formData.set("countryCode", selected.countryCode);
     formData.set("latitude", selected.latitude.toString());
     formData.set("longitude", selected.longitude.toString());
-    formData.set("timezone", selected.timezone);
+    // Open-Meteo omits `timezone` on some results; String(undefined) would post
+    // the literal "undefined", which the schema rejects. Empty means "unknown"
+    // and falls back to the trip timezone.
+    formData.set("timezone", selected.timezone ?? "");
     setSubmitError(null);
     // async callback: keeps isPending true until the action resolves
     startTransition(async () => {

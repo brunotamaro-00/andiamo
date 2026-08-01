@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "db:migrate": "prisma migrate dev",
     "guides:sync": "tsx scripts/sync-guides.ts",
+    "itinerary:check": "tsx scripts/check-itinerary.ts",
     "brand:build": "tsx scripts/build-brand.ts",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:dev": "tsx prisma/seed-dev.ts",

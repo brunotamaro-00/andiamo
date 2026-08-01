@@ -27,6 +27,7 @@ interface Props {
   departureDate: Date | null;
   nights: number;
   isCandidate: boolean;
+  isAnchored: boolean;
   currentOrder: number;
   allStops: StopOption[];
 }
@@ -52,7 +53,7 @@ export function EditStopPanel(props: Props) {
 }
 
 function EditModal({
-  stopId, name, arrivalDate, departureDate, nights, isCandidate,
+  stopId, name, arrivalDate, departureDate, nights, isCandidate, isAnchored,
   allStops, onClose,
 }: Props & { onClose: () => void }) {
   const [isPending, startTransition] = useTransition();
@@ -60,12 +61,14 @@ function EditModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [mutationError, setMutationError] = useState<string | null>(null);
   const [candidateChecked, setCandidateChecked] = useState(isCandidate);
+  const [anchoredChecked, setAnchoredChecked] = useState(isAnchored);
   // "keep" sentinel: allStops has order gaps (excludes this stop and flex margins),
   // so currentOrder - 1 may not match any rendered option
   const [selectedAfterOrder, setSelectedAfterOrder] = useState("keep");
 
   function handleSave(formData: FormData) {
     formData.set("isCandidate", candidateChecked ? "true" : "false");
+    formData.set("isAnchored", anchoredChecked ? "true" : "false");
     setMutationError(null);
     startTransition(async () => {
       try {
@@ -122,7 +125,9 @@ function EditModal({
             {departureDate && (
               <span className="text-ink-3"> → {formatDateDisplay(departureDate)}</span>
             )}
-            <span className="ml-1.5 text-xs text-ink-3">· calculada</span>
+            <span className="ml-1.5 text-xs text-ink-3">
+              · {anchoredChecked ? "fija" : "calculada"}
+            </span>
           </p>
         </div>
 
@@ -141,14 +146,39 @@ function EditModal({
           ))}
         </SelectField>
 
-        <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
+        <label className="flex items-center gap-2 min-h-[44px] text-sm text-ink-2 cursor-pointer">
           <input
             type="checkbox"
             checked={candidateChecked}
             onChange={(e) => setCandidateChecked(e.target.checked)}
-            className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+            className="h-5 w-5 shrink-0 rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           />
           Tentativa (sin decidir)
+        </label>
+
+        {/* An anchored stop is one whose date is real — a bought flight, a
+            booked hotel. The itinerary walk jumps to it instead of dragging it
+            along, which is also the only way the trip can hold an unbooked gap. */}
+        <label
+          className={`flex items-center gap-2 min-h-[44px] text-sm cursor-pointer ${
+            arrivalDate ? "text-ink-2" : "text-ink-faint cursor-not-allowed"
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={anchoredChecked}
+            disabled={!arrivalDate}
+            onChange={(e) => setAnchoredChecked(e.target.checked)}
+            className="h-5 w-5 shrink-0 rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick disabled:opacity-50"
+          />
+          <span>
+            Fecha fija
+            <span className="block text-[11px] text-ink-3 leading-tight">
+              {arrivalDate
+                ? "No se mueve cuando cambian las paradas anteriores"
+                : "Necesita una fecha calculada primero"}
+            </span>
+          </span>
         </label>
 
         <div className="flex gap-2">

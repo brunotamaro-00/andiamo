@@ -21,6 +21,11 @@ interface StopInput {
   currencyCode: string;
   tempRange: string;
   isCandidate?: boolean;
+  /** Fixed date: the itinerary walk jumps the cursor here instead of deriving
+   *  it from the previous stop. Set it on any stop whose date is real (a bought
+   *  flight) and on the one that opens a gap — without it the walk is strictly
+   *  contiguous and eats the unbooked days. See computeItinerary. */
+  isAnchored?: boolean;
   /** null = shared (default). A person makes it person-scoped (see Pititas). */
   ownerPerson?: "bruno" | "katia" | null;
   /** Pseudo-city: no flag/sun/weather/currency, excluded from the Spitwise sync. */
@@ -35,6 +40,7 @@ export const STOPS: StopInput[] = [
     category: "Ciudad", priceLevel: "$$$",
     arrivalDate: "2026-08-05", departureDate: "2026-08-13", nights: 8,
     latitude: 51.5074, longitude: -0.1278, timezone: "Europe/London", currencyCode: "GBP", tempRange: "15-23°C",
+    isAnchored: true, // el inicio del viaje
   },
   {
     country: "Reino Unido", countryFlag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "York", slug: "york",
@@ -135,6 +141,7 @@ export const STOPS: StopInput[] = [
     country: "Suiza", countryFlag: "🇨🇭", name: "Grindelwald", slug: "grindelwald",
     category: "Ciudad", priceLevel: "$$",
     arrivalDate: "2026-09-19", departureDate: null, nights: 0,
+    isAnchored: true, // corre en paralelo a Interlaken, no después
     latitude: 46.62396, longitude: 8.03601, timezone: "Europe/Zurich", currencyCode: "CHF", tempRange: "4-13°C",
     isCandidate: true,
   },
@@ -142,6 +149,7 @@ export const STOPS: StopInput[] = [
     country: "Suiza", countryFlag: "🇨🇭", name: "Lauterbrunnen", slug: "lauterbrunnen",
     category: "Ciudad", priceLevel: "$$",
     arrivalDate: "2026-09-19", departureDate: null, nights: 0,
+    isAnchored: true, // corre en paralelo a Interlaken, no después
     latitude: 46.59307, longitude: 7.90938, timezone: "Europe/Zurich", currencyCode: "CHF", tempRange: "6-15°C",
     isCandidate: true,
   },
@@ -230,6 +238,7 @@ export const STOPS: StopInput[] = [
     category: "Ciudad", priceLevel: "$$",
     arrivalDate: "2026-11-08", departureDate: "2026-11-13", nights: 5,
     latitude: 41.3851, longitude: 2.1734, timezone: "Europe/Madrid", currencyCode: "EUR", tempRange: "10-17°C",
+    isAnchored: true, // sostiene los 10 días sin reservar después de Nápoles
   },
   {
     country: "España", countryFlag: "🇪🇸", name: "Madrid", slug: "madrid",
@@ -263,6 +272,7 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        isAnchored: stop.isAnchored ?? false,
         ownerPerson: stop.ownerPerson ?? null,
         isLocal: stop.isLocal ?? false,
       },
@@ -283,6 +293,7 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        isAnchored: stop.isAnchored ?? false,
         ownerPerson: stop.ownerPerson ?? null,
         isLocal: stop.isLocal ?? false,
       },

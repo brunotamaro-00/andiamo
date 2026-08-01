@@ -72,6 +72,29 @@ const optionalDateStr = z
 /** Checkbox fields are absent from FormData when unchecked — treat undefined/null as false. */
 const boolStr = z.preprocess((v) => (v == null ? "false" : String(v)), z.string().transform((v) => v === "true"));
 
+/** Upper bound for `insertAfterOrder`. Orders are contiguous from 1, so nothing
+ *  legitimate lands past a few hundred; an out-of-range value would create a
+ *  stop at an order no shift can ever reach, stranding it at the end forever. */
+export const MAX_STOP_ORDER = 999;
+
+/** A real IANA zone, or the empty marker. `Intl.DateTimeFormat` throws
+ *  RangeError on anything else, and sun.ts feeds this straight into one from a
+ *  Server Component — a stop saved with "auto" or "undefined" (which is what
+ *  `formData.set("timezone", geo.timezone)` produces when the geocoder omits it)
+ *  made its detail page 500 permanently, with no field in UpdateStopSchema to
+ *  repair it from the app. */
+const timezoneStr = z.string().transform((v, ctx) => {
+  const t = v.trim();
+  if (!t || t === "auto" || t === "undefined" || t === "null") return null;
+  try {
+    new Intl.DateTimeFormat("en-CA", { timeZone: t });
+    return t;
+  } catch {
+    ctx.addIssue({ code: "custom", message: "Zona horaria inválida" });
+    return z.NEVER;
+  }
+});
+
 // ── Schemas ──────────────────────────────────────────────────────────────────
 
 export const CreateStopSchema = z.object({
@@ -80,15 +103,17 @@ export const CreateStopSchema = z.object({
   countryCode: z.string().transform((v) => v.trim().toUpperCase()),
   latitude: coordStr(-90, 90),
   longitude: coordStr(-180, 180),
-  timezone: z.string().transform((v) => v.trim() || "auto"),
+  timezone: timezoneStr,
   nights: intStr(0, MAX_NIGHTS),
-  insertAfterOrder: intStr(0),
+  insertAfterOrder: intStr(0, MAX_STOP_ORDER),
 });
 
 export const UpdateStopSchema = z.object({
   name: requiredStr,
   nights: intStr(0, MAX_NIGHTS),
   isCandidate: boolStr,
+  /** Fixed date: exclude this stop from the itinerary walk's cursor. */
+  isAnchored: boolStr,
 });
 
 export const TripStartSchema = z.object({

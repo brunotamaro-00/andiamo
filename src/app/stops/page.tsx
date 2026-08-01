@@ -11,7 +11,7 @@ import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
-import { Check, ChevronRight, MapPin, Search } from "lucide-react";
+import { Check, ChevronRight, Lock, MapPin, Search } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Flag } from "@/components/Flag";
@@ -169,7 +169,20 @@ export default async function StopsPage() {
                       {stop.arrivalDate && (
                         <>
                           <span className="text-border-strong text-[11px]">·</span>
-                          <span className="text-[11px] text-ink-3 font-medium">{formatShortDate(new Date(stop.arrivalDate))}</span>
+                          <span className="text-[11px] text-ink-3 font-medium inline-flex items-center gap-1">
+                            {formatShortDate(new Date(stop.arrivalDate))}
+                            {/* Anchored = fixed date. Worth showing: it's the
+                                difference between a date that moves when you
+                                edit an earlier stop and one that doesn't. */}
+                            {stop.isAnchored && (
+                              <Lock
+                                size={10}
+                                strokeWidth={2.5}
+                                aria-label="Fecha fija"
+                                className="text-ink-faint"
+                              />
+                            )}
+                          </span>
                         </>
                       )}
                       {isCandidate && <Badge variant="special">tentativa</Badge>}

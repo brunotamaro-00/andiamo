@@ -71,6 +71,29 @@ describe("computeCurrentStopSlug", () => {
     expect(computeCurrentStopSlug(stops, null, "2026-07-01")).toBe("paris");
   });
 
+  // A day covered by nobody's window used to fall through to the *last* stop of
+  // the trip: in the ten unbooked days after Nápoles, tapping "Hoy" opened
+  // Madrid, three weeks away. The manual override that would have rescued it is
+  // read but never written by any code path.
+  it("points at the next stop during a gap mid-trip, not the last one", () => {
+    const stops = [
+      stop("napoles", 1, "2026-10-27", "2026-10-29"),
+      stop("barcelona", 2, "2026-11-08", "2026-11-13"),
+      stop("madrid", 3, "2026-11-13", "2026-11-18"),
+    ];
+    expect(computeCurrentStopSlug(stops, null, "2026-10-31")).toBe("barcelona");
+    expect(computeCurrentStopSlug(stops, null, "2026-11-07")).toBe("barcelona");
+  });
+
+  it("points at the next stop on a day held only by a transit stop", () => {
+    const stops = [
+      stop("paris", 1, "2026-06-01", "2026-06-04"),
+      stop("transito", 2, "2026-06-04", "2026-06-04", { nights: 0 }),
+      stop("roma", 3, "2026-06-05", "2026-06-08"),
+    ];
+    expect(computeCurrentStopSlug(stops, null, "2026-06-04")).toBe("roma");
+  });
+
   it("honours the manual override", () => {
     expect(computeCurrentStopSlug(trip(), "id-paris", "2026-06-05")).toBe("paris");
   });

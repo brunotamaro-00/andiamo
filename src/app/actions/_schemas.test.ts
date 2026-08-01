@@ -6,6 +6,7 @@ import {
   CreateDocumentLinkSchema,
   UpdateDocumentSchema,
   MAX_NIGHTS,
+  MAX_STOP_ORDER,
 } from "./_schemas";
 import { addDaysStr } from "@/lib/trip";
 
@@ -61,6 +62,36 @@ describe("CreateStopSchema", () => {
   it("rejects out-of-range coordinates", () => {
     expect(parseForm(fd({ ...validCreate, latitude: "95" }), CreateStopSchema).ok).toBe(false);
     expect(parseForm(fd({ ...validCreate, longitude: "200" }), CreateStopSchema).ok).toBe(false);
+  });
+
+  // A stop persisted with a non-IANA timezone made its detail page throw
+  // RangeError out of Intl.DateTimeFormat — a permanent 500 with no field in
+  // UpdateStopSchema to repair it from inside the app.
+  it("rejects a timezone Intl can't construct", () => {
+    expect(
+      parseForm(fd({ ...validCreate, timezone: "Europe/Nowhere" }), CreateStopSchema).ok,
+    ).toBe(false);
+  });
+
+  // "auto" was the old default and "undefined" is what a geocode result with no
+  // timezone stringifies to. Both mean "we don't know", so they map to null —
+  // the stop is still worth creating; it just falls back to the trip timezone.
+  it("maps unknown-timezone sentinels to null instead of a fake zone", () => {
+    for (const tz of ["", "auto", "undefined", "null"]) {
+      const result = parseForm(fd({ ...validCreate, timezone: tz }), CreateStopSchema);
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.data.timezone).toBeNull();
+    }
+  });
+
+  it("bounds insertAfterOrder — an unreachable order strands the stop at the end", () => {
+    expect(
+      parseForm(fd({ ...validCreate, insertAfterOrder: String(MAX_STOP_ORDER + 1) }), CreateStopSchema)
+        .ok,
+    ).toBe(false);
+    expect(
+      parseForm(fd({ ...validCreate, insertAfterOrder: "999999" }), CreateStopSchema).ok,
+    ).toBe(false);
   });
 });
 

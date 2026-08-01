@@ -49,18 +49,18 @@ export function computeCurrentStopSlug(
     }
   }
 
-  // If the trip hasn't started yet, return the first stop that has dates.
-  // Looking only at stops[0] meant that a first stop without dates (valid —
-  // computeItinerary leaves them null with no tripStartDate) fell through to the
-  // "trip ended" branch below and pointed at the *last* stop mid-trip.
-  const firstWithDate = stops.find((s) => s.arrivalDate);
-  if (firstWithDate?.arrivalDate && today < dateToStr(firstWithDate.arrivalDate)) {
-    return firstWithDate.slug;
-  }
+  // Today is inside nobody's window. Point at the *next* stop — which covers
+  // both "the trip hasn't started yet" and any uncovered day mid-trip: the gap
+  // between two booked legs, or a day held only by a transit/flex stop that the
+  // filter above drops. Falling back to the last stop instead sent /hoy to the
+  // final city of the trip on those days (Madrid, three weeks away), and the
+  // manual override that would have rescued it is never written by any code path.
+  const dated = stops.filter((s) => s.arrivalDate != null);
+  const upcoming = dated.find((s) => today <= dateToStr(s.arrivalDate!));
+  if (upcoming) return upcoming.slug;
 
-  // If trip ended or no dates, return last stop with dates
-  const lastWithDate = [...stops].reverse().find((s) => s.arrivalDate);
-  return lastWithDate?.slug ?? stops[0]?.slug ?? null;
+  // Nothing ahead: the trip is over (or has no dates at all).
+  return dated.at(-1)?.slug ?? stops[0]?.slug ?? null;
 }
 
 export async function getCurrentStopSlug(): Promise<string | null> {
