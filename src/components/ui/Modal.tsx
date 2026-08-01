@@ -28,6 +28,41 @@ function subscribeSheet(cb: () => void) {
   return () => mq.removeEventListener("change", cb);
 }
 
+/* Scroll lock, reference-counted across nested modals.
+ *
+ * The lock used to be per-instance and its cleanup released unconditionally.
+ * EditStopPanel mounts ConfirmDialog (a second Modal) *inside* the still-open
+ * edit sheet, so cancelling the delete handed scrolling and interactivity back
+ * to the page behind a sheet that was still covering it. */
+let scrollLockDepth = 0;
+let restoreScrollY = 0;
+
+/** Open modals, innermost last — so only the top one answers Escape. */
+const modalStack: string[] = [];
+
+function acquireScrollLock(): () => void {
+  const scrollRoot = document.getElementById("scroll-root");
+  if (!scrollRoot) return () => {};
+
+  if (scrollLockDepth === 0) {
+    restoreScrollY = scrollRoot.scrollTop;
+    scrollRoot.style.overflow = "hidden";
+    scrollRoot.setAttribute("inert", "");
+  }
+  scrollLockDepth += 1;
+
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    scrollLockDepth -= 1;
+    if (scrollLockDepth > 0) return;
+    scrollRoot.style.overflow = "";
+    scrollRoot.scrollTop = restoreScrollY;
+    scrollRoot.removeAttribute("inert");
+  };
+}
+
 interface ModalProps {
   title: string;
   onClose: () => void;
@@ -82,23 +117,25 @@ export function Modal({ title, onClose, children, locked = false }: ModalProps) 
         panel.querySelector<HTMLElement>(FOCUSABLE);
       target?.focus();
     }
-    const scrollRoot = document.getElementById("scroll-root");
-    if (scrollRoot) {
-      const scrollY = scrollRoot.scrollTop;
-      scrollRoot.style.overflow = "hidden";
-      scrollRoot.setAttribute("inert", "");
-      return () => {
-        scrollRoot.style.overflow = "";
-        scrollRoot.scrollTop = scrollY;
-        scrollRoot.removeAttribute("inert");
-      };
-    }
-  }, []);
+    const releaseLock = acquireScrollLock();
+    modalStack.push(titleId);
+    return () => {
+      releaseLock();
+      const at = modalStack.lastIndexOf(titleId);
+      if (at !== -1) modalStack.splice(at, 1);
+    };
+  }, [titleId]);
 
   /* Escape to close + focus trap */
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") { requestClose(); return; }
+      if (e.key === "Escape") {
+        // Both instances of a nested pair listen on `document`, so one Escape
+        // used to close the ConfirmDialog *and* the sheet behind it.
+        if (modalStack.at(-1) !== titleId) return;
+        requestClose();
+        return;
+      }
       if (e.key !== "Tab") return;
       const panel = panelRef.current;
       if (!panel) return;

@@ -66,7 +66,7 @@ export default async function LoginPage({ searchParams }: Props) {
     last === null ? PEOPLE : [last, ...PEOPLE.filter((p) => p !== last)];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-8">
+    <main className="min-h-full flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-8">
       <div className="animate-slide-up">
         <Lockup size="xl" tagline={BRAND_TAGLINE} />
       </div>
@@ -149,6 +149,6 @@ export default async function LoginPage({ searchParams }: Props) {
           </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

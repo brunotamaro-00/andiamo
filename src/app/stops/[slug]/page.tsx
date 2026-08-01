@@ -169,7 +169,7 @@ export default async function StopPage({ params }: Props) {
   const path = `/stops/${slug}`;
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle={stop.name} actions={<PersonSwitcher person={viewer} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
@@ -270,7 +270,7 @@ export default async function StopPage({ params }: Props) {
               href={`/stops/${prevStop.slug}`}
               className={[
                 "group flex-1 flex items-center gap-1.5 bg-surface border border-border card-shadow card-hover",
-                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0",
+                "rounded-lg px-3 min-h-[44px] text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -294,7 +294,7 @@ export default async function StopPage({ params }: Props) {
               href={`/stops/${nextStop.slug}`}
               className={[
                 "group flex-1 flex items-center justify-end gap-1.5 bg-surface border border-border card-shadow card-hover",
-                "rounded-lg px-3 py-2.5 text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0 text-right",
+                "rounded-lg px-3 min-h-[44px] text-sm text-ink-2 hover:border-border-strong hover:text-ink hover:card-shadow-lg hover:-translate-y-[1px] motion-reduce:hover:translate-y-0 text-right",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick",
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
               ]
@@ -373,7 +373,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
     <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
       <Link
         href={`/guias/${primary.slug}`}
-        className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
+        className="flex items-center gap-3 min-h-[44px] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
       >
         <BookOpen size={18} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
         <div className="flex-1 min-w-0">
@@ -391,7 +391,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
             <Link
               key={doc.slug}
               href={`/guias/${primary.slug}/${doc.slug}`}
-              className="rounded-full border border-border px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+              className="inline-flex items-center min-h-[44px] rounded-full border border-border px-3.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
             >
               {doc.title}
             </Link>
@@ -424,7 +424,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
               <Link
                 key={doc.slug}
                 href={`/guias/${primary.slug}/${doc.slug}`}
-                className="rounded-full border border-border px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                className="inline-flex items-center min-h-[44px] rounded-full border border-border px-3.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
               >
                 {doc.title}
               </Link>
@@ -439,7 +439,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
             <Link
               key={guide.slug}
               href={`/guias/${guide.slug}`}
-              className="flex items-center gap-1.5 text-xs font-semibold text-ink-2 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
+              className="flex items-center gap-1.5 min-h-[44px] text-xs font-semibold text-ink-2 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded"
             >
               <ChevronRight size={12} strokeWidth={2} aria-hidden="true" />
               También cerca: {guide.title}

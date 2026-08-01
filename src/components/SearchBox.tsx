@@ -54,7 +54,7 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
         aria-label="Buscar en el viaje"
         autoFocus
         enterKeyHint="search"
-        className="w-full bg-surface-2 border border-border-strong rounded-xl pl-9 pr-9 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
+        className="w-full bg-surface-2 border border-border-strong rounded-xl pl-9 pr-12 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
       />
       {value && (
         <button

@@ -3,7 +3,7 @@ import { IS_DEMO } from "@/lib/demo";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-8">
+    <main className="min-h-full flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-8">
       <div className="flex flex-col items-center gap-2">
         <Skeleton className="h-10 w-44" />
         <Skeleton className="h-3 w-32" />
@@ -14,6 +14,6 @@ export default function Loading() {
         {!IS_DEMO && <Skeleton className="h-[188px] w-full rounded-xl" />}
         <Skeleton className={`w-full rounded-xl ${IS_DEMO ? "h-[152px]" : "h-[236px]"}`} />
       </div>
-    </div>
+    </main>
   );
 }

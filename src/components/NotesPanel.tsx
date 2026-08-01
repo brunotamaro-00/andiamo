@@ -299,11 +299,23 @@ function NoteEditor({
   const [status, setStatus] = useState<SaveStatus>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
+  // The debounced save reads these on unmount, when the state closure is stale.
+  const latest = useRef({ title, body });
+  latest.current = { title, body };
+  const save = useRef(onSave);
+  save.current = onSave;
 
-  /* Flush any pending save on unmount. */
+  /* Actually flush the pending save on unmount — this used to only clear the
+     timer, so anything typed in the last 700 ms was silently dropped. The sheet
+     is drag-to-dismiss: flicking it down right after typing the Ryanair booking
+     code lost the code. Fire-and-forget is fine here; the panel that owns
+     onSave outlives this editor and reconciles from the server. */
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
+      if (!dirty.current) return;
+      dirty.current = false;
+      void save.current(latest.current.title.trim(), latest.current.body);
     };
   }, []);
 
@@ -328,6 +340,13 @@ function NoteEditor({
       setStatus("saving");
       const result = await onSave(title.trim(), body);
       setStatus(result === "ok" ? "saved" : "error");
+      // Staying put on failure. Returning to the read-only view showed the
+      // stale server copy as if the edit had never happened, so a failed save
+      // offline looked exactly like a successful one.
+      if (result !== "ok") {
+        dirty.current = true;
+        return;
+      }
     }
     onDone();
   }
@@ -371,9 +390,9 @@ function NoteEditor({
             </>
           )}
           {status === "error" && (
-            <span className="text-danger flex items-center gap-1">
+            <span className="text-danger flex items-center gap-1 font-semibold">
               <AlertCircle size={11} strokeWidth={1.5} aria-hidden="true" />
-              Error al guardar
+              No se guardó — no cierres
             </span>
           )}
           {status === "idle" && !title.trim() && body.trim() && (

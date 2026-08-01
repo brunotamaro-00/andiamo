@@ -95,9 +95,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <OfflineBanner />
         {IS_DEMO ? <DemoIntro /> : null}
         <Providers>
-          <main id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
+          {/* Scroll container, not a landmark: every page renders its own
+              <main>, and nesting them made VoiceOver's rotor list two "main"
+              regions on every screen — with the content in the inner one. */}
+          <div id="scroll-root" className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
             {children}
-          </main>
+          </div>
           <TabBar />
         </Providers>
         <PullToRefresh />

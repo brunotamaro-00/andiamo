@@ -11,7 +11,7 @@ export default function GuidesIndexPage() {
   const manifest = getManifest();
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle="Guías del viaje" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">

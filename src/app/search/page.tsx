@@ -82,7 +82,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const total = stops.length + notes.length + documents.length + guideHits.length;
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle="Buscar" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">

@@ -24,7 +24,7 @@ export default async function GeneralPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle="General del viaje" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">

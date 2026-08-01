@@ -109,7 +109,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
   const isRegional = guide.cities.length > 0;
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle={guide.title} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5 pb-24">

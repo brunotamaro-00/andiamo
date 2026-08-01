@@ -48,7 +48,7 @@ export default async function StopsPage() {
   const tripStartFallback = tripStartDate ? dateToStr(tripStartDate) : "";
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       {/* Header */}
       <PageHeader
         subtitle="Europa 2026"

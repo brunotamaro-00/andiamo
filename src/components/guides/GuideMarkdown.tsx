@@ -102,7 +102,11 @@ const components: Components = {
       return <ExternalLink href={url}>{prettyUrl(url)}</ExternalLink>;
     }
     return (
-      <code className="bg-surface-2 rounded px-1 py-0.5 text-[0.85em] break-all">{children}</code>
+      // Relative to the surrounding prose, but never below the 11px floor:
+      // inside the guide tables (text-xs) a bare 0.85em lands at 10.2px, and
+      // those cells are exactly where the prices, platform numbers and station
+      // codes live.
+      <code className="bg-surface-2 rounded px-1 py-0.5 text-[max(11px,0.85em)] break-all">{children}</code>
     );
   },
   pre: ({ children }) => (

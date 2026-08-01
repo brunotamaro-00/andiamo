@@ -54,13 +54,13 @@ export default async function GuideDocPage({
     : stripLeadingH1(await readDocMarkdown(found.doc.file));
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-full bg-canvas">
       <PageHeader subtitle={found.doc.title} />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         <Link
           href={`/guias/${found.guide.slug}`}
-          className="inline-flex items-center gap-1 mb-4 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
+          className="inline-flex items-center gap-1 mb-2 min-h-[44px] text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1"
         >
           <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
           <span className="truncate max-w-[16rem]">
