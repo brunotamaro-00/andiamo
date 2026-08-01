@@ -112,8 +112,6 @@ export const UpdateStopSchema = z.object({
   name: requiredStr,
   nights: intStr(0, MAX_NIGHTS),
   isCandidate: boolStr,
-  /** Fixed date: exclude this stop from the itinerary walk's cursor. */
-  isAnchored: boolStr,
 });
 
 export const TripStartSchema = z.object({

@@ -10,7 +10,6 @@ import { currencyForCountry, flagFromCountryCode } from "@/lib/country-currency"
 import { shiftOrders, PARKED_ORDER, type Tx } from "@/lib/stop-order";
 import { recalculateItinerary } from "@/lib/itinerary";
 import { slugify } from "@/lib/slug";
-import { strToDate } from "@/lib/trip";
 import { parseForm, CreateStopSchema, UpdateStopSchema, TripStartSchema } from "./_schemas";
 
 // INVARIANT: a stop's slug is set once at creation and never changes —
@@ -118,11 +117,11 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
 
   const parsed = parseForm(formData, UpdateStopSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { name, nights, isCandidate, isAnchored } = parsed.data;
+  const { name, nights, isCandidate } = parsed.data;
 
   const current = await db.stop.findUnique({
     where: { id },
-    select: { slug: true, arrivalDate: true },
+    select: { slug: true },
   });
   if (!current) return { error: "Parada no encontrada" };
 
@@ -133,14 +132,7 @@ export async function updateStop(id: string, formData: FormData, afterOrder?: nu
     await db.$transaction(async (tx) => {
       await tx.stop.update({
         where: { id },
-        data: {
-          name,
-          nights,
-          isCandidate,
-          // Anchoring a stop that has no date yet would pin nothing; the walk
-          // ignores such an anchor anyway, so don't record one.
-          isAnchored: isAnchored && current.arrivalDate != null,
-        },
+        data: { name, nights, isCandidate },
       });
       if (afterOrder !== undefined) await applyMove(tx, id, afterOrder);
     });
@@ -217,34 +209,16 @@ export async function setTripStart(formData: FormData): Promise<{ error?: string
   if (!parsed.ok) return { error: parsed.error };
   const { tripStartDate } = parsed.data;
 
-  // The start of the trip is the first stop's anchor, not a free-floating
-  // Setting. Writing only the Setting is how it drifted two months away from
-  // the itinerary it was supposed to anchor.
-  const first = await db.stop.findFirst({
-    where: { isLocal: false },
-    orderBy: { order: "asc" },
-    select: { id: true },
+  // This Setting is the trip's only date input: every stop's arrival and
+  // departure is derived from it by the itinerary walk, so moving it is
+  // *meant* to shift the whole trip.
+  await db.setting.upsert({
+    where: { key: "tripStartDate" },
+    create: { key: "tripStartDate", value: tripStartDate },
+    update: { value: tripStartDate },
   });
 
-  await db.$transaction([
-    db.setting.upsert({
-      where: { key: "tripStartDate" },
-      create: { key: "tripStartDate", value: tripStartDate },
-      update: { value: tripStartDate },
-    }),
-    ...(first
-      ? [
-          db.stop.update({
-            where: { id: first.id },
-            data: { isAnchored: true, arrivalDate: strToDate(tripStartDate) },
-          }),
-        ]
-      : []),
-  ]);
-
-  // Moving the start legitimately shifts everything, so the drift guardrail
-  // would fire on a big jump. It's the one mutation allowed to do that.
-  const recalc = await recalculateItinerary({ allowLargeDrift: true });
+  const recalc = await recalculateItinerary();
   if (recalc.error) return recalc;
   after(() => notifyStopsChanged());
 

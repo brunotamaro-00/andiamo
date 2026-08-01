@@ -230,7 +230,6 @@ export default async function StopPage({ params }: Props) {
                 departureDate={stop.departureDate}
                 nights={stop.nights}
                 isCandidate={stop.isCandidate}
-                isAnchored={stop.isAnchored}
                 currentOrder={stop.order}
                 allStops={allStops}
               />

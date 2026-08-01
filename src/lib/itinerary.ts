@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
-import { dateToStr, addDaysStr, strToDate, daysBetween } from "./trip";
+import { dateToStr, addDaysStr, strToDate } from "./trip";
 import { fetchTempRange } from "./temp-range";
 
 interface StopInput {
@@ -9,8 +9,6 @@ interface StopInput {
   order: number;
   nights: number;
   isCandidate: boolean;
-  isAnchored?: boolean;
-  arrivalDate?: Date | null;
 }
 
 interface DateResult {
@@ -19,19 +17,17 @@ interface DateResult {
 }
 
 /**
- * Pure function — derives arrival/departure for every stop given an anchor start date.
+ * Pure function — derives arrival/departure for every stop from the trip's start
+ * date, the stop order and each stop's nights. Those are the only inputs: no
+ * stored date is ever read back, so the itinerary can't hold a gap and can't
+ * pin a stop against an edit upstream of it.
  *
  * Rules:
- * - Anchored stop: the cursor *jumps* to its own arrivalDate. This is the only
- *   way the walk can hold a gap — without it the cursor is strictly contiguous,
- *   so the ten unbooked days between Nápoles and Barcelona get eaten and
- *   Barcelona slides ten days earlier than the flight that's already paid for.
- *   An anchor also stops an edit upstream from dragging everything after it.
  * - Normal stop: arrival = cursor, departure = arrival + nights. Cursor advances.
  *   A stop with 0 nights is a transit stop — it lands on the cursor day without advancing it.
  * - Candidate stop: gets tentative dates at cursor position but does NOT advance cursor.
- *   An anchored candidate still doesn't advance it (Grindelwald runs *instead of*
- *   Interlaken, not after it) — it only pins where its own tentative window starts.
+ *   A candidate is an alternative to the mainline, not an extra leg of it
+ *   (Grindelwald runs *instead of* Interlaken, not after it).
  * - If no tripStartStr: all dates are null.
  */
 export function computeItinerary(
@@ -49,9 +45,7 @@ export function computeItinerary(
   const sorted = [...stops].sort((a, b) => a.order - b.order);
 
   for (const stop of sorted) {
-    // An anchor is only usable if it carries the date it's anchored to.
-    const anchor = stop.isAnchored && stop.arrivalDate ? dateToStr(stop.arrivalDate) : null;
-    const arrival = anchor ?? cursor;
+    const arrival = cursor;
     const dep = stop.nights > 0 ? addDaysStr(arrival, stop.nights) : null;
 
     result.set(stop.id, {
@@ -66,18 +60,6 @@ export function computeItinerary(
 
   return result;
 }
-
-/**
- * How far a recalculation is allowed to move a date that already existed.
- *
- * The anchor walk is only as good as its inputs, and a bad anchor silently
- * rewrites the whole trip: a stale `tripStartDate` of 2026-05-31 against a
- * 2026-08-05 departure moved every stop 66 days and pushed the wreckage to
- * Spitwise, with no confirmation and no undo. Nobody legitimately shifts a
- * booked itinerary by a month from a "noches" edit, so past this the
- * recalculation refuses to persist and says so.
- */
-export const MAX_DRIFT_DAYS = 30;
 
 interface DatedStop {
   order: number;
@@ -125,16 +107,13 @@ export function assumedDateWindow(
  * and persists any that changed. The tempRange refresh (HTTP to Open-Meteo)
  * is deferred with `after()` so mutations respond without waiting on it.
  *
- * Call this after every mutation that affects order, nights, or the anchor.
+ * Call this after every mutation that affects order or nights.
  * Safe to call outside a Prisma transaction — it manages its own batch update.
  *
- * Returns `{ error }` instead of writing when the recomputation would move an
- * existing date more than MAX_DRIFT_DAYS. Callers should surface it; leaving
- * the dates untouched is always the safe outcome.
+ * Still returns `{ error }` so callers can surface a failure without changing
+ * shape, even though nothing rejects a recomputation today.
  */
-export async function recalculateItinerary(
-  opts: { allowLargeDrift?: boolean } = {},
-): Promise<{ error?: string }> {
+export async function recalculateItinerary(): Promise<{ error?: string }> {
   const [tripStartSetting, stops] = await Promise.all([
     db.setting.findUnique({ where: { key: "tripStartDate" } }),
     // Pseudo-cities (Pititas) sit *parallel* to the linear itinerary — they run
@@ -152,7 +131,6 @@ export async function recalculateItinerary(
         arrivalDate: true,
         departureDate: true,
         isCandidate: true,
-        isAnchored: true,
         latitude: true,
         longitude: true,
         tempRange: true,
@@ -160,27 +138,23 @@ export async function recalculateItinerary(
     }),
   ]);
 
-  // The trip's start is the first anchored stop's own date, not a free-floating
-  // Setting. The Setting drifted out of sync with the itinerary once already
-  // (2026-05-31 against a 2026-08-05 departure) and, because it feeds the cursor,
-  // every stop inherited the lie. Anchors are the source of truth; the Setting
-  // is a cache of the first one, kept fresh here for the editor to read back.
-  const firstAnchored = stops.find((s) => s.isAnchored && s.arrivalDate);
-  let tripStartStr = firstAnchored?.arrivalDate
-    ? dateToStr(firstAnchored.arrivalDate)
-    : (tripStartSetting?.value ?? null);
+  // The Setting is the trip's single date input — every other date in the app
+  // is derived from it plus the order and nights of each stop.
+  let tripStartStr = tripStartSetting?.value ?? null;
 
-  // Bootstrap: no anchor and no setting yet — seed from the earliest confirmed stop.
+  // Bootstrap: no setting yet — seed it once from the earliest confirmed stop.
   if (!tripStartStr) {
     const firstDated = stops.find((s) => !s.isCandidate && s.arrivalDate);
-    if (firstDated?.arrivalDate) tripStartStr = dateToStr(firstDated.arrivalDate);
-  }
-  if (tripStartStr && tripStartStr !== tripStartSetting?.value) {
-    await db.setting.upsert({
-      where: { key: "tripStartDate" },
-      create: { key: "tripStartDate", value: tripStartStr },
-      update: { value: tripStartStr },
-    });
+    if (firstDated?.arrivalDate) {
+      tripStartStr = dateToStr(firstDated.arrivalDate);
+      // upsert, not create: two concurrent mutations on a fresh DB would both
+      // find no Setting and the loser would get a P2002 instead of a response.
+      await db.setting.upsert({
+        where: { key: "tripStartDate" },
+        create: { key: "tripStartDate", value: tripStartStr },
+        update: {},
+      });
+    }
   }
 
   const computed = computeItinerary(stops, tripStartStr);
@@ -194,30 +168,6 @@ export async function recalculateItinerary(
     const newDep = next.departure ? dateToStr(next.departure) : null;
     return oldArr !== newArr || oldDep !== newDep;
   });
-
-  // Guardrail. Only dates that already existed count: null → tentative date is
-  // the algorithm filling in a candidate, not a shift.
-  const drift = Math.max(
-    0,
-    ...changed.flatMap((stop) => {
-      const next = computed.get(stop.id)!;
-      const moves: number[] = [];
-      if (stop.arrivalDate && next.arrival) {
-        moves.push(Math.abs(daysBetween(dateToStr(stop.arrivalDate), dateToStr(next.arrival))));
-      }
-      if (stop.departureDate && next.departure) {
-        moves.push(
-          Math.abs(daysBetween(dateToStr(stop.departureDate), dateToStr(next.departure))),
-        );
-      }
-      return moves;
-    }),
-  );
-  if (drift > MAX_DRIFT_DAYS && !opts.allowLargeDrift) {
-    return {
-      error: `El recálculo movería el itinerario ${drift} días. No se guardó nada — revisá la fecha de inicio y las paradas con fecha fija.`,
-    };
-  }
 
   // Phase 1 (blocking): persist the recomputed dates only
   if (changed.length > 0) {

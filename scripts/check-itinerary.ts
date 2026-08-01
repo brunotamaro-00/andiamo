@@ -13,7 +13,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { computeItinerary, MAX_DRIFT_DAYS } from "../src/lib/itinerary";
+import { computeItinerary } from "../src/lib/itinerary";
 import { dateToStr, daysBetween } from "../src/lib/trip";
 
 async function main() {
@@ -27,17 +27,14 @@ async function main() {
     db.setting.findUnique({ where: { key: "tripStartDate" } }),
   ]);
 
-  const firstAnchored = stops.find((s) => s.isAnchored && s.arrivalDate);
-  const tripStart = firstAnchored?.arrivalDate
-    ? dateToStr(firstAnchored.arrivalDate)
-    : (setting?.value ?? null);
+  // Same bootstrap as recalculateItinerary: without the Setting (a fresh seed)
+  // the walk starts at the earliest confirmed stop.
+  const firstDated = stops.find((s) => !s.isCandidate && s.arrivalDate);
+  const tripStart =
+    setting?.value ?? (firstDated?.arrivalDate ? dateToStr(firstDated.arrivalDate) : null);
 
-  console.log(`anchor: ${tripStart ?? "(ninguna)"}   setting: ${setting?.value ?? "(vacío)"}`);
   console.log(
-    `anclas: ${stops
-      .filter((s) => s.isAnchored)
-      .map((s) => `${s.slug}@${s.arrivalDate ? dateToStr(s.arrivalDate) : "?"}`)
-      .join(", ")}\n`,
+    `inicio: ${tripStart ?? "(ninguno)"}   setting: ${setting?.value ?? "(vacío)"}\n`,
   );
 
   const computed = computeItinerary(stops, tripStart);
@@ -68,7 +65,7 @@ async function main() {
   }
 
   console.log(
-    `\nfechas existentes movidas: ${drifted}  ·  candidatas rellenadas: ${filled}  ·  drift máximo: ${worst} d (límite ${MAX_DRIFT_DAYS})`,
+    `\nfechas existentes movidas: ${drifted}  ·  candidatas rellenadas: ${filled}  ·  desplazamiento máximo: ${worst} d`,
   );
   await db.$disconnect();
   if (drifted > 0) process.exit(1);

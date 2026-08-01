@@ -6,8 +6,8 @@ import { setTripStart } from "@/app/actions/stops";
 import { haptics } from "@/lib/haptics";
 
 interface Props {
-  value: string; // YYYY-MM-DD or "" — the persisted override setting
-  fallbackValue?: string; // YYYY-MM-DD — computed from first stop's arrivalDate
+  value: string; // YYYY-MM-DD or "" — the Setting, the trip's only date input
+  fallbackValue?: string; // YYYY-MM-DD — first stop's arrivalDate, for display before the Setting exists
 }
 
 function formatDisplay(dateStr: string): string {

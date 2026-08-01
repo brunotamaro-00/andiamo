@@ -82,7 +82,7 @@ export function itineraryNights(
  * Day 1 = arrival at the first stop.
  *
  * @param arrivalDate  The stop's arrivalDate (Date or string).
- * @param tripStartDate The first stop's arrivalDate (Date or string) — the anchor.
+ * @param tripStartDate The trip's start (Date or string) — the first stop's arrivalDate.
  * @returns  Positive integer ≥ 1, or null if either date is missing.
  */
 export function tripDayNumber(
