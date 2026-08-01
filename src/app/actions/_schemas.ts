@@ -106,6 +106,7 @@ export const CreateStopSchema = z.object({
   timezone: timezoneStr,
   nights: intStr(0, MAX_NIGHTS),
   insertAfterOrder: intStr(0, MAX_STOP_ORDER),
+  isCandidate: boolStr,
 });
 
 export const UpdateStopSchema = z.object({
@@ -128,6 +129,26 @@ export const CreateNoteSchema = z.object({
   body: z.string().default(""),
   pinned: boolStr,
 });
+
+/** JSON twin of CreateNoteSchema for the integration API (the bot posts JSON,
+ *  not FormData, so `boolStr` and the slug/stopId split don't apply). The stop
+ *  is named by slug and resolved to an id in the route. */
+export const CreateNoteApiSchema = z.object({
+  stopSlug: z.string().trim().nullable().optional(),
+  title: z.string().default(""),
+  body: z.string().default(""),
+  pinned: z.boolean().default(false),
+});
+
+/** A note with no title takes the first non-empty line of its body. Shared by
+ *  the server actions and the integration route so a note dictated to the bot
+ *  can't end up titled differently from one typed in the web. */
+export function derivedTitle(rawTitle: string, body: string): string {
+  const t = rawTitle.trim();
+  if (t) return t;
+  const firstLine = body.split("\n").find((l) => l.trim());
+  return firstLine?.trim().slice(0, 80) || "Sin título";
+}
 
 export const UpdateNoteSchema = z.object({
   title: z.string().transform((v) => v.trim()),

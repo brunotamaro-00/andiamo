@@ -38,6 +38,21 @@ describe("CreateStopSchema", () => {
     }
   });
 
+  it("defaults isCandidate to false when the checkbox is absent", () => {
+    const result = parseForm(fd(validCreate), CreateStopSchema);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.isCandidate).toBe(false);
+  });
+
+  it("accepts a tentative stop at creation time", () => {
+    const result = parseForm(
+      fd({ ...validCreate, isCandidate: "true" }),
+      CreateStopSchema,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.isCandidate).toBe(true);
+  });
+
   it("rejects negative nights — they would corrupt the itinerary cursor", () => {
     const result = parseForm(fd({ ...validCreate, nights: "-5" }), CreateStopSchema);
     expect(result.ok).toBe(false);

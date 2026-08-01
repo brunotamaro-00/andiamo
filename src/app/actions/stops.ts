@@ -31,7 +31,7 @@ export async function createStop(formData: FormData) {
 
   const parsed = parseForm(formData, CreateStopSchema);
   if (!parsed.ok) return { error: parsed.error };
-  const { name, country, countryCode, latitude, longitude, timezone, nights, insertAfterOrder } =
+  const { name, country, countryCode, latitude, longitude, timezone, nights, insertAfterOrder, isCandidate } =
     parsed.data;
 
   const currencyCode = currencyForCountry(countryCode);
@@ -56,7 +56,7 @@ export async function createStop(formData: FormData) {
           nights,
           arrivalDate: null,
           departureDate: null,
-          isCandidate: false,
+          isCandidate,
           isFlexMargin: false,
           category: "Ciudad",
           priceLevel: "$$",
