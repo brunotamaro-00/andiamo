@@ -16,6 +16,38 @@ export const runtime = "nodejs";
 const KIND_VALUES = new Set<string>(Object.values(DocumentKind));
 
 /**
+ * Andiamo → Spitwise: metadata of every document, so the bot can answer
+ * "¿dónde está el voucher del hostel de Roma?" off its own cache.
+ *
+ * Metadata only: `storagePath` and `externalUrl` never leave — the bot links to
+ * /api/documents/<id>, the one route that resolves either source. No query
+ * params on purpose (same shape as /api/notes): the filtering happens in
+ * Spitwise's search_documents tool, over the synced rows.
+ */
+export async function GET(req: NextRequest) {
+  if (!isValidApiKey(req.headers.get("X-Api-Key"))) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+  const docs = await db.document.findMany({
+    include: { stop: { select: { slug: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  const payload = docs.map((d) => ({
+    id: d.id,
+    stopSlug: d.stop?.slug ?? null,
+    label: d.label,
+    note: d.note,
+    kind: d.kind,
+    source: d.source,
+    docDate: d.docDate ? d.docDate.toISOString().slice(0, 10) : null,
+    fileName: d.fileName,
+    mimeType: d.mimeType,
+    createdAt: d.createdAt.toISOString(),
+  }));
+  return Response.json(payload);
+}
+
+/**
  * Spitwise → Andiamo: the WhatsApp bot uploads travel documents here.
  * Auth is the shared X-Api-Key (same contract as /api/stops); the session
  * cookie gate in proxy.ts excludes /api/integration for this reason.
