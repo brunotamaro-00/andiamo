@@ -202,7 +202,7 @@ describe("getDoc", () => {
   });
 
   it("resolves pseudo-guides for general docs and resources", () => {
-    expect(getDoc("general", "checklist")).not.toBeNull();
+    expect(getDoc("general", "presupuesto")).not.toBeNull();
     expect(getDoc("recursos", "packing-list")).not.toBeNull();
   });
 });

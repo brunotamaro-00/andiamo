@@ -22,6 +22,16 @@ const DEST = path.join(process.cwd(), "content", "guides");
 const EXCLUDED_DIRS = new Set([".git", ".claude", "Pititas"]);
 /** Root-level markdown that is tooling noise, not trip content. */
 const EXCLUDED_FILES = new Set(["claude.md"]);
+/** Trip-wide docs ("El viaje") that reach the app. The Itinerary root doubles
+ *  as the planning workspace (checklist de reservas, itinerario general,
+ *  README): eso es para *armar* el viaje, no para leerlo en la ruta. Solo pasa
+ *  lo consultable en movimiento — filenames del source, no slugs. */
+const TRIP_WIDE_FILES = new Set([
+  "EURAIL.md",
+  "PRESUPUESTO.md",
+  "apps_utiles.md",
+  "packing_list.md",
+]);
 
 const COUNTRY_FLAGS: Record<string, string> = {
   Reino_Unido: "🇬🇧",
@@ -220,12 +230,13 @@ function main() {
 
   // ── Trip-wide docs ────────────────────────────────────────────────────────
   for (const f of rootFiles) {
-    const override = f === "README.md" ? "Resumen del viaje" : undefined;
-    manifest.general.push(copyDoc(path.join(SOURCE, f), "_general", { titleOverride: override }));
+    if (!TRIP_WIDE_FILES.has(f)) continue;
+    manifest.general.push(copyDoc(path.join(SOURCE, f), "_general"));
   }
   if (rootDirs.includes("recursos")) {
     const { files } = listDir(path.join(SOURCE, "recursos"));
     for (const f of files) {
+      if (!TRIP_WIDE_FILES.has(f)) continue;
       manifest.resources.push(copyDoc(path.join(SOURCE, "recursos", f), "_recursos"));
     }
   }

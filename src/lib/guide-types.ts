@@ -79,7 +79,7 @@ export interface GuideCountry {
  *  the source hasn't changed, so re-running the sync leaves git clean. */
 export interface GuideManifest {
   countries: GuideCountry[];
-  /** Trip-wide docs (itinerario general, checklist, Eurail, presupuesto…) */
+  /** Trip-wide docs (Eurail, presupuesto) — allowlist in `sync-guides.ts` */
   general: GuideDoc[];
   /** Practical resources (packing list, frases, apps, documentos) */
   resources: GuideDoc[];

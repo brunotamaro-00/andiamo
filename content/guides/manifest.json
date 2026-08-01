@@ -2593,29 +2593,14 @@
   ],
   "general": [
     {
-      "slug": "checklist",
-      "title": "Panel de Control Maestro: Reservas y Preparativos",
-      "file": "_general/checklist.md"
-    },
-    {
       "slug": "eurail",
       "title": "Eurail — Tracker Maestro",
       "file": "_general/eurail.md"
     },
     {
-      "slug": "itinerario-general",
-      "title": "Itinerario General - Europa 2026",
-      "file": "_general/itinerario-general.md"
-    },
-    {
       "slug": "presupuesto",
       "title": "Presupuesto del Viaje",
       "file": "_general/presupuesto.md"
-    },
-    {
-      "slug": "readme",
-      "title": "Resumen del viaje",
-      "file": "_general/readme.md"
     }
   ],
   "resources": [
@@ -2623,16 +2608,6 @@
       "slug": "apps-utiles",
       "title": "Apps Útiles para el Viaje",
       "file": "_recursos/apps-utiles.md"
-    },
-    {
-      "slug": "documentos",
-      "title": "Documentos y Preparativos",
-      "file": "_recursos/documentos.md"
-    },
-    {
-      "slug": "frases-utiles",
-      "title": "Frases Útiles por Idioma",
-      "file": "_recursos/frases-utiles.md"
     },
     {
       "slug": "packing-list",
