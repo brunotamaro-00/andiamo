@@ -315,9 +315,6 @@ export default async function StopPage({ params }: Props) {
           )}
         </div>
 
-        {/* City guide */}
-        <GuideCard stopSlug={stop.slug} />
-
         {/* Notes */}
         <div id="notas" className="scroll-mt-20">
           <NotesPanel
@@ -342,6 +339,9 @@ export default async function StopPage({ params }: Props) {
             path={path}
           />
         </div>
+
+        {/* City guide */}
+        <GuideCard stopSlug={stop.slug} />
 
         {/* Spend panel — fed by Spitwise; degrades silently if unreachable */}
         <div id="gastos" className="scroll-mt-20">
