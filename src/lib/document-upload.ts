@@ -1,5 +1,7 @@
+import { after } from "next/server";
 import { db } from "@/lib/db";
 import { uploadToR2, deleteFromR2 } from "@/lib/r2";
+import { notifyDocumentsChanged } from "@/lib/spitwise";
 import { DocumentKind } from "@/generated/prisma/enums";
 
 /** Valid DocumentKind values, derived from the Prisma enum. */
@@ -79,7 +81,7 @@ export async function persistUploadedDocument(params: {
   await uploadToR2(key, buffer, file.type);
 
   try {
-    return await db.document.create({
+    const doc = await db.document.create({
       data: {
         stopId: params.stopId,
         label: params.label,
@@ -93,6 +95,11 @@ export async function persistUploadedDocument(params: {
         docDate: params.docDate,
       },
     });
+    // Both upload paths (integration route and the web's own upload) land
+    // here, so this is the one place that has to tell Spitwise the document
+    // cache is stale.
+    after(() => notifyDocumentsChanged());
+    return doc;
   } catch (e) {
     // The file is already in R2 at this point. Without this rollback a failed
     // insert (e.g. P2003 from a stopId deleted concurrently) left the object

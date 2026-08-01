@@ -120,3 +120,7 @@ export async function notifyStopsChanged(): Promise<void> {
 export async function notifyNotesChanged(): Promise<void> {
   return notifyChanged("notes.changed");
 }
+
+export async function notifyDocumentsChanged(): Promise<void> {
+  return notifyChanged("documents.changed");
+}

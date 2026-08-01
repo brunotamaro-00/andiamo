@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { db, isRecordMissing } from "@/lib/db";
+import { notifyDocumentsChanged } from "@/lib/spitwise";
 import { requireAuth } from "@/lib/auth";
 import { DocumentKind } from "@/generated/prisma/enums";
 import { parseForm, CreateDocumentLinkSchema, UpdateDocumentSchema } from "./_schemas";
@@ -33,6 +35,8 @@ export async function createDocumentLink(formData: FormData) {
   revalidatePath(slug ? `/stops/${slug}` : "/general");
   // /search indexes document.label — notes.ts already does this.
   revalidatePath("/search");
+  // Uploads ping from persistUploadedDocument; links have no other path.
+  after(() => notifyDocumentsChanged());
 }
 
 export async function updateDocument(id: string, formData: FormData, path: string) {
@@ -61,6 +65,7 @@ export async function updateDocument(id: string, formData: FormData, path: strin
 
   revalidatePath(path);
   revalidatePath("/search");
+  after(() => notifyDocumentsChanged());
 }
 
 export async function deleteDocument(id: string, path: string) {
@@ -86,4 +91,5 @@ export async function deleteDocument(id: string, path: string) {
 
   revalidatePath(path);
   revalidatePath("/search");
+  after(() => notifyDocumentsChanged());
 }
