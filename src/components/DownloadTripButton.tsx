@@ -21,6 +21,14 @@ const LS_KEY = "andiamo:trip-downloaded";
  *  the SW is gone, not that the download is slow. */
 const STALL_TIMEOUT_MS = 30_000;
 
+/** The download finished but some files never made it into the cache. */
+class PartialDownloadError extends Error {
+  constructor(readonly failed: number, readonly total: number) {
+    super(`partial: ${failed}/${total}`);
+    this.name = "PartialDownloadError";
+  }
+}
+
 interface DownloadedMeta {
   at: number;
   bytes: number;
@@ -121,6 +129,14 @@ export function DownloadTripButton() {
           }
           if (data?.finished) {
             clearTimeout(stallTimer);
+            // The SW now reports what it failed to write (quota, 4xx, network).
+            // Reporting a clean success over a half-empty cache is worse than
+            // no download: you only find out in airplane mode, when it's too
+            // late to do anything about it.
+            if (typeof data.failed === "number" && data.failed > 0) {
+              reject(new PartialDownloadError(data.failed, data.total ?? 0));
+              return;
+            }
             const saved: DownloadedMeta = { at: Date.now(), bytes: data.bytes ?? 0 };
             try {
               localStorage.setItem(LS_KEY, JSON.stringify(saved));
@@ -141,9 +157,11 @@ export function DownloadTripButton() {
     } catch (e) {
       haptics.error();
       setError(
-        e instanceof Error && e.message === "stalled"
-          ? "La descarga se quedó sin respuesta. Recargá la app e intentá de nuevo."
-          : "No se pudo descargar todo. Revisá la conexión e intentá de nuevo.",
+        e instanceof PartialDownloadError
+          ? `Quedaron ${e.failed} de ${e.total} sin guardar (puede ser falta de espacio). Liberá espacio e intentá de nuevo.`
+          : e instanceof Error && e.message === "stalled"
+            ? "La descarga se quedó sin respuesta. Recargá la app e intentá de nuevo."
+            : "No se pudo descargar todo. Revisá la conexión e intentá de nuevo.",
       );
     } finally {
       setStatus("idle");

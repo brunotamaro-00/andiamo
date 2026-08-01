@@ -19,7 +19,11 @@
 // Los assets de public/brand/* NO se precachean a propósito: la app dibuja la
 // marca con SVG inline (src/components/Brand.tsx) y esos PNG son solo para
 // crawlers y para el sistema operativo, que no pasan por el service worker.
-const CACHE_VERSION = "v15";
+// v16: navegación con deadline, documentos que fallan con 503 real (y no con el
+// HTML de offline disfrazado de PDF), "Descargar viaje" que cuenta bytes recién
+// escritos y precachea también los chunks de /_next/static que el HTML necesita
+// para hidratar.
+const CACHE_VERSION = "v16";
 const SHELL_CACHE = `andiamo-shell-${CACHE_VERSION}`;
 const TRIP_CACHE  = `andiamo-trip-${CACHE_VERSION}`;  // on-demand precache of stop/guide route HTML
 // Document files are addressed by immutable id and don't depend on the build.
@@ -93,6 +97,13 @@ self.addEventListener("message", (event) => {
       caches
         .keys()
         .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        // offline.html is public and goes down with the rest, but precacheShell
+        // only runs on `install` and the worker is already installed — so after
+        // any logout, offlinePage() fell through to a bare unstyled 503 with no
+        // way back into the cached trip. Re-warm what can be fetched now; the
+        // auth-gated routes simply redirect and are skipped, as at install.
+        .then(() => precacheShell())
+        .catch(() => {})
         .then(() => event.ports[0]?.postMessage({ done: true }))
     );
     return;
@@ -148,11 +159,18 @@ async function cacheFirstDocs(request) {
   try {
     const response = await fetch(request);
     if (response.ok && !response.redirected && response.status === 200) {
-      cache.put(request, response.clone());
+      safePut(cache, request, response.clone());
     }
     return response;
   } catch {
-    return offlinePage();
+    // A real 503, never the offline HTML page. offlinePage() answers 200 with
+    // text/html, and DownloadDocButton only checks `res.ok` — so at the hostel
+    // desk with no signal, "Descargar" happily saved 2 KB of "Sin conexión"
+    // page under the name voucher.pdf and iOS reported success.
+    return new Response("Documento no disponible sin conexión", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 }
 
@@ -172,9 +190,20 @@ async function staleWhileRevalidate(cacheName, request) {
   return cached ?? (await networkFetch) ?? offlinePage();
 }
 
+/** How long a navigation waits for the network before falling back to a cached
+ *  copy. Network-first only ever reached the cache when `fetch` *rejected*, and
+ *  the connectivity this app is built for doesn't reject: hotel wifi that
+ *  associates without routing, a train tunnel, a captive portal. The socket
+ *  opens and stalls, so the tap hung for a minute-plus with the whole trip
+ *  sitting in TRIP_CACHE — and `navigator.onLine` stayed true, so the offline
+ *  banner never appeared either. Only applied when there *is* something cached;
+ *  with nothing to fall back to, waiting is still the best we can do. */
+const NAVIGATION_TIMEOUT_MS = 3500;
+
 /** Navigation: network-first so online visits always render fresh data (the
  *  pages are force-dynamic). The fresh HTML is cached for offline use. When the
- *  network fails, fall back to the cached copy, then the offline page.
+ *  network fails — or takes longer than NAVIGATION_TIMEOUT_MS — fall back to
+ *  the cached copy, then the offline page.
  *
  *  Offline soft navigations in the App Router fail their RSC fetch and Next
  *  falls back to a hard navigation, which lands here and is served from cache. */
@@ -182,35 +211,66 @@ async function networkFirstNavigate(request, url) {
   const shell = await caches.open(SHELL_CACHE);
   const trip = await caches.open(TRIP_CACHE);
 
-  try {
-    const response = await fetch(request);
+  const network = fetch(request).then((response) => {
     // Never cache a redirected response: returning one to a navigation request
     // fails with ERR_FAILED. Store fresh HTML in the trip cache for offline.
     if (response.ok && !response.redirected) {
-      trip.put(request, response.clone());
+      // Unawaited puts reject on QuotaExceededError; without a catch that's an
+      // unhandled rejection inside the SW on every navigation once storage fills.
+      safePut(trip, request, response.clone());
       // Heal the shell: if install ran logged out, this route is missing from
       // SHELL_CACHE (see precacheShell). An authenticated visit restores it.
       if (SHELL_ROUTES.includes(url.pathname)) {
-        shell.put(url.pathname, response.clone());
+        safePut(shell, url.pathname, response.clone());
       }
     }
     return response;
+  });
+  // Nobody awaits this on the timeout path — keep the rejection handled.
+  network.catch(() => {});
+
+  const cached = await cachedNavigation(trip, shell, request, url);
+
+  if (cached) {
+    const winner = await Promise.race([
+      network.catch(() => null),
+      new Promise((resolve) => setTimeout(() => resolve(null), NAVIGATION_TIMEOUT_MS)),
+    ]);
+    return winner ?? cached;
+  }
+
+  try {
+    return await network;
   } catch {
-    // Offline: serve the cached copy of this exact route if we have one.
-    const cached = (await trip.match(request)) ?? (await shell.match(request));
-    if (cached && !cached.redirected) return cached;
-
-    // "/" and "/hoy" redirect server-side and can't be cached — offline, fall
-    // back to the itinerary as the entry point. Check TRIP_CACHE first: that's
-    // where fresh navigations and "Descargar viaje" store /stops, so looking
-    // only at SHELL_CACHE sent users to the offline page with the whole trip
-    // sitting in cache. `start_url` is "/", so this is the PWA's cold start.
-    if (url.pathname === "/" || url.pathname === "/hoy") {
-      const stops = (await trip.match("/stops")) ?? (await shell.match("/stops"));
-      if (stops && !stops.redirected) return stops;
-    }
-
     return offlinePage();
+  }
+}
+
+/** The best cached answer for a navigation, or null. */
+async function cachedNavigation(trip, shell, request, url) {
+  const cached = (await trip.match(request)) ?? (await shell.match(request));
+  if (cached && !cached.redirected) return cached;
+
+  // "/" and "/hoy" redirect server-side and can't be cached — offline, fall
+  // back to the itinerary as the entry point. Check TRIP_CACHE first: that's
+  // where fresh navigations and "Descargar viaje" store /stops, so looking
+  // only at SHELL_CACHE sent users to the offline page with the whole trip
+  // sitting in cache. `start_url` is "/", so this is the PWA's cold start.
+  if (url.pathname === "/" || url.pathname === "/hoy") {
+    const stops = (await trip.match("/stops")) ?? (await shell.match("/stops"));
+    if (stops && !stops.redirected) return stops;
+  }
+
+  return null;
+}
+
+/** cache.put that resolves false instead of rejecting (quota, opaque response). */
+async function safePut(cache, key, response) {
+  try {
+    await cache.put(key, response);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -224,26 +284,41 @@ const PRECACHE_CONCURRENCY = 6;
 async function precacheTrip(routes, docs, port) {
   const tripCache = await caches.open(TRIP_CACHE);
   const docsCache = await caches.open(DOCS_CACHE);
+  const shellCache = await caches.open(SHELL_CACHE);
   const jobs = [
-    ...routes.map((url) => ({ cache: tripCache, url })),
-    ...docs.map((url) => ({ cache: docsCache, url })),
+    ...routes.map((url) => ({ cache: tripCache, url, html: true })),
+    ...docs.map((url) => ({ cache: docsCache, url, html: false })),
   ];
   const total = jobs.length;
   let done = 0;
   let bytes = 0;
+  let failed = 0;
+  // Build assets referenced by the HTML we cache. Collected across all routes
+  // and de-duplicated: the layout chunks repeat on every single page.
+  const assets = new Set();
 
-  const report = () => port?.postMessage({ done, total, bytes });
+  const report = () => port?.postMessage({ done, total, bytes, failed });
 
-  async function warm({ cache, url }) {
+  async function warm({ cache, url, html }) {
     try {
       const res = await fetch(url, { credentials: "same-origin" });
       if (res.ok && !res.redirected && res.status === 200) {
-        const buf = await res.clone().arrayBuffer();
-        bytes += buf.byteLength; // single-threaded event loop → += is safe
-        await cache.put(url, res);
+        const body = await res.clone().arrayBuffer();
+        // Count bytes only once the write actually landed. Incrementing first
+        // and swallowing a QuotaExceededError meant "Descargado · 48,3 MB" over
+        // a cache that held nothing — discovered the next morning, in the air.
+        if (await safePut(cache, url, res)) {
+          bytes += body.byteLength; // single-threaded event loop → += is safe
+          if (html) collectAssets(body, assets);
+        } else {
+          failed += 1;
+        }
+      } else {
+        failed += 1;
       }
     } catch {
-      // Skip individual failures — a partial download is still useful.
+      // A partial download is still useful, but it is not a success.
+      failed += 1;
     } finally {
       done += 1;
       report();
@@ -252,21 +327,50 @@ async function precacheTrip(routes, docs, port) {
 
   // Worker pool: each worker pulls the next job off a shared cursor until the
   // queue drains, keeping up to PRECACHE_CONCURRENCY requests in flight.
-  let cursor = 0;
-  async function worker() {
-    while (cursor < jobs.length) {
-      const job = jobs[cursor++];
-      await warm(job);
-    }
+  async function drain(queue, task) {
+    let cursor = 0;
+    const worker = async () => {
+      while (cursor < queue.length) await task(queue[cursor++]);
+    };
+    const workers = Math.min(PRECACHE_CONCURRENCY, queue.length);
+    await Promise.all(Array.from({ length: workers }, worker));
   }
 
   try {
-    const workers = Math.min(PRECACHE_CONCURRENCY, jobs.length);
-    await Promise.all(Array.from({ length: workers }, worker));
-    port?.postMessage({ finished: true, done, total, bytes });
+    await drain(jobs, warm);
+
+    // Second pass: the JS chunks the cached HTML needs to hydrate. Without it
+    // "Descargar viaje" cached pages that render but are dead to the touch —
+    // /_next/static only ever entered SHELL_CACHE via stale-while-revalidate,
+    // i.e. only for routes visited *online*. A guide precached but never opened
+    // had no chunk, so offline its modals, tabs and links did nothing.
+    const missing = [];
+    for (const asset of assets) {
+      if (!(await shellCache.match(asset))) missing.push(asset);
+    }
+    await drain(missing, async (url) => {
+      try {
+        const res = await fetch(url, { credentials: "same-origin" });
+        if (res.ok && !res.redirected) {
+          const body = await res.clone().arrayBuffer();
+          if (await safePut(shellCache, url, res)) bytes += body.byteLength;
+        }
+      } catch {
+        // A missing chunk degrades hydration on that route, not the download.
+      }
+    });
+
+    port?.postMessage({ finished: true, done, total, bytes, failed });
   } catch (err) {
     port?.postMessage({ error: String(err) });
   }
+}
+
+/** Pulls same-origin /_next/static references out of a cached HTML body. */
+function collectAssets(buffer, into) {
+  const html = new TextDecoder().decode(buffer);
+  const matches = html.matchAll(/["'(](\/_next\/static\/[^"')\s]+)["')]/g);
+  for (const [, path] of matches) into.add(path);
 }
 
 /** Returns the offline fallback HTML page. */

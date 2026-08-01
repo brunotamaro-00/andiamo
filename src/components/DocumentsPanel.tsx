@@ -122,6 +122,12 @@ function DownloadDocButton({
       const res = await fetch(url);
       if (!res.ok) throw new Error("fetch failed");
       const blob = await res.blob();
+      // Guard against saving a web page as a boarding pass. Uploaded documents
+      // are PDFs and images; an HTML body here means something served a page
+      // instead of the file (an offline fallback, a login redirect). Saving it
+      // under the name "voucher.pdf" is worse than failing — you find out at
+      // the check-in desk.
+      if (blob.type.startsWith("text/html")) throw new Error("not a file");
       const type = blob.type || "application/octet-stream";
       const file = new File([blob], name, { type });
 
@@ -147,7 +153,11 @@ function DownloadDocButton({
     } catch (err) {
       // User dismissed the share sheet — not an error
       if (err instanceof DOMException && err.name === "AbortError") return;
-      toast("No se pudo descargar el archivo");
+      toast(
+        err instanceof Error && err.message === "not a file"
+          ? "El archivo no está disponible sin conexión"
+          : "No se pudo descargar el archivo",
+      );
     } finally {
       setSaving(false);
     }
