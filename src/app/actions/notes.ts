@@ -5,15 +5,7 @@ import { after } from "next/server";
 import { db, isRecordMissing } from "@/lib/db";
 import { notifyNotesChanged } from "@/lib/spitwise";
 import { requireAuth } from "@/lib/auth";
-import { parseForm, CreateNoteSchema, UpdateNoteSchema } from "./_schemas";
-
-function derivedTitle(rawTitle: string, body: string): string {
-  const t = rawTitle.trim();
-  if (t) return t;
-  // Fall back to first non-empty line of the body
-  const firstLine = body.split("\n").find((l) => l.trim());
-  return firstLine?.trim().slice(0, 80) || "Sin título";
-}
+import { parseForm, CreateNoteSchema, UpdateNoteSchema, derivedTitle } from "./_schemas";
 
 export async function createNote(formData: FormData) {
   await requireAuth();
