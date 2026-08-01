@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
-import { Plus, AlertCircle, RotateCcw } from "lucide-react";
+import { Plus, AlertCircle, RotateCcw, MapPin, SearchX } from "lucide-react";
 import { createStop } from "@/app/actions/stops";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { inputClass } from "@/components/ui/Field";
 import { Label } from "@/components/ui/Label";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { NightsStepper } from "@/components/ui/NightsStepper";
 import { ToggleRow } from "@/components/ui/ToggleRow";
 import { flagFromCountryCode } from "@/lib/country-currency";
@@ -255,7 +257,6 @@ function AddStopModal({
           aria-label="Buscar ciudad"
           className={inputClass}
         />
-        {searching && <p className="text-xs text-ink-3 mt-1">Buscando...</p>}
         {geoError && (
           <p className="text-xs text-danger flex items-center gap-1.5 mt-1" role="alert">
             <AlertCircle size={12} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
@@ -273,7 +274,35 @@ function AddStopModal({
         </p>
       </div>
 
-      {results.length > 0 && (
+      {/* The results area holds its height from the start, so the sheet opens
+          at the size it will have once you type instead of as a sliver at the
+          bottom of the screen that grows under your thumb. */}
+      <div className="min-h-[300px]">
+        {searching && results.length === 0 && (
+          <div className="space-y-1" aria-hidden="true">
+            <Skeleton className="h-[58px] w-full" />
+            <Skeleton className="h-[58px] w-full opacity-70" />
+            <Skeleton className="h-[58px] w-full opacity-40" />
+          </div>
+        )}
+
+        {!searching && results.length === 0 && (
+          <EmptyState
+            icon={query.length >= 2 ? SearchX : MapPin}
+            title={
+              query.length >= 2
+                ? `Sin resultados para "${query}"`
+                : "¿A qué ciudad van?"
+            }
+            description={
+              query.length >= 2
+                ? "Probá con el nombre en su idioma original, o con la ciudad grande más cercana."
+                : "Buscala por nombre y elegila de la lista. Después definís las noches y dónde entra en el itinerario."
+            }
+          />
+        )}
+
+        {results.length > 0 && (
         <div className="space-y-1">
           {results.map((r, i) => (
             <button
@@ -295,7 +324,8 @@ function AddStopModal({
             </button>
           ))}
         </div>
-      )}
+        )}
+      </div>
 
       {selected && (
         <Button
