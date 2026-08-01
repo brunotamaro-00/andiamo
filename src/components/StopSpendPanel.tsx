@@ -8,6 +8,9 @@ import { personLabel } from "@/lib/person";
 import { getPerson } from "@/lib/person-server";
 import { todayStr, dateToStr } from "@/lib/trip";
 
+/** Spitwise sends amounts as strings; they render rounded to whole USD. */
+const usd = (v: string | number) => Math.round(Number(v) || 0);
+
 /** Rich spend panel fed by Spitwise: total and per-category bars. Per-movement
  *  detail lives in Spitwise itself. Degrades silently — Spitwise down or future
  *  stop with no data renders nothing; current/past stop with no data shows a
@@ -56,11 +59,11 @@ export default async function StopSpendPanel({
             {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
           </p>
           <p className="font-display uppercase text-[22px] leading-tight text-ink font-tabular">
-            USD <AnimatedNumber value={total} decimals={2} />
+            USD <AnimatedNumber value={total} decimals={0} />
           </p>
           {detail.itinerary_days > 0 && (
             <p className="text-[12px] text-ink-2 font-tabular">
-              ≈ USD {detail.avg_per_day_usd}/día · {detail.itinerary_days}{" "}
+              ≈ USD {usd(detail.avg_per_day_usd)}/día · {detail.itinerary_days}{" "}
               {detail.itinerary_days === 1 ? "día" : "días"}
             </p>
           )}
@@ -83,7 +86,7 @@ export default async function StopSpendPanel({
                     {cat.name ?? "Otros"}
                   </span>
                   <span className="font-tabular text-[12px] font-bold text-ink shrink-0">
-                    USD {cat.total_usd}
+                    USD {usd(cat.total_usd)}
                   </span>
                 </div>
                 <ProgressBar value={pct} animateIn delayMs={Math.min(i, 5) * 40} />
