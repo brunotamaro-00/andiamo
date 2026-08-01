@@ -149,6 +149,11 @@ function DocChip({
   );
 }
 
+/** Fold case + diacritics so "Países Bajos" matches folder-derived "Paises Bajos". */
+function fold(s: string): string {
+  return s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
 /** Display-only shortening for country-wide doc titles. Inside "🇮🇹 Italia" the
  *  country name is noise, but Reino Unido has one "Costumbres" per nation, so
  *  the qualifier survives when it isn't just the country again. */
@@ -160,7 +165,7 @@ function countryDocLabel(title: string, countryName: string): string {
   const customs = title.match(/^costumbres\s+en\s+(.+)$/i);
   if (customs) {
     const where = bare(customs[1]);
-    return where.toLowerCase() === countryName.toLowerCase()
+    return fold(where) === fold(countryName)
       ? "Costumbres"
       : `Costumbres · ${where}`;
   }

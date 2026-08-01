@@ -11,7 +11,7 @@ import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
-import { guideCityForStop, guidesForStop } from "@/lib/guides";
+import { docKind, guideCityForStop, guidesForStop } from "@/lib/guides";
 import type { GuideDoc } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { CurrentStopSync } from "@/components/CurrentStopContext";
@@ -366,8 +366,9 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   const city = guideCityForStop(stopSlug);
   // City docs are the specific ones; the guide's own docs are region-wide and
   // repeat the same names ("Transporte"), so they get their own labelled row.
-  const chips = city ? city.docs : primary.docs;
-  const regionChips = city ? primary.docs : [];
+  // Desvíos cercanos stays on /guias — on /stops it crowded the 7-chip grid.
+  const chips = stopGuideChips(city ? city.docs : primary.docs, city?.slug);
+  const regionChips = city ? stopGuideChips(primary.docs) : [];
 
   return (
     <div className="bg-surface rounded-xl border border-border card-shadow p-3.5 animate-fade-in">
@@ -430,12 +431,18 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   );
 }
 
+/** Docs shown as quick chips on the stop card. Hides Desvíos cercanos so the
+ *  full 7-doc city set fits as a 2×3 grid; the doc remains on /guias. */
+function stopGuideChips(docs: GuideDoc[], cityPrefix?: string): GuideDoc[] {
+  return docs.filter((d) => docKind(d.slug, cityPrefix) !== "desvios-cercanos");
+}
+
 /** Doc shortcuts for a guide, as a 3-column grid: equal-width cells keep both
  *  edges of the block flush (a wrapping flex row ragged them against the card)
- *  and three per row keeps 7 docs at 3 rows instead of 4. Every chip is a
- *  single truncated line — a wrapped title would make the row taller than the
- *  44px touch target for no gain. The trailing chips stretch to fill the last
- *  row, so the block always closes as a rectangle. */
+ *  and three per row keeps 6 docs at 2 rows. Every chip is a single truncated
+ *  line — a wrapped title would make the row taller than the 44px touch target
+ *  for no gain. The trailing chips stretch to fill the last row, so the block
+ *  always closes as a rectangle. */
 function DocChips({
   guideSlug,
   docs,

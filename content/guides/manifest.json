@@ -1693,6 +1693,11 @@
               "file": "italia/florencia/actividades.md"
             },
             {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "italia/florencia/nightlife.md"
+            },
+            {
               "slug": "gastronomia",
               "title": "Gastronomía",
               "file": "italia/florencia/gastronomia.md"
@@ -1766,6 +1771,11 @@
               "slug": "actividades",
               "title": "Actividades",
               "file": "italia/napoles/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "italia/napoles/nightlife.md"
             },
             {
               "slug": "gastronomia",
@@ -2417,6 +2427,11 @@
       ],
       "countryDocs": [
         {
+          "slug": "costumbres",
+          "title": "Costumbres en Italia",
+          "file": "italia/costumbres.md"
+        },
+        {
           "slug": "frases-utiles",
           "title": "Frases Útiles — Italia (italiano)",
           "file": "italia/frases-utiles.md"
@@ -2521,6 +2536,11 @@
         }
       ],
       "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres en España",
+          "file": "espana/costumbres.md"
+        },
         {
           "slug": "frases-utiles",
           "title": "Frases Útiles — España (español + catalán)",
