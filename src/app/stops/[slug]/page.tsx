@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
 import { guideCityForStop, guidesForStop } from "@/lib/guides";
+import type { GuideDoc } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { CurrentStopSync } from "@/components/CurrentStopContext";
 import { PageHeader } from "@/components/PageHeader";
@@ -370,71 +371,50 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   const regionChips = city ? primary.docs : [];
 
   return (
-    <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
+    <div className="bg-surface rounded-xl border border-border card-shadow p-3.5 animate-fade-in">
       <Link
         href={`/guias/${primary.slug}`}
-        className="flex items-center gap-3 min-h-[44px] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
+        className="flex items-center gap-2 min-h-[44px] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
       >
-        <BookOpen size={18} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">Guía</p>
-          <p className="font-display uppercase text-[17px] leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
-            {city ? `${primary.title} · ${city.title}` : primary.title}
-          </p>
-        </div>
-        <ChevronRight size={15} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
+        <BookOpen size={16} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
+        <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
+          Guía ·
+        </span>
+        <span className="flex-1 min-w-0 font-display uppercase text-[15px] leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
+          {city ? `${primary.title} · ${city.title}` : primary.title}
+        </span>
+        <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
       </Link>
 
-      {chips.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {chips.map((doc) => (
-            <Link
-              key={doc.slug}
-              href={`/guias/${primary.slug}/${doc.slug}`}
-              className="inline-flex items-center min-h-[44px] rounded-full border border-border px-3.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-            >
-              {doc.title}
-            </Link>
-          ))}
-        </div>
-      )}
+      {chips.length > 0 && <DocChips guideSlug={primary.slug} docs={chips} />}
 
       {/* The stop *is* the region: point at the city groups inside its guide */}
       {!city && primary.cities.length > 0 && (
         <Link
           href={`/guias/${primary.slug}`}
-          className="block mt-3 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+          className="flex items-center gap-2 min-h-[44px] mt-2.5 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
         >
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
-            {primary.cities.length} ciudades en la guía
-          </p>
-          <p className="text-xs font-semibold text-ink-2 mt-0.5">
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
+            {primary.cities.length} ciudades
+          </span>
+          <span className="flex-1 min-w-0 text-xs font-semibold text-ink-2 truncate">
             {primary.cities.map((c) => c.title).join(" · ")}
-          </p>
+          </span>
+          <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
         </Link>
       )}
 
       {regionChips.length > 0 && (
-        <div className="mt-3">
+        <div className="mt-2.5">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
             Toda {primary.title}
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            {regionChips.map((doc) => (
-              <Link
-                key={doc.slug}
-                href={`/guias/${primary.slug}/${doc.slug}`}
-                className="inline-flex items-center min-h-[44px] rounded-full border border-border px-3.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-              >
-                {doc.title}
-              </Link>
-            ))}
-          </div>
+          <DocChips guideSlug={primary.slug} docs={regionChips} flush />
         </div>
       )}
 
       {extras.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-border space-y-1">
+        <div className="mt-2.5 pt-2.5 border-t border-border space-y-1">
           {extras.map((guide) => (
             <Link
               key={guide.slug}
@@ -447,6 +427,43 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Doc shortcuts for a guide, as a 3-column grid: equal-width cells keep both
+ *  edges of the block flush (a wrapping flex row ragged them against the card)
+ *  and three per row keeps 7 docs at 3 rows instead of 4. Every chip is a
+ *  single truncated line — a wrapped title would make the row taller than the
+ *  44px touch target for no gain. The trailing chips stretch to fill the last
+ *  row, so the block always closes as a rectangle. */
+function DocChips({
+  guideSlug,
+  docs,
+  flush,
+}: {
+  guideSlug: string;
+  docs: GuideDoc[];
+  flush?: boolean;
+}) {
+  const rest = docs.length % 3;
+  return (
+    <div className={`grid grid-cols-3 gap-1.5 ${flush ? "" : "mt-2.5"}`}>
+      {docs.map((doc, i) => {
+        const isLast = i === docs.length - 1;
+        const span =
+          isLast && rest === 1 ? "col-span-3" : isLast && rest === 2 ? "col-span-2" : "";
+        return (
+          <Link
+            key={doc.slug}
+            href={`/guias/${guideSlug}/${doc.slug}`}
+            title={doc.title}
+            className={`flex items-center justify-center min-w-0 h-11 rounded-full border border-border px-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${span}`}
+          >
+            <span className="truncate">{doc.title}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }
