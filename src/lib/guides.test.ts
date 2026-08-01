@@ -67,6 +67,25 @@ describe("guide manifest", () => {
 });
 
 describe("regional guides (Sur de Italia)", () => {
+  it("nests southern regions and itinerarios under the Sur de Italia container", () => {
+    const hub = getGuide("sur-de-italia");
+    expect(hub?.guides.map((g) => g.slug)).toEqual([
+      "calabria",
+      "costa-amalfitana",
+      "itinerarios",
+      "puglia",
+      "sicilia",
+    ]);
+    // Italy's top-level list is only the four city/container guides
+    const italia = getManifest().countries.find((c) => c.slug === "italia");
+    expect(italia?.guides.map((g) => g.slug)).toEqual([
+      "florencia",
+      "napoles",
+      "roma",
+      "sur-de-italia",
+    ]);
+  });
+
   it("keeps the southern regions as guides with nested cities", () => {
     for (const [region, cities] of [
       ["sicilia", ["agrigento", "catania", "noto", "palermo", "ragusa", "siracusa"]],
@@ -75,6 +94,7 @@ describe("regional guides (Sur de Italia)", () => {
     ] as const) {
       const guide = getGuide(region);
       expect(guide, `missing regional guide ${region}`).not.toBeNull();
+      expect(guide!.parentSlug).toBe("sur-de-italia");
       expect(guide!.cities.map((c) => c.slug)).toEqual([...cities]);
       // Region-wide docs live at the root of the guide, not duplicated per city
       expect(guide!.docs.map((d) => d.slug)).toContain("transporte");
@@ -93,12 +113,14 @@ describe("regional guides (Sur de Italia)", () => {
     expect(hub!.docs.length).toBeGreaterThan(0);
   });
 
-  it("keeps Costa Amalfitana reachable from Nápoles, outside the southern stops", () => {
+  it("keeps Costa Amalfitana nested under Sur de Italia and linked from Nápoles", () => {
     expect(STOP_TO_GUIDES.napoles).toEqual(["napoles", "costa-amalfitana"]);
     const amalfi = getGuide("costa-amalfitana");
+    expect(amalfi?.parentSlug).toBe("sur-de-italia");
     expect(amalfi?.cities.map((c) => c.slug)).toEqual(["amalfi", "sorrento"]);
     // Nápoles itself is not part of the Sur de Italia container
     expect(getGuide("napoles")?.cities).toEqual([]);
+    expect(getGuide("napoles")?.parentSlug).toBeUndefined();
   });
 
   it("namespaces city doc slugs so they don't collide with region docs", () => {

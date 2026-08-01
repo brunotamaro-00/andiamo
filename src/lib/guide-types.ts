@@ -30,17 +30,29 @@ export interface Guide {
   dayTrips: GuideDoc[];
   /** Nested city groups. Empty for the flat city guides (Roma, París…). */
   cities: GuideCity[];
+  /** Nested guides (e.g. Sicilia under Sur de Italia). Empty for leaf guides.
+   *  Children keep their own `/guias/[slug]` routes; this is navigation only. */
+  guides: Guide[];
+  /** Parent guide slug when nested (e.g. `sur-de-italia` for `sicilia`). */
+  parentSlug?: string;
 }
 
 /** Every doc reachable under /guias/[guide]/… — region-level docs and day
  *  trips plus each nested city's. Order: region docs, region day trips, then
- *  per city (docs then day trips), matching how the guide page renders. */
+ *  per city (docs then day trips), matching how the guide page renders.
+ *  Does not walk nested child guides (those have their own routes). */
 export function guideDocs(guide: Guide): GuideDoc[] {
   return [
     ...guide.docs,
     ...guide.dayTrips,
     ...guide.cities.flatMap((c) => [...c.docs, ...c.dayTrips]),
   ];
+}
+
+/** Depth-first flatten of a guide tree (container → children). Used wherever
+ *  routes, search or export need every guide regardless of nesting. */
+export function flattenGuides(guides: Guide[]): Guide[] {
+  return guides.flatMap((g) => [g, ...flattenGuides(g.guides)]);
 }
 
 /** Doc kind behind a slug: the bare tail once the `<city>-` prefix that keeps

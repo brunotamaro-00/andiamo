@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildGuidesExport } from "./guides-export";
-import { getManifest, guideDocs, STOP_TO_GUIDES } from "./guides";
+import { flattenGuides, getManifest, guideDocs, STOP_TO_GUIDES } from "./guides";
 
 describe("buildGuidesExport", () => {
   it("exports every manifest doc with its markdown", async () => {
@@ -8,7 +8,10 @@ describe("buildGuidesExport", () => {
     const manifest = getManifest();
     const expected =
       manifest.countries.reduce(
-        (n, c) => n + c.countryDocs.length + c.guides.reduce((m, g) => m + guideDocs(g).length, 0),
+        (n, c) =>
+          n +
+          c.countryDocs.length +
+          flattenGuides(c.guides).reduce((m, g) => m + guideDocs(g).length, 0),
         0,
       ) +
       manifest.general.length +

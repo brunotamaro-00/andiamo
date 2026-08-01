@@ -11,7 +11,7 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { slugify } from "../src/lib/slug";
-import { guideDocs } from "../src/lib/guide-types";
+import { flattenGuides, guideDocs } from "../src/lib/guide-types";
 import type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "../src/lib/guide-types";
 
 const SOURCE =
@@ -165,9 +165,15 @@ function buildCity(sourceDir: string, guideDestRelDir: string): GuideCity | null
   return { slug: citySlug, title: dirName, docs, dayTrips };
 }
 
-function buildGuide(sourceDir: string, country: { name: string; flag: string; slug: string }): Guide {
+function buildGuide(
+  sourceDir: string,
+  country: { name: string; flag: string; slug: string },
+  opts: { parentSlug?: string } = {}
+): Guide {
   const dirName = path.basename(sourceDir);
   const guideSlug = slugify(dirName);
+  // Dest stays country/guide (not nested under the container) so /guias/[slug]
+  // file paths stay stable when a guide moves in/out of a REGION_CONTAINER.
   const destRelDir = path.posix.join(country.slug, guideSlug);
   const { dirs, files } = listDir(sourceDir);
 
@@ -190,6 +196,8 @@ function buildGuide(sourceDir: string, country: { name: string; flag: string; sl
     docs,
     dayTrips,
     cities,
+    guides: [],
+    ...(opts.parentSlug ? { parentSlug: opts.parentSlug } : {}),
   };
 }
 
@@ -252,27 +260,28 @@ function main() {
     for (const cityDir of cityDirs) {
       const fullCityDir = path.join(countryDir, cityDir);
       if (REGION_CONTAINERS.has(cityDir)) {
-        // Its subfolders are guides; its loose .md files form a guide of their own.
+        // Container guide (Sur de Italia): decision docs at the root, and each
+        // subfolder is a nested guide (Sicilia, Puglia, Itinerarios…).
         const { dirs: regionDirs, files: regionFiles } = listDir(fullCityDir);
-        for (const sub of regionDirs) {
-          country.guides.push(buildGuide(path.join(fullCityDir, sub), country));
-        }
-        if (regionFiles.length > 0) {
-          // Decision hub only (README + opciones) — no cities, no day trips.
-          const regionSlug = slugify(cityDir);
-          const docs = regionFiles.map((f) =>
-            copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
-          );
-          country.guides.push({
-            slug: regionSlug,
-            title: cityDir,
-            country: country.name,
-            countryFlag: country.flag,
-            docs,
-            dayTrips: [],
-            cities: [],
-          });
-        }
+        const regionSlug = slugify(cityDir);
+        const nested = regionDirs
+          .map((sub) =>
+            buildGuide(path.join(fullCityDir, sub), country, { parentSlug: regionSlug })
+          )
+          .sort((a, b) => a.title.localeCompare(b.title, "es"));
+        const docs = regionFiles.map((f) =>
+          copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
+        );
+        country.guides.push({
+          slug: regionSlug,
+          title: cityDir,
+          country: country.name,
+          countryFlag: country.flag,
+          docs,
+          dayTrips: [],
+          cities: [],
+          guides: nested,
+        });
       } else {
         country.guides.push(buildGuide(fullCityDir, country));
       }
@@ -285,7 +294,8 @@ function main() {
   manifest.countries.sort((a, b) => a.order - b.order);
 
   // ── Validation ────────────────────────────────────────────────────────────
-  const guideSlugs = manifest.countries.flatMap((c) => c.guides.map((g) => g.slug));
+  const allGuides = flattenGuides(manifest.countries.flatMap((c) => c.guides));
+  const guideSlugs = allGuides.map((g) => g.slug);
   const dupGuides = guideSlugs.filter((s, i) => guideSlugs.indexOf(s) !== i);
   if (dupGuides.length > 0) {
     console.error(`Duplicate guide slugs: ${dupGuides.join(", ")}`);
@@ -293,27 +303,25 @@ function main() {
   }
   // Doc slugs must be unique across the whole guide (region docs, region day
   // trips and every city's docs share the /guias/[guide]/[doc] namespace).
-  for (const c of manifest.countries) {
-    for (const g of c.guides) {
-      const all = guideDocs(g).map((d) => d.slug);
-      const dup = all.filter((s, i) => all.indexOf(s) !== i);
-      if (dup.length > 0) {
-        console.error(`Duplicate doc slugs in guide "${g.slug}": ${dup.join(", ")}`);
-        process.exit(1);
-      }
+  for (const g of allGuides) {
+    const all = guideDocs(g).map((d) => d.slug);
+    const dup = all.filter((s, i) => all.indexOf(s) !== i);
+    if (dup.length > 0) {
+      console.error(`Duplicate doc slugs in guide "${g.slug}": ${dup.join(", ")}`);
+      process.exit(1);
     }
   }
   const totalDocs =
     manifest.general.length +
     manifest.resources.length +
     manifest.countries.reduce(
-      (n, c) => n + c.countryDocs.length + c.guides.reduce((m, g) => m + guideDocs(g).length, 0),
+      (n, c) =>
+        n +
+        c.countryDocs.length +
+        flattenGuides(c.guides).reduce((m, g) => m + guideDocs(g).length, 0),
       0
     );
-  const totalCities = manifest.countries.reduce(
-    (n, c) => n + c.guides.reduce((m, g) => m + g.cities.length, 0),
-    0
-  );
+  const totalCities = allGuides.reduce((n, g) => n + g.cities.length, 0);
   if (manifest.countries.length === 0 || totalDocs === 0) {
     console.error("Manifest is empty — wrong source dir?");
     process.exit(1);

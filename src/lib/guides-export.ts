@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { getManifest, readDocMarkdown, STOP_TO_GUIDES } from "./guides";
 import { demoDocMarkdown } from "./guides-demo";
 import { IS_DEMO } from "./demo";
-import type { GuideDoc } from "./guide-types";
+import { flattenGuides, type GuideDoc } from "./guide-types";
 
 export type ExportDocKind = "city" | "daytrip" | "country" | "general" | "resource";
 
@@ -48,7 +48,7 @@ function collectSources(): DocSource[] {
   const sources: DocSource[] = [];
 
   for (const country of manifest.countries) {
-    for (const guide of country.guides) {
+    for (const guide of flattenGuides(country.guides)) {
       const base = {
         guideSlug: guide.slug,
         guideTitle: guide.title,

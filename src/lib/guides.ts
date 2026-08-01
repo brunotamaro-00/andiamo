@@ -3,9 +3,10 @@ import path from "node:path";
 import manifestJson from "../../content/guides/manifest.json";
 import { IS_DEMO } from "./demo";
 import type { Guide, GuideCity, GuideDoc, GuideManifest } from "./guide-types";
+import { flattenGuides } from "./guide-types";
 
 export type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
-export { docKind, guideDocs } from "./guide-types";
+export { docKind, flattenGuides, guideDocs } from "./guide-types";
 
 const source = manifestJson as GuideManifest;
 
@@ -32,6 +33,7 @@ const PSEUDO_GUIDES: Guide[] = [
           docs: manifest.general,
           dayTrips: [],
           cities: [],
+          guides: [],
         },
         {
           slug: "recursos",
@@ -41,6 +43,7 @@ const PSEUDO_GUIDES: Guide[] = [
           docs: manifest.resources,
           dayTrips: [],
           cities: [],
+          guides: [],
         },
       ]),
   // Loose country-level docs (e.g. the Slovenia regional README)
@@ -54,6 +57,7 @@ const PSEUDO_GUIDES: Guide[] = [
       docs: c.countryDocs,
       dayTrips: [],
       cities: [],
+      guides: [],
     })),
 ];
 
@@ -61,8 +65,9 @@ export function getManifest(): GuideManifest {
   return manifest;
 }
 
+/** Every guide with a `/guias/[slug]` route — top-level and nested children. */
 export function getAllGuides(): Guide[] {
-  return [...manifest.countries.flatMap((c) => c.guides), ...PSEUDO_GUIDES];
+  return [...flattenGuides(manifest.countries.flatMap((c) => c.guides)), ...PSEUDO_GUIDES];
 }
 
 export function getGuide(slug: string): Guide | null {

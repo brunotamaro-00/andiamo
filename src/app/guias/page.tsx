@@ -59,14 +59,20 @@ export default function GuidesIndexPage() {
                 const tripCount =
                   guide.dayTrips.length +
                   guide.cities.reduce((n, c) => n + c.dayTrips.length, 0);
-                // One meta line only: cities take precedence over day trips on a
-                // regional guide so the row never wraps.
+                // One meta line only. Nested guides (Sur de Italia) beat cities
+                // and day trips so the container reads as a group, not a leaf.
                 const extra =
-                  guide.cities.length > 0
-                    ? ` · ${guide.cities.length} ${guide.cities.length === 1 ? "ciudad" : "ciudades"}`
-                    : tripCount > 0
-                      ? ` · ${tripCount} day trips`
-                      : "";
+                  guide.guides.length > 0
+                    ? ` · ${guide.guides.length} ${guide.guides.length === 1 ? "guía" : "guías"}`
+                    : guide.cities.length > 0
+                      ? ` · ${guide.cities.length} ${guide.cities.length === 1 ? "ciudad" : "ciudades"}`
+                      : tripCount > 0
+                        ? ` · ${tripCount} day trips`
+                        : "";
+                const meta =
+                  guide.guides.length > 0 && all.length === 0
+                    ? `${guide.guides.length} ${guide.guides.length === 1 ? "guía" : "guías"}`
+                    : `${all.length} docs${extra}`;
                 return (
                   <Link
                     key={guide.slug}
@@ -78,7 +84,7 @@ export default function GuidesIndexPage() {
                       {guide.title}
                     </span>
                     <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">
-                      {all.length} docs{extra}
+                      {meta}
                     </span>
                     <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
                   </Link>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   BedDouble,
+  BookOpen,
   ChevronRight,
   FileText,
   Landmark,
@@ -15,7 +16,7 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import { docKind, getAllGuides, getGuide, stopSlugsForGuide } from "@/lib/guides";
+import { docKind, getAllGuides, getGuide, guideDocs, stopSlugsForGuide } from "@/lib/guides";
 import type { GuideDoc } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
@@ -107,6 +108,9 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
 
   const relatedStops = stopSlugsForGuide(slug);
   const isRegional = guide.cities.length > 0;
+  const parent = guide.parentSlug ? getGuide(guide.parentSlug) : null;
+  const backHref = parent ? `/guias/${parent.slug}` : "/guias";
+  const backLabel = parent ? parent.title : "Guías";
 
   return (
     <div className="min-h-full bg-canvas">
@@ -114,11 +118,11 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5 pb-24">
         <Link
-          href="/guias"
+          href={backHref}
           className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
         >
           <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
-          Guías
+          {backLabel}
         </Link>
 
         {/* Title card */}
@@ -130,16 +134,52 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
             </h2>
             <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-0.5">
               {guide.country}
+              {guide.guides.length > 0 &&
+                ` · ${guide.guides.length} ${guide.guides.length === 1 ? "guía" : "guías"}`}
               {isRegional &&
                 ` · ${guide.cities.length} ${guide.cities.length === 1 ? "ciudad" : "ciudades"}`}
             </p>
           </div>
         </div>
 
+        {/* Nested guides (Sicilia, Puglia… under Sur de Italia) */}
+        {guide.guides.length > 0 && (
+          <section className="animate-fade-in stagger-1">
+            <p className={SECTION_LABEL}>Regiones e itinerarios</p>
+            <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+              {guide.guides.map((child) => {
+                const all = guideDocs(child);
+                const extra =
+                  child.cities.length > 0
+                    ? ` · ${child.cities.length} ${child.cities.length === 1 ? "ciudad" : "ciudades"}`
+                    : "";
+                return (
+                  <Link
+                    key={child.slug}
+                    href={`/guias/${child.slug}`}
+                    className="flex items-center gap-3 min-h-[44px] px-3.5 py-2.5 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
+                  >
+                    <BookOpen size={16} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
+                    <span className="flex-1 min-w-0 font-display uppercase text-[15px] leading-tight text-ink truncate">
+                      {child.title}
+                    </span>
+                    <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">
+                      {all.length} docs{extra}
+                    </span>
+                    <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Guide-level docs — region-wide on a regional guide */}
         {guide.docs.length > 0 && (
           <section className="animate-fade-in stagger-1">
-            <p className={SECTION_LABEL}>{isRegional ? "Toda la región" : "Guía"}</p>
+            <p className={SECTION_LABEL}>
+              {guide.guides.length > 0 ? "Decisión" : isRegional ? "Toda la región" : "Guía"}
+            </p>
             <DocGrid guideSlug={guide.slug} docs={guide.docs} />
           </section>
         )}

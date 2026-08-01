@@ -49,7 +49,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "highlands",
@@ -94,7 +95,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "londres",
@@ -160,7 +162,8 @@
               "file": "reino-unido/londres/day-trips/oxford.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "york",
@@ -205,7 +208,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -286,7 +290,8 @@
               "file": "paises-bajos/amsterdam/day-trips/utrecht.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -351,7 +356,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "estrasburgo",
@@ -396,7 +402,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "paris",
@@ -452,7 +459,8 @@
               "file": "francia/paris/day-trips/versalles.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -538,7 +546,8 @@
               "file": "portugal/lisboa/day-trips/sintra.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "porto",
@@ -583,7 +592,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -669,7 +679,8 @@
               "file": "alemania/friburgo/day-trips/triberg-gengenbach.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -714,7 +725,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "interlaken",
@@ -739,7 +751,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "lauterbrunnen",
@@ -764,7 +777,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "lucerna",
@@ -784,7 +798,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -864,7 +879,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "viena",
@@ -920,7 +936,8 @@
               "file": "austria/viena/day-trips/wachau.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -996,7 +1013,8 @@
               "file": "chequia/praga/day-trips/kutna-hora.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -1077,7 +1095,8 @@
               "file": "polonia/cracovia/day-trips/zakopane.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -1163,7 +1182,8 @@
               "file": "hungria/budapest/day-trips/szentendre.md"
             }
           ],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -1218,7 +1238,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "karst-y-cuevas",
@@ -1253,7 +1274,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "lagos-alpinos",
@@ -1288,7 +1310,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "liubliana",
@@ -1333,7 +1356,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "valle-del-soca-y-triglav",
@@ -1368,7 +1392,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
@@ -1400,287 +1425,6 @@
       "name": "Italia",
       "flag": "🇮🇹",
       "guides": [
-        {
-          "slug": "calabria",
-          "title": "Calabria",
-          "country": "Italia",
-          "countryFlag": "🇮🇹",
-          "docs": [
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "italia/calabria/gastronomia.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "italia/calabria/transporte.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "italia/calabria/contexto-historico.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [
-            {
-              "slug": "reggio-calabria",
-              "title": "Reggio Calabria",
-              "docs": [
-                {
-                  "slug": "reggio-calabria-actividades",
-                  "title": "Actividades",
-                  "file": "italia/calabria/reggio-calabria/actividades.md"
-                },
-                {
-                  "slug": "reggio-calabria-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/calabria/reggio-calabria/alojamiento.md"
-                },
-                {
-                  "slug": "reggio-calabria-transporte",
-                  "title": "Transporte",
-                  "file": "italia/calabria/reggio-calabria/transporte.md"
-                },
-                {
-                  "slug": "reggio-calabria-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/calabria/reggio-calabria/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "reggio-calabria-bova",
-                  "title": "Day Trip: Bova y el área grecanica",
-                  "file": "italia/calabria/reggio-calabria/day-trips/bova.md"
-                },
-                {
-                  "slug": "reggio-calabria-gerace",
-                  "title": "Day Trip: Gerace y la costa jónica",
-                  "file": "italia/calabria/reggio-calabria/day-trips/gerace.md"
-                },
-                {
-                  "slug": "reggio-calabria-aspromonte",
-                  "title": "Day Trip: Parco Nazionale dell'Aspromonte",
-                  "file": "italia/calabria/reggio-calabria/day-trips/aspromonte.md"
-                }
-              ]
-            },
-            {
-              "slug": "scilla",
-              "title": "Scilla",
-              "docs": [
-                {
-                  "slug": "scilla-actividades",
-                  "title": "Actividades",
-                  "file": "italia/calabria/scilla/actividades.md"
-                },
-                {
-                  "slug": "scilla-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/calabria/scilla/alojamiento.md"
-                },
-                {
-                  "slug": "scilla-transporte",
-                  "title": "Transporte",
-                  "file": "italia/calabria/scilla/transporte.md"
-                },
-                {
-                  "slug": "scilla-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/calabria/scilla/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": []
-            },
-            {
-              "slug": "tropea",
-              "title": "Tropea",
-              "docs": [
-                {
-                  "slug": "tropea-actividades",
-                  "title": "Actividades",
-                  "file": "italia/calabria/tropea/actividades.md"
-                },
-                {
-                  "slug": "tropea-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/calabria/tropea/alojamiento.md"
-                },
-                {
-                  "slug": "tropea-transporte",
-                  "title": "Transporte",
-                  "file": "italia/calabria/tropea/transporte.md"
-                },
-                {
-                  "slug": "tropea-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/calabria/tropea/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "tropea-capo-vaticano",
-                  "title": "Day Trip: Capo Vaticano",
-                  "file": "italia/calabria/tropea/day-trips/capo-vaticano.md"
-                },
-                {
-                  "slug": "tropea-isole-eolie",
-                  "title": "Day Trip: Islas Eolias (desde Tropea)",
-                  "file": "italia/calabria/tropea/day-trips/isole-eolie.md"
-                },
-                {
-                  "slug": "tropea-pizzo",
-                  "title": "Day Trip: Pizzo Calabro",
-                  "file": "italia/calabria/tropea/day-trips/pizzo.md"
-                },
-                {
-                  "slug": "tropea-serra-san-bruno",
-                  "title": "Day Trip: Serra San Bruno y las Serre",
-                  "file": "italia/calabria/tropea/day-trips/serra-san-bruno.md"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "costa-amalfitana",
-          "title": "Costa Amalfitana",
-          "country": "Italia",
-          "countryFlag": "🇮🇹",
-          "docs": [
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "italia/costa-amalfitana/gastronomia.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "italia/costa-amalfitana/transporte.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "italia/costa-amalfitana/contexto-historico.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [
-            {
-              "slug": "amalfi",
-              "title": "Amalfi",
-              "docs": [
-                {
-                  "slug": "amalfi-actividades",
-                  "title": "Actividades",
-                  "file": "italia/costa-amalfitana/amalfi/actividades.md"
-                },
-                {
-                  "slug": "amalfi-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/costa-amalfitana/amalfi/alojamiento.md"
-                },
-                {
-                  "slug": "amalfi-transporte",
-                  "title": "Transporte",
-                  "file": "italia/costa-amalfitana/amalfi/transporte.md"
-                },
-                {
-                  "slug": "amalfi-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/costa-amalfitana/amalfi/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "amalfi-atrani",
-                  "title": "Day Trip: Atrani",
-                  "file": "italia/costa-amalfitana/amalfi/day-trips/atrani.md"
-                },
-                {
-                  "slug": "amalfi-furore-praiano",
-                  "title": "Day Trip: Furore y Praiano",
-                  "file": "italia/costa-amalfitana/amalfi/day-trips/furore-praiano.md"
-                },
-                {
-                  "slug": "amalfi-positano",
-                  "title": "Day Trip: Positano",
-                  "file": "italia/costa-amalfitana/amalfi/day-trips/positano.md"
-                },
-                {
-                  "slug": "amalfi-ravello",
-                  "title": "Day Trip: Ravello",
-                  "file": "italia/costa-amalfitana/amalfi/day-trips/ravello.md"
-                },
-                {
-                  "slug": "amalfi-valle-delle-ferriere",
-                  "title": "Day Trip: Valle delle Ferriere",
-                  "file": "italia/costa-amalfitana/amalfi/day-trips/valle-delle-ferriere.md"
-                }
-              ]
-            },
-            {
-              "slug": "sorrento",
-              "title": "Sorrento",
-              "docs": [
-                {
-                  "slug": "sorrento-actividades",
-                  "title": "Actividades",
-                  "file": "italia/costa-amalfitana/sorrento/actividades.md"
-                },
-                {
-                  "slug": "sorrento-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/costa-amalfitana/sorrento/alojamiento.md"
-                },
-                {
-                  "slug": "sorrento-transporte",
-                  "title": "Transporte",
-                  "file": "italia/costa-amalfitana/sorrento/transporte.md"
-                },
-                {
-                  "slug": "sorrento-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/costa-amalfitana/sorrento/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "sorrento-capri",
-                  "title": "Day Trip: Capri",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/capri.md"
-                },
-                {
-                  "slug": "sorrento-herculano",
-                  "title": "Day Trip: Herculano (Ercolano Scavi)",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/herculano.md"
-                },
-                {
-                  "slug": "sorrento-pompeya",
-                  "title": "Day Trip: Pompeya (Pompei Scavi)",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/pompeya.md"
-                },
-                {
-                  "slug": "sorrento-procida",
-                  "title": "Day Trip: Procida",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/procida.md"
-                },
-                {
-                  "slug": "sorrento-sentiero-degli-dei",
-                  "title": "Day Trip: Sentiero degli Dei (Camino de los Dioses)",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/sentiero-degli-dei.md"
-                },
-                {
-                  "slug": "sorrento-vesubio",
-                  "title": "Day Trip: Vesubio (Gran Cono)",
-                  "file": "italia/costa-amalfitana/sorrento/day-trips/vesubio.md"
-                }
-              ]
-            }
-          ]
-        },
         {
           "slug": "florencia",
           "title": "Florencia",
@@ -1724,42 +1468,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
-        },
-        {
-          "slug": "itinerarios",
-          "title": "Itinerarios",
-          "country": "Italia",
-          "countryFlag": "🇮🇹",
-          "docs": [
-            {
-              "slug": "a-full-puglia",
-              "title": "Escenario A — Full Puglia + Matera",
-              "file": "italia/itinerarios/a-full-puglia.md"
-            },
-            {
-              "slug": "b-full-sicilia",
-              "title": "Escenario B — Vuelta completa a Sicilia",
-              "file": "italia/itinerarios/b-full-sicilia.md"
-            },
-            {
-              "slug": "c-puglia-y-sicilia-este",
-              "title": "Escenario C — Puglia + Sicilia este",
-              "file": "italia/itinerarios/c-puglia-y-sicilia-este.md"
-            },
-            {
-              "slug": "d-puglia-calabria-sicilia",
-              "title": "Escenario D — Puglia → Calabria → Sicilia (road trip)",
-              "file": "italia/itinerarios/d-puglia-calabria-sicilia.md"
-            },
-            {
-              "slug": "e-sicilia-este-lento",
-              "title": "Escenario E — Sicilia este, ritmo lento",
-              "file": "italia/itinerarios/e-sicilia-este-lento.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "napoles",
@@ -1804,230 +1514,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
-        },
-        {
-          "slug": "puglia",
-          "title": "Puglia",
-          "country": "Italia",
-          "countryFlag": "🇮🇹",
-          "docs": [
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "italia/puglia/gastronomia.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "italia/puglia/transporte.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "italia/puglia/contexto-historico.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [
-            {
-              "slug": "bari",
-              "title": "Bari",
-              "docs": [
-                {
-                  "slug": "bari-actividades",
-                  "title": "Actividades",
-                  "file": "italia/puglia/bari/actividades.md"
-                },
-                {
-                  "slug": "bari-nightlife",
-                  "title": "Nightlife",
-                  "file": "italia/puglia/bari/nightlife.md"
-                },
-                {
-                  "slug": "bari-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/puglia/bari/alojamiento.md"
-                },
-                {
-                  "slug": "bari-transporte",
-                  "title": "Transporte",
-                  "file": "italia/puglia/bari/transporte.md"
-                },
-                {
-                  "slug": "bari-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/puglia/bari/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "bari-castel-del-monte",
-                  "title": "Day Trip: Castel del Monte",
-                  "file": "italia/puglia/bari/day-trips/castel-del-monte.md"
-                },
-                {
-                  "slug": "bari-monopoli",
-                  "title": "Day Trip: Monopoli",
-                  "file": "italia/puglia/bari/day-trips/monopoli.md"
-                },
-                {
-                  "slug": "bari-polignano-a-mare",
-                  "title": "Day Trip: Polignano a Mare",
-                  "file": "italia/puglia/bari/day-trips/polignano-a-mare.md"
-                },
-                {
-                  "slug": "bari-trani",
-                  "title": "Day Trip: Trani",
-                  "file": "italia/puglia/bari/day-trips/trani.md"
-                }
-              ]
-            },
-            {
-              "slug": "lecce",
-              "title": "Lecce",
-              "docs": [
-                {
-                  "slug": "lecce-actividades",
-                  "title": "Actividades",
-                  "file": "italia/puglia/lecce/actividades.md"
-                },
-                {
-                  "slug": "lecce-nightlife",
-                  "title": "Nightlife",
-                  "file": "italia/puglia/lecce/nightlife.md"
-                },
-                {
-                  "slug": "lecce-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/puglia/lecce/alojamiento.md"
-                },
-                {
-                  "slug": "lecce-transporte",
-                  "title": "Transporte",
-                  "file": "italia/puglia/lecce/transporte.md"
-                },
-                {
-                  "slug": "lecce-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/puglia/lecce/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "lecce-costa-salento",
-                  "title": "Day Trip: Costa del Salento (norte y Jónico)",
-                  "file": "italia/puglia/lecce/day-trips/costa-salento.md"
-                },
-                {
-                  "slug": "lecce-gallipoli",
-                  "title": "Day Trip: Gallipoli",
-                  "file": "italia/puglia/lecce/day-trips/gallipoli.md"
-                },
-                {
-                  "slug": "lecce-otranto",
-                  "title": "Day Trip: Otranto",
-                  "file": "italia/puglia/lecce/day-trips/otranto.md"
-                },
-                {
-                  "slug": "lecce-santa-maria-di-leuca",
-                  "title": "Day Trip: Santa Maria di Leuca (el fin del tacón)",
-                  "file": "italia/puglia/lecce/day-trips/santa-maria-di-leuca.md"
-                }
-              ]
-            },
-            {
-              "slug": "matera",
-              "title": "Matera",
-              "docs": [
-                {
-                  "slug": "matera-actividades",
-                  "title": "Actividades",
-                  "file": "italia/puglia/matera/actividades.md"
-                },
-                {
-                  "slug": "matera-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/puglia/matera/alojamiento.md"
-                },
-                {
-                  "slug": "matera-transporte",
-                  "title": "Transporte",
-                  "file": "italia/puglia/matera/transporte.md"
-                },
-                {
-                  "slug": "matera-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/puglia/matera/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "matera-altamura",
-                  "title": "Day Trip: Altamura",
-                  "file": "italia/puglia/matera/day-trips/altamura.md"
-                },
-                {
-                  "slug": "matera-craco",
-                  "title": "Day Trip: Craco (el pueblo fantasma)",
-                  "file": "italia/puglia/matera/day-trips/craco.md"
-                },
-                {
-                  "slug": "matera-parco-murgia-materana",
-                  "title": "Day Trip: Parco della Murgia Materana",
-                  "file": "italia/puglia/matera/day-trips/parco-murgia-materana.md"
-                }
-              ]
-            },
-            {
-              "slug": "ostuni",
-              "title": "Ostuni",
-              "docs": [
-                {
-                  "slug": "ostuni-actividades",
-                  "title": "Actividades",
-                  "file": "italia/puglia/ostuni/actividades.md"
-                },
-                {
-                  "slug": "ostuni-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/puglia/ostuni/alojamiento.md"
-                },
-                {
-                  "slug": "ostuni-transporte",
-                  "title": "Transporte",
-                  "file": "italia/puglia/ostuni/transporte.md"
-                },
-                {
-                  "slug": "ostuni-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/puglia/ostuni/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "ostuni-alberobello",
-                  "title": "Day Trip: Alberobello",
-                  "file": "italia/puglia/ostuni/day-trips/alberobello.md"
-                },
-                {
-                  "slug": "ostuni-cisternino",
-                  "title": "Day Trip: Cisternino",
-                  "file": "italia/puglia/ostuni/day-trips/cisternino.md"
-                },
-                {
-                  "slug": "ostuni-locorotondo",
-                  "title": "Day Trip: Locorotondo",
-                  "file": "italia/puglia/ostuni/day-trips/locorotondo.md"
-                },
-                {
-                  "slug": "ostuni-martina-franca",
-                  "title": "Day Trip: Martina Franca",
-                  "file": "italia/puglia/ostuni/day-trips/martina-franca.md"
-                }
-              ]
-            }
-          ]
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "roma",
@@ -2093,316 +1581,8 @@
               "file": "italia/roma/day-trips/tivoli.md"
             }
           ],
-          "cities": []
-        },
-        {
-          "slug": "sicilia",
-          "title": "Sicilia",
-          "country": "Italia",
-          "countryFlag": "🇮🇹",
-          "docs": [
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "italia/sicilia/gastronomia.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "italia/sicilia/transporte.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "italia/sicilia/contexto-historico.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [
-            {
-              "slug": "agrigento",
-              "title": "Agrigento",
-              "docs": [
-                {
-                  "slug": "agrigento-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/agrigento/actividades.md"
-                },
-                {
-                  "slug": "agrigento-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/agrigento/alojamiento.md"
-                },
-                {
-                  "slug": "agrigento-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/agrigento/transporte.md"
-                },
-                {
-                  "slug": "agrigento-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/agrigento/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "agrigento-piazza-armerina",
-                  "title": "Day Trip: Piazza Armerina — Villa Romana del Casale",
-                  "file": "italia/sicilia/agrigento/day-trips/piazza-armerina.md"
-                },
-                {
-                  "slug": "agrigento-scala-dei-turchi",
-                  "title": "Day Trip: Scala dei Turchi (y la costa blanca)",
-                  "file": "italia/sicilia/agrigento/day-trips/scala-dei-turchi.md"
-                }
-              ]
-            },
-            {
-              "slug": "catania",
-              "title": "Catania",
-              "docs": [
-                {
-                  "slug": "catania-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/catania/actividades.md"
-                },
-                {
-                  "slug": "catania-nightlife",
-                  "title": "Nightlife",
-                  "file": "italia/sicilia/catania/nightlife.md"
-                },
-                {
-                  "slug": "catania-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/catania/alojamiento.md"
-                },
-                {
-                  "slug": "catania-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/catania/transporte.md"
-                },
-                {
-                  "slug": "catania-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/catania/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "catania-acireale-riviera-dei-ciclopi",
-                  "title": "Day Trip: Acireale y la Riviera dei Ciclopi",
-                  "file": "italia/sicilia/catania/day-trips/acireale-riviera-dei-ciclopi.md"
-                },
-                {
-                  "slug": "catania-bronte",
-                  "title": "Day Trip: Bronte (y el oeste del Etna)",
-                  "file": "italia/sicilia/catania/day-trips/bronte.md"
-                },
-                {
-                  "slug": "catania-etna",
-                  "title": "Day Trip: Monte Etna",
-                  "file": "italia/sicilia/catania/day-trips/etna.md"
-                },
-                {
-                  "slug": "catania-taormina",
-                  "title": "Day Trip: Taormina",
-                  "file": "italia/sicilia/catania/day-trips/taormina.md"
-                }
-              ]
-            },
-            {
-              "slug": "noto",
-              "title": "Noto",
-              "docs": [
-                {
-                  "slug": "noto-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/noto/actividades.md"
-                },
-                {
-                  "slug": "noto-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/noto/alojamiento.md"
-                },
-                {
-                  "slug": "noto-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/noto/transporte.md"
-                },
-                {
-                  "slug": "noto-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/noto/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "noto-avola",
-                  "title": "Day Trip: Avola",
-                  "file": "italia/sicilia/noto/day-trips/avola.md"
-                },
-                {
-                  "slug": "noto-modica",
-                  "title": "Day Trip: Modica (desde Noto)",
-                  "file": "italia/sicilia/noto/day-trips/modica.md"
-                },
-                {
-                  "slug": "noto-scicli",
-                  "title": "Day Trip: Scicli (desde Noto)",
-                  "file": "italia/sicilia/noto/day-trips/scicli.md"
-                }
-              ]
-            },
-            {
-              "slug": "palermo",
-              "title": "Palermo",
-              "docs": [
-                {
-                  "slug": "palermo-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/palermo/actividades.md"
-                },
-                {
-                  "slug": "palermo-nightlife",
-                  "title": "Nightlife",
-                  "file": "italia/sicilia/palermo/nightlife.md"
-                },
-                {
-                  "slug": "palermo-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/palermo/alojamiento.md"
-                },
-                {
-                  "slug": "palermo-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/palermo/transporte.md"
-                },
-                {
-                  "slug": "palermo-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/palermo/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "palermo-cefalu",
-                  "title": "Day Trip: Cefalù",
-                  "file": "italia/sicilia/palermo/day-trips/cefalu.md"
-                },
-                {
-                  "slug": "palermo-monreale",
-                  "title": "Day Trip: Monreale",
-                  "file": "italia/sicilia/palermo/day-trips/monreale.md"
-                },
-                {
-                  "slug": "palermo-zingaro",
-                  "title": "Day Trip: Riserva dello Zingaro",
-                  "file": "italia/sicilia/palermo/day-trips/zingaro.md"
-                },
-                {
-                  "slug": "palermo-segesta-erice",
-                  "title": "Day Trip: Segesta + Erice",
-                  "file": "italia/sicilia/palermo/day-trips/segesta-erice.md"
-                },
-                {
-                  "slug": "palermo-trapani-marsala",
-                  "title": "Day Trip: Trapani y Marsala",
-                  "file": "italia/sicilia/palermo/day-trips/trapani-marsala.md"
-                }
-              ]
-            },
-            {
-              "slug": "ragusa",
-              "title": "Ragusa",
-              "docs": [
-                {
-                  "slug": "ragusa-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/ragusa/actividades.md"
-                },
-                {
-                  "slug": "ragusa-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/ragusa/alojamiento.md"
-                },
-                {
-                  "slug": "ragusa-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/ragusa/transporte.md"
-                },
-                {
-                  "slug": "ragusa-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/ragusa/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "ragusa-caltagirone",
-                  "title": "Day Trip: Caltagirone",
-                  "file": "italia/sicilia/ragusa/day-trips/caltagirone.md"
-                },
-                {
-                  "slug": "ragusa-modica",
-                  "title": "Day Trip: Modica",
-                  "file": "italia/sicilia/ragusa/day-trips/modica.md"
-                },
-                {
-                  "slug": "ragusa-scicli",
-                  "title": "Day Trip: Scicli",
-                  "file": "italia/sicilia/ragusa/day-trips/scicli.md"
-                }
-              ]
-            },
-            {
-              "slug": "siracusa",
-              "title": "Siracusa",
-              "docs": [
-                {
-                  "slug": "siracusa-actividades",
-                  "title": "Actividades",
-                  "file": "italia/sicilia/siracusa/actividades.md"
-                },
-                {
-                  "slug": "siracusa-nightlife",
-                  "title": "Nightlife",
-                  "file": "italia/sicilia/siracusa/nightlife.md"
-                },
-                {
-                  "slug": "siracusa-alojamiento",
-                  "title": "Alojamiento",
-                  "file": "italia/sicilia/siracusa/alojamiento.md"
-                },
-                {
-                  "slug": "siracusa-transporte",
-                  "title": "Transporte",
-                  "file": "italia/sicilia/siracusa/transporte.md"
-                },
-                {
-                  "slug": "siracusa-desvios-cercanos",
-                  "title": "Desvíos cercanos",
-                  "file": "italia/sicilia/siracusa/desvios-cercanos.md"
-                }
-              ],
-              "dayTrips": [
-                {
-                  "slug": "siracusa-marzamemi",
-                  "title": "Day Trip: Marzamemi",
-                  "file": "italia/sicilia/siracusa/day-trips/marzamemi.md"
-                },
-                {
-                  "slug": "siracusa-palazzolo-acreide",
-                  "title": "Day Trip: Palazzolo Acreide",
-                  "file": "italia/sicilia/siracusa/day-trips/palazzolo-acreide.md"
-                },
-                {
-                  "slug": "siracusa-vendicari",
-                  "title": "Day Trip: Riserva Naturale di Vendicari",
-                  "file": "italia/sicilia/siracusa/day-trips/vendicari.md"
-                }
-              ]
-            }
-          ]
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "sur-de-italia",
@@ -2422,7 +1602,867 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": [
+            {
+              "slug": "calabria",
+              "title": "Calabria",
+              "country": "Italia",
+              "countryFlag": "🇮🇹",
+              "docs": [
+                {
+                  "slug": "gastronomia",
+                  "title": "Gastronomía",
+                  "file": "italia/calabria/gastronomia.md"
+                },
+                {
+                  "slug": "transporte",
+                  "title": "Transporte",
+                  "file": "italia/calabria/transporte.md"
+                },
+                {
+                  "slug": "contexto-historico",
+                  "title": "Contexto histórico",
+                  "file": "italia/calabria/contexto-historico.md"
+                }
+              ],
+              "dayTrips": [],
+              "cities": [
+                {
+                  "slug": "reggio-calabria",
+                  "title": "Reggio Calabria",
+                  "docs": [
+                    {
+                      "slug": "reggio-calabria-actividades",
+                      "title": "Actividades",
+                      "file": "italia/calabria/reggio-calabria/actividades.md"
+                    },
+                    {
+                      "slug": "reggio-calabria-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/calabria/reggio-calabria/alojamiento.md"
+                    },
+                    {
+                      "slug": "reggio-calabria-transporte",
+                      "title": "Transporte",
+                      "file": "italia/calabria/reggio-calabria/transporte.md"
+                    },
+                    {
+                      "slug": "reggio-calabria-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/calabria/reggio-calabria/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "reggio-calabria-bova",
+                      "title": "Day Trip: Bova y el área grecanica",
+                      "file": "italia/calabria/reggio-calabria/day-trips/bova.md"
+                    },
+                    {
+                      "slug": "reggio-calabria-gerace",
+                      "title": "Day Trip: Gerace y la costa jónica",
+                      "file": "italia/calabria/reggio-calabria/day-trips/gerace.md"
+                    },
+                    {
+                      "slug": "reggio-calabria-aspromonte",
+                      "title": "Day Trip: Parco Nazionale dell'Aspromonte",
+                      "file": "italia/calabria/reggio-calabria/day-trips/aspromonte.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "scilla",
+                  "title": "Scilla",
+                  "docs": [
+                    {
+                      "slug": "scilla-actividades",
+                      "title": "Actividades",
+                      "file": "italia/calabria/scilla/actividades.md"
+                    },
+                    {
+                      "slug": "scilla-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/calabria/scilla/alojamiento.md"
+                    },
+                    {
+                      "slug": "scilla-transporte",
+                      "title": "Transporte",
+                      "file": "italia/calabria/scilla/transporte.md"
+                    },
+                    {
+                      "slug": "scilla-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/calabria/scilla/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": []
+                },
+                {
+                  "slug": "tropea",
+                  "title": "Tropea",
+                  "docs": [
+                    {
+                      "slug": "tropea-actividades",
+                      "title": "Actividades",
+                      "file": "italia/calabria/tropea/actividades.md"
+                    },
+                    {
+                      "slug": "tropea-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/calabria/tropea/alojamiento.md"
+                    },
+                    {
+                      "slug": "tropea-transporte",
+                      "title": "Transporte",
+                      "file": "italia/calabria/tropea/transporte.md"
+                    },
+                    {
+                      "slug": "tropea-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/calabria/tropea/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "tropea-capo-vaticano",
+                      "title": "Day Trip: Capo Vaticano",
+                      "file": "italia/calabria/tropea/day-trips/capo-vaticano.md"
+                    },
+                    {
+                      "slug": "tropea-isole-eolie",
+                      "title": "Day Trip: Islas Eolias (desde Tropea)",
+                      "file": "italia/calabria/tropea/day-trips/isole-eolie.md"
+                    },
+                    {
+                      "slug": "tropea-pizzo",
+                      "title": "Day Trip: Pizzo Calabro",
+                      "file": "italia/calabria/tropea/day-trips/pizzo.md"
+                    },
+                    {
+                      "slug": "tropea-serra-san-bruno",
+                      "title": "Day Trip: Serra San Bruno y las Serre",
+                      "file": "italia/calabria/tropea/day-trips/serra-san-bruno.md"
+                    }
+                  ]
+                }
+              ],
+              "guides": [],
+              "parentSlug": "sur-de-italia"
+            },
+            {
+              "slug": "costa-amalfitana",
+              "title": "Costa Amalfitana",
+              "country": "Italia",
+              "countryFlag": "🇮🇹",
+              "docs": [
+                {
+                  "slug": "gastronomia",
+                  "title": "Gastronomía",
+                  "file": "italia/costa-amalfitana/gastronomia.md"
+                },
+                {
+                  "slug": "transporte",
+                  "title": "Transporte",
+                  "file": "italia/costa-amalfitana/transporte.md"
+                },
+                {
+                  "slug": "contexto-historico",
+                  "title": "Contexto histórico",
+                  "file": "italia/costa-amalfitana/contexto-historico.md"
+                }
+              ],
+              "dayTrips": [],
+              "cities": [
+                {
+                  "slug": "amalfi",
+                  "title": "Amalfi",
+                  "docs": [
+                    {
+                      "slug": "amalfi-actividades",
+                      "title": "Actividades",
+                      "file": "italia/costa-amalfitana/amalfi/actividades.md"
+                    },
+                    {
+                      "slug": "amalfi-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/costa-amalfitana/amalfi/alojamiento.md"
+                    },
+                    {
+                      "slug": "amalfi-transporte",
+                      "title": "Transporte",
+                      "file": "italia/costa-amalfitana/amalfi/transporte.md"
+                    },
+                    {
+                      "slug": "amalfi-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/costa-amalfitana/amalfi/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "amalfi-atrani",
+                      "title": "Day Trip: Atrani",
+                      "file": "italia/costa-amalfitana/amalfi/day-trips/atrani.md"
+                    },
+                    {
+                      "slug": "amalfi-furore-praiano",
+                      "title": "Day Trip: Furore y Praiano",
+                      "file": "italia/costa-amalfitana/amalfi/day-trips/furore-praiano.md"
+                    },
+                    {
+                      "slug": "amalfi-positano",
+                      "title": "Day Trip: Positano",
+                      "file": "italia/costa-amalfitana/amalfi/day-trips/positano.md"
+                    },
+                    {
+                      "slug": "amalfi-ravello",
+                      "title": "Day Trip: Ravello",
+                      "file": "italia/costa-amalfitana/amalfi/day-trips/ravello.md"
+                    },
+                    {
+                      "slug": "amalfi-valle-delle-ferriere",
+                      "title": "Day Trip: Valle delle Ferriere",
+                      "file": "italia/costa-amalfitana/amalfi/day-trips/valle-delle-ferriere.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "sorrento",
+                  "title": "Sorrento",
+                  "docs": [
+                    {
+                      "slug": "sorrento-actividades",
+                      "title": "Actividades",
+                      "file": "italia/costa-amalfitana/sorrento/actividades.md"
+                    },
+                    {
+                      "slug": "sorrento-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/costa-amalfitana/sorrento/alojamiento.md"
+                    },
+                    {
+                      "slug": "sorrento-transporte",
+                      "title": "Transporte",
+                      "file": "italia/costa-amalfitana/sorrento/transporte.md"
+                    },
+                    {
+                      "slug": "sorrento-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/costa-amalfitana/sorrento/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "sorrento-capri",
+                      "title": "Day Trip: Capri",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/capri.md"
+                    },
+                    {
+                      "slug": "sorrento-herculano",
+                      "title": "Day Trip: Herculano (Ercolano Scavi)",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/herculano.md"
+                    },
+                    {
+                      "slug": "sorrento-pompeya",
+                      "title": "Day Trip: Pompeya (Pompei Scavi)",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/pompeya.md"
+                    },
+                    {
+                      "slug": "sorrento-procida",
+                      "title": "Day Trip: Procida",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/procida.md"
+                    },
+                    {
+                      "slug": "sorrento-sentiero-degli-dei",
+                      "title": "Day Trip: Sentiero degli Dei (Camino de los Dioses)",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/sentiero-degli-dei.md"
+                    },
+                    {
+                      "slug": "sorrento-vesubio",
+                      "title": "Day Trip: Vesubio (Gran Cono)",
+                      "file": "italia/costa-amalfitana/sorrento/day-trips/vesubio.md"
+                    }
+                  ]
+                }
+              ],
+              "guides": [],
+              "parentSlug": "sur-de-italia"
+            },
+            {
+              "slug": "itinerarios",
+              "title": "Itinerarios",
+              "country": "Italia",
+              "countryFlag": "🇮🇹",
+              "docs": [
+                {
+                  "slug": "a-full-puglia",
+                  "title": "Escenario A — Full Puglia + Matera",
+                  "file": "italia/itinerarios/a-full-puglia.md"
+                },
+                {
+                  "slug": "b-full-sicilia",
+                  "title": "Escenario B — Vuelta completa a Sicilia",
+                  "file": "italia/itinerarios/b-full-sicilia.md"
+                },
+                {
+                  "slug": "c-puglia-y-sicilia-este",
+                  "title": "Escenario C — Puglia + Sicilia este",
+                  "file": "italia/itinerarios/c-puglia-y-sicilia-este.md"
+                },
+                {
+                  "slug": "d-puglia-calabria-sicilia",
+                  "title": "Escenario D — Puglia → Calabria → Sicilia (road trip)",
+                  "file": "italia/itinerarios/d-puglia-calabria-sicilia.md"
+                },
+                {
+                  "slug": "e-sicilia-este-lento",
+                  "title": "Escenario E — Sicilia este, ritmo lento",
+                  "file": "italia/itinerarios/e-sicilia-este-lento.md"
+                }
+              ],
+              "dayTrips": [],
+              "cities": [],
+              "guides": [],
+              "parentSlug": "sur-de-italia"
+            },
+            {
+              "slug": "puglia",
+              "title": "Puglia",
+              "country": "Italia",
+              "countryFlag": "🇮🇹",
+              "docs": [
+                {
+                  "slug": "gastronomia",
+                  "title": "Gastronomía",
+                  "file": "italia/puglia/gastronomia.md"
+                },
+                {
+                  "slug": "transporte",
+                  "title": "Transporte",
+                  "file": "italia/puglia/transporte.md"
+                },
+                {
+                  "slug": "contexto-historico",
+                  "title": "Contexto histórico",
+                  "file": "italia/puglia/contexto-historico.md"
+                }
+              ],
+              "dayTrips": [],
+              "cities": [
+                {
+                  "slug": "bari",
+                  "title": "Bari",
+                  "docs": [
+                    {
+                      "slug": "bari-actividades",
+                      "title": "Actividades",
+                      "file": "italia/puglia/bari/actividades.md"
+                    },
+                    {
+                      "slug": "bari-nightlife",
+                      "title": "Nightlife",
+                      "file": "italia/puglia/bari/nightlife.md"
+                    },
+                    {
+                      "slug": "bari-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/puglia/bari/alojamiento.md"
+                    },
+                    {
+                      "slug": "bari-transporte",
+                      "title": "Transporte",
+                      "file": "italia/puglia/bari/transporte.md"
+                    },
+                    {
+                      "slug": "bari-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/puglia/bari/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "bari-castel-del-monte",
+                      "title": "Day Trip: Castel del Monte",
+                      "file": "italia/puglia/bari/day-trips/castel-del-monte.md"
+                    },
+                    {
+                      "slug": "bari-monopoli",
+                      "title": "Day Trip: Monopoli",
+                      "file": "italia/puglia/bari/day-trips/monopoli.md"
+                    },
+                    {
+                      "slug": "bari-polignano-a-mare",
+                      "title": "Day Trip: Polignano a Mare",
+                      "file": "italia/puglia/bari/day-trips/polignano-a-mare.md"
+                    },
+                    {
+                      "slug": "bari-trani",
+                      "title": "Day Trip: Trani",
+                      "file": "italia/puglia/bari/day-trips/trani.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "lecce",
+                  "title": "Lecce",
+                  "docs": [
+                    {
+                      "slug": "lecce-actividades",
+                      "title": "Actividades",
+                      "file": "italia/puglia/lecce/actividades.md"
+                    },
+                    {
+                      "slug": "lecce-nightlife",
+                      "title": "Nightlife",
+                      "file": "italia/puglia/lecce/nightlife.md"
+                    },
+                    {
+                      "slug": "lecce-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/puglia/lecce/alojamiento.md"
+                    },
+                    {
+                      "slug": "lecce-transporte",
+                      "title": "Transporte",
+                      "file": "italia/puglia/lecce/transporte.md"
+                    },
+                    {
+                      "slug": "lecce-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/puglia/lecce/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "lecce-costa-salento",
+                      "title": "Day Trip: Costa del Salento (norte y Jónico)",
+                      "file": "italia/puglia/lecce/day-trips/costa-salento.md"
+                    },
+                    {
+                      "slug": "lecce-gallipoli",
+                      "title": "Day Trip: Gallipoli",
+                      "file": "italia/puglia/lecce/day-trips/gallipoli.md"
+                    },
+                    {
+                      "slug": "lecce-otranto",
+                      "title": "Day Trip: Otranto",
+                      "file": "italia/puglia/lecce/day-trips/otranto.md"
+                    },
+                    {
+                      "slug": "lecce-santa-maria-di-leuca",
+                      "title": "Day Trip: Santa Maria di Leuca (el fin del tacón)",
+                      "file": "italia/puglia/lecce/day-trips/santa-maria-di-leuca.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "matera",
+                  "title": "Matera",
+                  "docs": [
+                    {
+                      "slug": "matera-actividades",
+                      "title": "Actividades",
+                      "file": "italia/puglia/matera/actividades.md"
+                    },
+                    {
+                      "slug": "matera-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/puglia/matera/alojamiento.md"
+                    },
+                    {
+                      "slug": "matera-transporte",
+                      "title": "Transporte",
+                      "file": "italia/puglia/matera/transporte.md"
+                    },
+                    {
+                      "slug": "matera-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/puglia/matera/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "matera-altamura",
+                      "title": "Day Trip: Altamura",
+                      "file": "italia/puglia/matera/day-trips/altamura.md"
+                    },
+                    {
+                      "slug": "matera-craco",
+                      "title": "Day Trip: Craco (el pueblo fantasma)",
+                      "file": "italia/puglia/matera/day-trips/craco.md"
+                    },
+                    {
+                      "slug": "matera-parco-murgia-materana",
+                      "title": "Day Trip: Parco della Murgia Materana",
+                      "file": "italia/puglia/matera/day-trips/parco-murgia-materana.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "ostuni",
+                  "title": "Ostuni",
+                  "docs": [
+                    {
+                      "slug": "ostuni-actividades",
+                      "title": "Actividades",
+                      "file": "italia/puglia/ostuni/actividades.md"
+                    },
+                    {
+                      "slug": "ostuni-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/puglia/ostuni/alojamiento.md"
+                    },
+                    {
+                      "slug": "ostuni-transporte",
+                      "title": "Transporte",
+                      "file": "italia/puglia/ostuni/transporte.md"
+                    },
+                    {
+                      "slug": "ostuni-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/puglia/ostuni/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "ostuni-alberobello",
+                      "title": "Day Trip: Alberobello",
+                      "file": "italia/puglia/ostuni/day-trips/alberobello.md"
+                    },
+                    {
+                      "slug": "ostuni-cisternino",
+                      "title": "Day Trip: Cisternino",
+                      "file": "italia/puglia/ostuni/day-trips/cisternino.md"
+                    },
+                    {
+                      "slug": "ostuni-locorotondo",
+                      "title": "Day Trip: Locorotondo",
+                      "file": "italia/puglia/ostuni/day-trips/locorotondo.md"
+                    },
+                    {
+                      "slug": "ostuni-martina-franca",
+                      "title": "Day Trip: Martina Franca",
+                      "file": "italia/puglia/ostuni/day-trips/martina-franca.md"
+                    }
+                  ]
+                }
+              ],
+              "guides": [],
+              "parentSlug": "sur-de-italia"
+            },
+            {
+              "slug": "sicilia",
+              "title": "Sicilia",
+              "country": "Italia",
+              "countryFlag": "🇮🇹",
+              "docs": [
+                {
+                  "slug": "gastronomia",
+                  "title": "Gastronomía",
+                  "file": "italia/sicilia/gastronomia.md"
+                },
+                {
+                  "slug": "transporte",
+                  "title": "Transporte",
+                  "file": "italia/sicilia/transporte.md"
+                },
+                {
+                  "slug": "contexto-historico",
+                  "title": "Contexto histórico",
+                  "file": "italia/sicilia/contexto-historico.md"
+                }
+              ],
+              "dayTrips": [],
+              "cities": [
+                {
+                  "slug": "agrigento",
+                  "title": "Agrigento",
+                  "docs": [
+                    {
+                      "slug": "agrigento-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/agrigento/actividades.md"
+                    },
+                    {
+                      "slug": "agrigento-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/agrigento/alojamiento.md"
+                    },
+                    {
+                      "slug": "agrigento-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/agrigento/transporte.md"
+                    },
+                    {
+                      "slug": "agrigento-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/agrigento/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "agrigento-piazza-armerina",
+                      "title": "Day Trip: Piazza Armerina — Villa Romana del Casale",
+                      "file": "italia/sicilia/agrigento/day-trips/piazza-armerina.md"
+                    },
+                    {
+                      "slug": "agrigento-scala-dei-turchi",
+                      "title": "Day Trip: Scala dei Turchi (y la costa blanca)",
+                      "file": "italia/sicilia/agrigento/day-trips/scala-dei-turchi.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "catania",
+                  "title": "Catania",
+                  "docs": [
+                    {
+                      "slug": "catania-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/catania/actividades.md"
+                    },
+                    {
+                      "slug": "catania-nightlife",
+                      "title": "Nightlife",
+                      "file": "italia/sicilia/catania/nightlife.md"
+                    },
+                    {
+                      "slug": "catania-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/catania/alojamiento.md"
+                    },
+                    {
+                      "slug": "catania-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/catania/transporte.md"
+                    },
+                    {
+                      "slug": "catania-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/catania/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "catania-acireale-riviera-dei-ciclopi",
+                      "title": "Day Trip: Acireale y la Riviera dei Ciclopi",
+                      "file": "italia/sicilia/catania/day-trips/acireale-riviera-dei-ciclopi.md"
+                    },
+                    {
+                      "slug": "catania-bronte",
+                      "title": "Day Trip: Bronte (y el oeste del Etna)",
+                      "file": "italia/sicilia/catania/day-trips/bronte.md"
+                    },
+                    {
+                      "slug": "catania-etna",
+                      "title": "Day Trip: Monte Etna",
+                      "file": "italia/sicilia/catania/day-trips/etna.md"
+                    },
+                    {
+                      "slug": "catania-taormina",
+                      "title": "Day Trip: Taormina",
+                      "file": "italia/sicilia/catania/day-trips/taormina.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "noto",
+                  "title": "Noto",
+                  "docs": [
+                    {
+                      "slug": "noto-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/noto/actividades.md"
+                    },
+                    {
+                      "slug": "noto-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/noto/alojamiento.md"
+                    },
+                    {
+                      "slug": "noto-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/noto/transporte.md"
+                    },
+                    {
+                      "slug": "noto-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/noto/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "noto-avola",
+                      "title": "Day Trip: Avola",
+                      "file": "italia/sicilia/noto/day-trips/avola.md"
+                    },
+                    {
+                      "slug": "noto-modica",
+                      "title": "Day Trip: Modica (desde Noto)",
+                      "file": "italia/sicilia/noto/day-trips/modica.md"
+                    },
+                    {
+                      "slug": "noto-scicli",
+                      "title": "Day Trip: Scicli (desde Noto)",
+                      "file": "italia/sicilia/noto/day-trips/scicli.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "palermo",
+                  "title": "Palermo",
+                  "docs": [
+                    {
+                      "slug": "palermo-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/palermo/actividades.md"
+                    },
+                    {
+                      "slug": "palermo-nightlife",
+                      "title": "Nightlife",
+                      "file": "italia/sicilia/palermo/nightlife.md"
+                    },
+                    {
+                      "slug": "palermo-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/palermo/alojamiento.md"
+                    },
+                    {
+                      "slug": "palermo-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/palermo/transporte.md"
+                    },
+                    {
+                      "slug": "palermo-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/palermo/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "palermo-cefalu",
+                      "title": "Day Trip: Cefalù",
+                      "file": "italia/sicilia/palermo/day-trips/cefalu.md"
+                    },
+                    {
+                      "slug": "palermo-monreale",
+                      "title": "Day Trip: Monreale",
+                      "file": "italia/sicilia/palermo/day-trips/monreale.md"
+                    },
+                    {
+                      "slug": "palermo-zingaro",
+                      "title": "Day Trip: Riserva dello Zingaro",
+                      "file": "italia/sicilia/palermo/day-trips/zingaro.md"
+                    },
+                    {
+                      "slug": "palermo-segesta-erice",
+                      "title": "Day Trip: Segesta + Erice",
+                      "file": "italia/sicilia/palermo/day-trips/segesta-erice.md"
+                    },
+                    {
+                      "slug": "palermo-trapani-marsala",
+                      "title": "Day Trip: Trapani y Marsala",
+                      "file": "italia/sicilia/palermo/day-trips/trapani-marsala.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "ragusa",
+                  "title": "Ragusa",
+                  "docs": [
+                    {
+                      "slug": "ragusa-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/ragusa/actividades.md"
+                    },
+                    {
+                      "slug": "ragusa-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/ragusa/alojamiento.md"
+                    },
+                    {
+                      "slug": "ragusa-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/ragusa/transporte.md"
+                    },
+                    {
+                      "slug": "ragusa-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/ragusa/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "ragusa-caltagirone",
+                      "title": "Day Trip: Caltagirone",
+                      "file": "italia/sicilia/ragusa/day-trips/caltagirone.md"
+                    },
+                    {
+                      "slug": "ragusa-modica",
+                      "title": "Day Trip: Modica",
+                      "file": "italia/sicilia/ragusa/day-trips/modica.md"
+                    },
+                    {
+                      "slug": "ragusa-scicli",
+                      "title": "Day Trip: Scicli",
+                      "file": "italia/sicilia/ragusa/day-trips/scicli.md"
+                    }
+                  ]
+                },
+                {
+                  "slug": "siracusa",
+                  "title": "Siracusa",
+                  "docs": [
+                    {
+                      "slug": "siracusa-actividades",
+                      "title": "Actividades",
+                      "file": "italia/sicilia/siracusa/actividades.md"
+                    },
+                    {
+                      "slug": "siracusa-nightlife",
+                      "title": "Nightlife",
+                      "file": "italia/sicilia/siracusa/nightlife.md"
+                    },
+                    {
+                      "slug": "siracusa-alojamiento",
+                      "title": "Alojamiento",
+                      "file": "italia/sicilia/siracusa/alojamiento.md"
+                    },
+                    {
+                      "slug": "siracusa-transporte",
+                      "title": "Transporte",
+                      "file": "italia/sicilia/siracusa/transporte.md"
+                    },
+                    {
+                      "slug": "siracusa-desvios-cercanos",
+                      "title": "Desvíos cercanos",
+                      "file": "italia/sicilia/siracusa/desvios-cercanos.md"
+                    }
+                  ],
+                  "dayTrips": [
+                    {
+                      "slug": "siracusa-marzamemi",
+                      "title": "Day Trip: Marzamemi",
+                      "file": "italia/sicilia/siracusa/day-trips/marzamemi.md"
+                    },
+                    {
+                      "slug": "siracusa-palazzolo-acreide",
+                      "title": "Day Trip: Palazzolo Acreide",
+                      "file": "italia/sicilia/siracusa/day-trips/palazzolo-acreide.md"
+                    },
+                    {
+                      "slug": "siracusa-vendicari",
+                      "title": "Day Trip: Riserva Naturale di Vendicari",
+                      "file": "italia/sicilia/siracusa/day-trips/vendicari.md"
+                    }
+                  ]
+                }
+              ],
+              "guides": [],
+              "parentSlug": "sur-de-italia"
+            }
+          ]
         }
       ],
       "countryDocs": [
@@ -2487,7 +2527,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         },
         {
           "slug": "madrid",
@@ -2532,7 +2573,8 @@
             }
           ],
           "dayTrips": [],
-          "cities": []
+          "cities": [],
+          "guides": []
         }
       ],
       "countryDocs": [
