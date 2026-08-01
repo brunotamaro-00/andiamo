@@ -551,25 +551,57 @@ function LinkForm({
   );
 }
 
+/** No progress for this long = the connection died mid-upload. `xhr.onerror`
+ *  does not fire for a socket that stays open and silent, which is exactly what
+ *  hostel wifi does, and the sheet is `locked` while uploading: without this the
+ *  promise never settles and the only way out of the modal is force-quitting
+ *  the PWA. Measured between progress events, not from the start, so a genuinely
+ *  slow 20 MB upload isn't cut off. */
+const UPLOAD_STALL_MS = 30_000;
+
 function uploadWithProgress(
   fd: FormData,
-  onProgress: (pct: number) => void
+  onProgress: (pct: number) => void,
+  registerAbort: (abort: () => void) => void,
 ): Promise<{ ok: boolean; status: number; body: string }> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    let stallTimer: ReturnType<typeof setTimeout>;
+    const armStallTimer = () => {
+      clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => xhr.abort(), UPLOAD_STALL_MS);
+    };
+    const settle = (fn: () => void) => {
+      clearTimeout(stallTimer);
+      fn();
+    };
+
     xhr.open("POST", "/api/documents/upload");
+    registerAbort(() => xhr.abort());
     xhr.upload.onprogress = (e) => {
+      armStallTimer();
       if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
     };
     xhr.onload = () =>
-      resolve({
-        ok: xhr.status >= 200 && xhr.status < 300,
-        status: xhr.status,
-        body: xhr.responseText,
-      });
-    xhr.onerror = () => reject(new Error("Error de red"));
+      settle(() =>
+        resolve({
+          ok: xhr.status >= 200 && xhr.status < 300,
+          status: xhr.status,
+          body: xhr.responseText,
+        }),
+      );
+    xhr.onerror = () => settle(() => reject(new Error("Error de red")));
+    xhr.onabort = () => settle(() => reject(new UploadAbortedError()));
+    armStallTimer();
     xhr.send(fd);
   });
+}
+
+class UploadAbortedError extends Error {
+  constructor() {
+    super("Subida cancelada");
+    this.name = "UploadAbortedError";
+  }
 }
 
 function UploadForm({
@@ -593,6 +625,7 @@ function UploadForm({
   const [docDate, setDocDate] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<(() => void) | null>(null);
 
   function validate(file: File): string | null {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -640,7 +673,9 @@ function UploadForm({
     if (stopId) fd.set("stopId", stopId);
 
     try {
-      const res = await uploadWithProgress(fd, setProgress);
+      const res = await uploadWithProgress(fd, setProgress, (abort) => {
+        abortRef.current = abort;
+      });
       if (!res.ok) {
         let message = "No se pudo subir el archivo.";
         try {
@@ -656,11 +691,27 @@ function UploadForm({
       toast("Documento subido");
       router.refresh();
       onClose();
-    } catch {
+    } catch (e) {
       haptics.error();
-      setError("Error de red. Revisá la conexión e intentá de nuevo.");
+      setError(
+        e instanceof UploadAbortedError
+          ? "Subida cancelada. El archivo no se guardó."
+          : "Error de red. Revisá la conexión e intentá de nuevo.",
+      );
       setUploading(false);
+    } finally {
+      abortRef.current = null;
     }
+  }
+
+  /** Cancel while uploading aborts the request instead of doing nothing — the
+   *  sheet is locked during the upload, so this is the only way out. */
+  function handleCancel() {
+    if (uploading) {
+      abortRef.current?.();
+      return;
+    }
+    onClose();
   }
 
   return (
@@ -737,10 +788,9 @@ function UploadForm({
             type="button"
             variant="secondary"
             className="flex-1"
-            onClick={onClose}
-            disabled={uploading}
+            onClick={handleCancel}
           >
-            Cancelar
+            {uploading ? "Cancelar subida" : "Cancelar"}
           </Button>
           <Button
             variant="primary"

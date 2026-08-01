@@ -7,6 +7,7 @@ import {
   labelFromFileName,
   parseDocDate,
   persistUploadedDocument,
+  rejectOversizedBody,
   validateUploadFile,
 } from "@/lib/document-upload";
 
@@ -23,6 +24,9 @@ export async function POST(req: NextRequest) {
   if (!isValidApiKey(req.headers.get("X-Api-Key"))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  const oversized = rejectOversizedBody(req);
+  if (oversized) return Response.json({ error: oversized.error }, { status: oversized.status });
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -45,16 +49,27 @@ export async function POST(req: NextRequest) {
     stopId = stop.id;
   }
 
-  const doc = await persistUploadedDocument({
-    file: file!,
-    label: label || labelFromFileName(file!.name),
-    note: note || null,
-    kind,
-    stopId,
-    docDate,
-  });
+  let doc;
+  try {
+    doc = await persistUploadedDocument({
+      file: file!,
+      label: label || labelFromFileName(file!.name),
+      note: note || null,
+      kind,
+      stopId,
+      docDate,
+    });
+  } catch (e) {
+    // The bot on the other end parses JSON. An R2 outage or a P2003 used to
+    // hand it an HTML 500 page, which it can't turn into a message.
+    console.error("[integration/documents] persist failed:", e);
+    return Response.json({ error: "no se pudo guardar el documento" }, { status: 500 });
+  }
 
   revalidatePath(stopSlug ? `/stops/${stopSlug}` : "/general");
+  // /search indexes document text — without this the voucher the bot just
+  // forwarded doesn't come up in a search for it.
+  revalidatePath("/search");
 
   return Response.json({ id: doc.id, stopSlug: stopSlug || null, label: doc.label });
 }

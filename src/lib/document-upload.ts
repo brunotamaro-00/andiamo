@@ -25,6 +25,23 @@ export type UploadValidationError = {
   error: string;
 };
 
+/**
+ * Rejects an oversized body *before* `req.formData()` buffers it into memory.
+ *
+ * The size check in validateUploadFile only runs once the whole request is
+ * already materialised, so a single accidental POST — a video picked in the iOS
+ * file dialog, a big WhatsApp attachment forwarded by the bot — could exhaust
+ * the standalone process and take the app down mid-trip. The multipart envelope
+ * adds a little overhead on top of the file, hence the slack.
+ */
+export function rejectOversizedBody(req: Request): UploadValidationError | null {
+  const declared = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > MAX_BYTES + 64 * 1024) {
+    return { status: 413, error: "El archivo supera el máximo de 20 MB" };
+  }
+  return null;
+}
+
 export function validateUploadFile(file: File | null): UploadValidationError | null {
   if (!file) return { status: 400, error: "Falta el archivo" };
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";

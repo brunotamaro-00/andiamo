@@ -1,3 +1,5 @@
+import { fetchWithTimeout, TIMEOUT_BACKGROUND_MS } from "./fetch-timeout";
+
 /** Years of history to average — smooths out single-year heatwaves/cold snaps. */
 const YEARS_OF_HISTORY = 10;
 
@@ -72,7 +74,11 @@ async function fetchYearTemps(
   url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min");
   url.searchParams.set("timezone", "auto");
 
-  const res = await fetch(url.toString(), { next: { revalidate: 86400 * 7 } });
+  const res = await fetchWithTimeout(
+    url.toString(),
+    { next: { revalidate: 86400 * 7 } },
+    TIMEOUT_BACKGROUND_MS,
+  );
   if (!res.ok) return null;
 
   const data = await res.json();

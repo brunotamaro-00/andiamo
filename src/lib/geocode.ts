@@ -1,3 +1,5 @@
+import { fetchWithTimeout, TIMEOUT_INTERACTIVE_MS } from "./fetch-timeout";
+
 export interface GeoResult {
   name: string;
   admin1: string | null;
@@ -17,7 +19,11 @@ export async function geocodeCity(query: string): Promise<GeoResult[]> {
 
   let data: { results?: unknown };
   try {
-    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
+    const res = await fetchWithTimeout(
+      url.toString(),
+      { next: { revalidate: 86400 } },
+      TIMEOUT_INTERACTIVE_MS,
+    );
     if (!res.ok) return [];
     data = await res.json();
   } catch {

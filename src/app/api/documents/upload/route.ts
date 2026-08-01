@@ -7,8 +7,10 @@ import {
   parseDocDate,
   parseDocKind,
   persistUploadedDocument,
+  rejectOversizedBody,
   validateUploadFile,
 } from "@/lib/document-upload";
+import { revalidatePath } from "next/cache";
 
 export const runtime = "nodejs";
 
@@ -25,6 +27,9 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     );
   }
+
+  const oversized = rejectOversizedBody(req);
+  if (oversized) return Response.json({ error: oversized.error }, { status: oversized.status });
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -52,6 +57,11 @@ export async function POST(req: NextRequest) {
       stopId,
       docDate,
     });
+    // The client's router.refresh() only refreshes the route it's on. /search
+    // indexes document text and would keep missing this one for the whole
+    // staleTimes window — the voucher you just uploaded, unfindable.
+    revalidatePath("/search");
+    revalidatePath(stopId ? "/stops/[slug]" : "/general", "page");
     return Response.json({ id: doc.id });
   } catch (e) {
     // persistUploadedDocument already rolled the R2 object back. Answer with JSON

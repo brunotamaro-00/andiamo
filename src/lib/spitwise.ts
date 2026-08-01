@@ -3,6 +3,7 @@
  *  Env: SPITWISE_URL (falls back to the legacy BOTARDO_URL until the
  *  Railway variable is renamed) + TRIP_SHARED_API_KEY. */
 
+import { fetchWithTimeout, TIMEOUT_RENDER_MS } from "./fetch-timeout";
 import type { PersonView } from "@/lib/person";
 
 export type SpendDetailCategory = {
@@ -68,12 +69,13 @@ export async function fetchStopSpendDetail(
   const cfg = env();
   if (!cfg) return null;
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `${cfg.base}/api/v1/cities/spend-detail?${withUser({ slug }, person)}`,
       {
         headers: { "X-Api-Key": cfg.key },
         next: { revalidate: 120 },
       },
+      TIMEOUT_RENDER_MS,
     );
     if (!res.ok) return null;
     return (await res.json()) as SpendDetail;
