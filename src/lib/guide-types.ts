@@ -65,6 +65,14 @@ export function docKind(docSlug: string, cityPrefix?: string): string {
     : docSlug;
 }
 
+/** Katia's raw research notes, pasted from her own doc rather than curated
+ *  into the standard files. They belong to the guide, so they read fine on
+ *  /guias — but they are not one of the seven canonical docs: they never get a
+ *  chip on a stop card, and the demo drops them instead of faking one. */
+export function isNotasKatia(docSlug: string, cityPrefix?: string): boolean {
+  return docKind(docSlug, cityPrefix) === "notas-katia";
+}
+
 export interface GuideCountry {
   order: number;
   slug: string;

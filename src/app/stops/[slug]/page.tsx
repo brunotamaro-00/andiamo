@@ -11,7 +11,7 @@ import { EditStopPanel } from "@/components/EditStopPanel";
 import { Badge } from "@/components/ui/Badge";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Thermometer, Sunrise, Sunset } from "lucide-react";
-import { docKind, guideCityForStop, guidesForStop } from "@/lib/guides";
+import { guideCityForStop, guidesForStop, stopGuideChips } from "@/lib/guides";
 import type { GuideDoc } from "@/lib/guides";
 import { HashScroller } from "@/components/HashScroller";
 import { CurrentStopSync } from "@/components/CurrentStopContext";
@@ -443,12 +443,6 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
       )}
     </div>
   );
-}
-
-/** Docs shown as quick chips on the stop card. Hides Desvíos cercanos so the
- *  full 7-doc city set fits as a 2×3 grid; the doc remains on /guias. */
-function stopGuideChips(docs: GuideDoc[], cityPrefix?: string): GuideDoc[] {
-  return docs.filter((d) => docKind(d.slug, cityPrefix) !== "desvios-cercanos");
 }
 
 /** Doc shortcuts for a guide, as a 3-column grid: equal-width cells keep both

@@ -2,13 +2,30 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import manifestJson from "../../content/guides/manifest.json";
 import { IS_DEMO } from "./demo";
-import type { Guide, GuideCity, GuideDoc, GuideManifest } from "./guide-types";
-import { flattenGuides } from "./guide-types";
+import type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
+import { docKind, flattenGuides, isNotasKatia } from "./guide-types";
 
 export type { Guide, GuideCity, GuideCountry, GuideDoc, GuideManifest } from "./guide-types";
-export { docKind, flattenGuides, guideDocs } from "./guide-types";
+export { docKind, flattenGuides, guideDocs, isNotasKatia } from "./guide-types";
 
 const source = manifestJson as GuideManifest;
+
+/** Katia's notes are her own raw research, not part of the doc structure the
+ *  demo is meant to showcase — so the demo drops them outright rather than
+ *  rendering a placeholder like it does for the seven standard docs. Removing
+ *  them from the manifest is the same single lever used for the trip-wide docs
+ *  below: no route, no offline precache entry, no search hit, no export row. */
+function dropNotasKatia(guide: Guide): Guide {
+  return {
+    ...guide,
+    docs: guide.docs.filter((d) => !isNotasKatia(d.slug)),
+    cities: guide.cities.map((c) => ({
+      ...c,
+      docs: c.docs.filter((d) => !isNotasKatia(d.slug, c.slug)),
+    })),
+    guides: guide.guides.map(dropNotasKatia),
+  };
+}
 
 /** The demo drops the trip-wide docs ("El viaje": panel de reservas, presupuesto,
  *  Eurail, packing list) — they're personal logistics, not structure worth
@@ -16,7 +33,18 @@ const source = manifestJson as GuideManifest;
  *  routes (generateStaticParams + dynamicParams:false → 404), the offline
  *  precache entries, the search hits and the Spitwise export rows. */
 const manifest: GuideManifest = IS_DEMO
-  ? { ...source, general: [], resources: [] }
+  ? {
+      ...source,
+      general: [],
+      resources: [],
+      countries: source.countries.map(
+        (c): GuideCountry => ({
+          ...c,
+          countryDocs: c.countryDocs.filter((d) => !isNotasKatia(d.slug)),
+          guides: c.guides.map(dropNotasKatia),
+        })
+      ),
+    }
   : source;
 
 /** Trip-wide docs and resources exposed as pseudo-guides so they share the
@@ -176,6 +204,16 @@ export function guidesForStop(stopSlug: string): Guide[] {
   return slugs
     .map((s) => getGuide(s))
     .filter((g): g is Guide => g !== null);
+}
+
+/** Docs shown as quick chips on a stop card. Hides Desvíos cercanos so the
+ *  full 7-doc city set fits as a 2×3 grid, and Katia's notes because they are
+ *  planning research rather than something to reach for standing in the city.
+ *  Both docs stay reachable on /guias. */
+export function stopGuideChips(docs: GuideDoc[], cityPrefix?: string): GuideDoc[] {
+  return docs.filter(
+    (d) => docKind(d.slug, cityPrefix) !== "desvios-cercanos" && !isNotasKatia(d.slug, cityPrefix)
+  );
 }
 
 /** Inverse of STOP_TO_GUIDES: stops whose primary or secondary guide is `guideSlug`. */

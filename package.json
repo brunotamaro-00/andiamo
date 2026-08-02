@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r public .next/standalone/public && cp -r content .next/standalone/content && cp -r .next/static .next/standalone/.next/static",
+    "build": "next build && cp -r public .next/standalone/public && tsx scripts/copy-content.ts && cp -r .next/static .next/standalone/.next/static",
     "start": "node .next/standalone/server.js",
     "lint": "eslint",
     "test": "vitest run",

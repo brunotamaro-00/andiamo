@@ -12,6 +12,11 @@
  *  - guides keep their whole structure but every doc renders a standard
  *    placeholder instead of the real research (`guides-demo.ts`), and the
  *    trip-wide "El viaje" docs are dropped entirely (`guides.ts`).
+ *  - Katia's notes (`notas-katia`) are dropped too, and not even as a
+ *    placeholder: they're her raw research pasted verbatim, not structure worth
+ *    showing. They leave the manifest (`guides.ts`), which kills their routes,
+ *    and the markdown never reaches the demo filesystem
+ *    (`scripts/copy-content.ts`).
  *
  *  Everything else stays writable on purpose — a visitor should be able to feel
  *  the product. A nightly cron re-seeds the demo database.
