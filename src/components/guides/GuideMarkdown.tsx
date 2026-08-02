@@ -10,7 +10,7 @@ import { Check, HelpCircle } from "lucide-react";
  *  - `[?]` task state (non-GFM) renders as a "candidata" check in special. */
 export function GuideMarkdown({ markdown }: { markdown: string }) {
   return (
-    <div className="space-y-3 text-sm text-ink leading-relaxed break-words">
+    <div className="space-y-3 text-reading text-ink break-words">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {markdown}
       </ReactMarkdown>
@@ -77,10 +77,10 @@ function extractMaybeMarker(children: ReactNode): { isMaybe: boolean; children: 
 
 const components: Components = {
   h1: ({ children }) => (
-    <h2 className="font-display uppercase text-2xl tracking-wide text-ink !mt-0">{children}</h2>
+    <h2 className="font-display uppercase text-2xl text-ink !mt-0">{children}</h2>
   ),
   h2: ({ children }) => (
-    <h2 className="font-display uppercase text-xl tracking-wide text-ink pt-4 border-t-2 border-border first:pt-0 first:border-t-0">
+    <h2 className="font-display uppercase text-xl text-ink pt-4 border-t-2 border-border first:pt-0 first:border-t-0">
       {children}
     </h2>
   ),

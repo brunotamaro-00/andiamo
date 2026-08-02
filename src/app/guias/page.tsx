@@ -21,9 +21,10 @@ export default function GuidesIndexPage() {
         {/* Trip-wide docs — empty in the demo, which drops them entirely */}
         {manifest.general.length + manifest.resources.length > 0 && (
         <section className="animate-fade-in">
-          <p className={`${SECTION_LABEL} mb-1.5 flex items-center gap-1.5`}>
-            <Globe size={12} strokeWidth={2} aria-hidden="true" />
+          <p className={`${SECTION_LABEL} mb-2 flex items-center gap-2`}>
+            <Globe size={12} strokeWidth={2} aria-hidden="true" className="shrink-0" />
             El viaje
+            <span className="h-px flex-1 bg-border" aria-hidden="true" />
           </p>
           <div className={`${cardClass} divide-y divide-border`}>
             {manifest.general.map((doc) => (
@@ -42,11 +43,11 @@ export default function GuidesIndexPage() {
             key={country.slug}
             className={`animate-fade-in ${idx < 6 ? `stagger-${idx + 1}` : ""}`}
           >
-            <p className={`${SECTION_LABEL} mb-1.5 flex items-baseline justify-between gap-2`}>
-              <span className="truncate">
-                <Flag flag={country.flag} className="mr-1" />
-                {country.name}
-              </span>
+            {/* Same editorial header as the /stops album pages: flag · name · rule */}
+            <p className={`${SECTION_LABEL} mb-2 flex items-center gap-2`}>
+              <Flag flag={country.flag} className="text-sm leading-none shrink-0" />
+              <span className="truncate">{country.name}</span>
+              <span className="h-px flex-1 bg-border" aria-hidden="true" />
               <span className="shrink-0 font-tabular">
                 {country.guides.length} {country.guides.length === 1 ? "guía" : "guías"}
               </span>

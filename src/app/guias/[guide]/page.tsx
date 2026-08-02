@@ -74,7 +74,7 @@ function DocGrid({
             className={`flex flex-col gap-2 ${cardClass} px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas`}
           >
             <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
-            <span className="text-title-sm font-extrabold text-ink leading-snug">{doc.title}</span>
+            <span className="font-display uppercase text-title-sm text-ink leading-snug">{doc.title}</span>
           </Link>
         );
       })}
@@ -100,7 +100,15 @@ function DayTripList({ guideSlug, docs }: { guideSlug: string; docs: GuideDoc[] 
   );
 }
 
-const SECTION_LABEL = "label-caps text-ink-3 mb-2";
+/** Editorial section label — same voice as the /stops album headers. */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="label-caps text-ink-3 mb-2 flex items-center gap-2">
+      <span className="truncate">{children}</span>
+      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+    </p>
+  );
+}
 
 export default async function GuidePage({ params }: { params: Promise<{ guide: string }> }) {
   const { guide: slug } = await params;
@@ -127,10 +135,10 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         </Link>
 
         {/* Title card */}
-        <div className={`${cardClass} px-4 py-4 flex items-center gap-3 animate-fade-in`}>
+        <div className="bg-surface rounded-xl border-2 border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
           <Flag flag={guide.countryFlag} className="text-4xl leading-none" />
           <div className="min-w-0">
-            <h2 className="font-display uppercase text-2xl leading-tight text-ink tracking-wide">
+            <h2 className="font-display uppercase text-2xl leading-tight text-ink">
               {guide.title}
             </h2>
             <p className="label-caps text-ink-3 mt-0.5">
@@ -146,7 +154,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {/* Nested guides (Sicilia, Puglia… under Sur de Italia) */}
         {guide.guides.length > 0 && (
           <section className="animate-fade-in stagger-1">
-            <p className={SECTION_LABEL}>Regiones e itinerarios</p>
+            <SectionLabel>Regiones e itinerarios</SectionLabel>
             <div className={`${cardClass} divide-y divide-border`}>
               {guide.guides.map((child) => {
                 const all = guideDocs(child);
@@ -178,9 +186,9 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {/* Guide-level docs — region-wide on a regional guide */}
         {guide.docs.length > 0 && (
           <section className="animate-fade-in stagger-1">
-            <p className={SECTION_LABEL}>
+            <SectionLabel>
               {guide.guides.length > 0 ? "Decisión" : isRegional ? "Toda la región" : "Guía"}
-            </p>
+            </SectionLabel>
             <DocGrid guideSlug={guide.slug} docs={guide.docs} />
           </section>
         )}
@@ -188,7 +196,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {/* Guide-level day trips */}
         {guide.dayTrips.length > 0 && (
           <section className="animate-fade-in stagger-2">
-            <p className={SECTION_LABEL}>Day trips</p>
+            <SectionLabel>Day trips</SectionLabel>
             <DayTripList guideSlug={guide.slug} docs={guide.dayTrips} />
           </section>
         )}
@@ -199,7 +207,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
             key={city.slug}
             className={`animate-fade-in ${idx < 5 ? `stagger-${idx + 2}` : "stagger-6"} rounded-xl border-2 border-border bg-surface-2/60 px-3 py-3 space-y-3`}
           >
-            <h3 className="font-display uppercase text-lg leading-tight text-ink tracking-wide flex items-center gap-2">
+            <h3 className="font-display uppercase text-lg leading-tight text-ink flex items-center gap-2">
               <MapPin size={15} strokeWidth={2} className="text-brick shrink-0" aria-hidden="true" />
               {city.title}
             </h3>
@@ -210,7 +218,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
 
             {city.dayTrips.length > 0 && (
               <div>
-                <p className={SECTION_LABEL}>Day trips desde {city.title}</p>
+                <SectionLabel>Day trips desde {city.title}</SectionLabel>
                 <DayTripList guideSlug={guide.slug} docs={city.dayTrips} />
               </div>
             )}
@@ -220,9 +228,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {/* Related stops */}
         {relatedStops.length > 0 && (
           <section className="animate-fade-in">
-            <p className="label-caps text-ink-3 mb-2">
-              Paradas relacionadas
-            </p>
+            <SectionLabel>Paradas relacionadas</SectionLabel>
             <div className="flex flex-wrap gap-2">
               {relatedStops.map((stopSlug) => (
                 <Link

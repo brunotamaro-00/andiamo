@@ -50,6 +50,7 @@
   --text-title-lg: 17px;     --text-title-lg--line-height: 1.3;  /* timeline stop names */
   --text-title-xl: 22px;     --text-title-xl--line-height: 1.2;  /* hero figures (spend total) */
   --text-numeral: 26px;      --text-numeral--line-height: 1;     /* editorial numerals (stepper) */
+  --text-reading: 15px;      --text-reading--line-height: 1.65;  /* long-form guide prose */
 }
 
 /* Entry/skeleton animations are defined once, as @utility (below), so they can
