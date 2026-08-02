@@ -40,7 +40,9 @@ Fuente de verdad de la *dirección* visual. Los tokens viven en `src/app/globals
 ## Rechazos explícitos (defaults que NO usamos)
 
 - Tres columnas de stats idénticas → franja editorial con un numeral dominante.
-- Lista de cards uniformes → ritmo por agrupación (país/tramo), aire entre grupos.
+- **El timeline de /stops es una lista plana a pedido de Bruno** (2026-08-01):
+  bandera en cada card + país en la meta, sin headers por país — se probó la
+  agrupación estilo álbum y no gustó; no reintroducirla.
 - Iconos genéricos icon-izquierda-label en grillas 2×N sin jerarquía.
 - Gradientes decorativos, glassmorphism, sombras negras genéricas, Inter.
 
