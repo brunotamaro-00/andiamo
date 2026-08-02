@@ -21,6 +21,8 @@ interface StopInput {
   currencyCode: string;
   tempRange: string;
   isCandidate?: boolean;
+  /** Buffer nights without a city (colchón). Excluded from the date walk UI. */
+  isFlexMargin?: boolean;
   /** null = shared (default). A person makes it person-scoped (see Pititas). */
   ownerPerson?: "bruno" | "katia" | null;
   /** Pseudo-city: no flag/sun/weather/currency, excluded from the Spitwise sync. */
@@ -190,6 +192,20 @@ export const STOPS: StopInput[] = [
     latitude: 46.0569, longitude: 14.5058, timezone: "Europe/Ljubljana", currencyCode: "EUR", tempRange: "7-15°C",
   },
   {
+    country: "Eslovenia", countryFlag: "🇸🇮", name: "Bled", slug: "bled",
+    category: "Ciudad", priceLevel: "$$",
+    arrivalDate: "2026-10-15", departureDate: null, nights: 0,
+    latitude: 46.36859, longitude: 14.11652, timezone: "Europe/Ljubljana", currencyCode: "EUR", tempRange: "7-16°C",
+    isCandidate: true,
+  },
+  {
+    country: "Eslovenia", countryFlag: "🇸🇮", name: "Bovec", slug: "bovec",
+    category: "Ciudad", priceLevel: "$$",
+    arrivalDate: "2026-10-15", departureDate: null, nights: 0,
+    latitude: 46.33808, longitude: 13.55245, timezone: "Europe/Ljubljana", currencyCode: "EUR", tempRange: "9-16°C",
+    isCandidate: true,
+  },
+  {
     country: "Italia", countryFlag: "🇮🇹", name: "Florencia", slug: "florencia",
     category: "Ciudad", priceLevel: "$$",
     arrivalDate: "2026-10-15", departureDate: "2026-10-20", nights: 5,
@@ -207,41 +223,38 @@ export const STOPS: StopInput[] = [
     arrivalDate: "2026-10-27", departureDate: "2026-10-29", nights: 2,
     latitude: 40.8518, longitude: 14.2681, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "14-20°C",
   },
-  // Sur de Italia: tres rutas alternativas para noviembre, todas tentativas y
-  // en paralelo (isCandidate no consume el cursor del itinerario). La guía de
-  // cada una es la región; sus ciudades son grupos internos (ver guides.ts).
-  // Coordenadas = ciudad puerta de entrada de cada región.
+  // Sur de Italia (espejo de prod): Puglia + Sicilia consumen el cursor;
+  // Calabria queda candidata en paralelo. Guías = regiones (guides.ts).
+  // Coordenadas = puerta de entrada (Bari / Reggio / Palermo).
   {
     country: "Italia", countryFlag: "🇮🇹", name: "Puglia", slug: "puglia",
-    category: "Ciudad", priceLevel: "$",
-    arrivalDate: "2026-10-29", departureDate: "2026-11-01", nights: 3,
+    category: "Ciudad", priceLevel: "$$",
+    arrivalDate: "2026-10-29", departureDate: "2026-11-03", nights: 5,
     latitude: 41.1171, longitude: 16.8719, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "15-21°C",
-    isCandidate: true,
   },
   {
     country: "Italia", countryFlag: "🇮🇹", name: "Calabria", slug: "calabria",
-    category: "Ciudad", priceLevel: "$",
-    arrivalDate: "2026-10-29", departureDate: "2026-11-01", nights: 3,
+    category: "Ciudad", priceLevel: "$$",
+    arrivalDate: "2026-11-03", departureDate: "2026-11-06", nights: 3,
     latitude: 38.6768, longitude: 15.8977, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "14-20°C",
     isCandidate: true,
   },
   {
     country: "Italia", countryFlag: "🇮🇹", name: "Sicilia", slug: "sicilia",
-    category: "Ciudad", priceLevel: "$",
-    arrivalDate: "2026-10-29", departureDate: "2026-11-01", nights: 3,
+    category: "Ciudad", priceLevel: "$$",
+    arrivalDate: "2026-11-03", departureDate: "2026-11-11", nights: 8,
     latitude: 38.1157, longitude: 13.3615, timezone: "Europe/Rome", currencyCode: "EUR", tempRange: "18-24°C",
-    isCandidate: true,
   },
   {
     country: "España", countryFlag: "🇪🇸", name: "Barcelona", slug: "barcelona",
     category: "Ciudad", priceLevel: "$$",
-    arrivalDate: "2026-10-29", departureDate: "2026-11-03", nights: 5,
+    arrivalDate: "2026-11-11", departureDate: "2026-11-16", nights: 5,
     latitude: 41.3851, longitude: 2.1734, timezone: "Europe/Madrid", currencyCode: "EUR", tempRange: "10-17°C",
   },
   {
     country: "España", countryFlag: "🇪🇸", name: "Madrid", slug: "madrid",
     category: "Ciudad", priceLevel: "$$",
-    arrivalDate: "2026-11-03", departureDate: "2026-11-08", nights: 5,
+    arrivalDate: "2026-11-16", departureDate: "2026-11-21", nights: 5,
     latitude: 40.4168, longitude: -3.7038, timezone: "Europe/Madrid", currencyCode: "EUR", tempRange: "5-12°C",
   },
 ];
@@ -270,6 +283,7 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        isFlexMargin: stop.isFlexMargin ?? false,
         ownerPerson: stop.ownerPerson ?? null,
         isLocal: stop.isLocal ?? false,
       },
@@ -290,6 +304,7 @@ async function main() {
         currencyCode: stop.currencyCode,
         tempRange: stop.tempRange,
         isCandidate: stop.isCandidate ?? false,
+        isFlexMargin: stop.isFlexMargin ?? false,
         ownerPerson: stop.ownerPerson ?? null,
         isLocal: stop.isLocal ?? false,
       },
@@ -297,6 +312,7 @@ async function main() {
     console.log(`  ✓ ${stop.countryFlag} ${stop.name}`);
   }
 
+  // GENERALES: tips / bookings del viaje entero. Detalle por país → nota de parada.
   const globalNotes = [
     { title: "UK ETA", body: "Ambos necesitan UK ETA (~£16 pp). Solo irlandeses están exentos. Solicitar antes del 5 ago.", pinned: true },
     { title: "Schengen — Persona 2", body: "89 días en Schengen (límite: 90). Ámsterdam → fin del viaje incluyendo Portugal.", pinned: true },
@@ -307,6 +323,7 @@ async function main() {
     { title: "Vuelo: París → Lisboa", body: "4 sept. ~USD 85 con equipaje (1 persona). COMPRADO.", pinned: false },
     { title: "Vuelo: Porto → Estrasburgo", body: "12 sept. Volotea, USD 90 (1 persona). COMPRADO.", pinned: false },
     { title: "Monedas no-Euro", body: "CHF (Suiza) · CZK (Chequia) · PLN (Polonia) · HUF (Hungría — cajero OTP Bank, NUNCA Euronet).", pinned: false },
+    { title: "Eurail / trenes", body: "Activar el pass en la ventana correcta. Reservas en Eurostar / algunos TGV / Italo. En Italia preferir tren a bus.", pinned: false },
   ];
 
   console.log("\nSeeding global notes...");

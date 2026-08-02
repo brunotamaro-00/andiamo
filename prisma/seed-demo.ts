@@ -26,8 +26,8 @@ import { runDummySeed } from "./seed-dummy";
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://demo.andiamo.lat").replace(/\/$/, "");
 
 /** Con hoy = 2026-09-25, estas tres candidatas quedan en el pasado sin haberse
- *  resuelto nunca. Puglia/Calabria/Sicilia no tienen fecha, así que se quedan y
- *  muestran bien la feature de "parada tentativa". */
+ *  resuelto nunca. Bled/Bovec/Calabria siguen en el futuro y muestran la
+ *  feature de "parada tentativa"; Puglia+Sicilia ya son paradas reales. */
 const EXPIRED_CANDIDATES = ["grindelwald", "lauterbrunnen", "innsbruck"];
 
 runDummySeed({

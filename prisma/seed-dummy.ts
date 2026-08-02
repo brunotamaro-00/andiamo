@@ -126,6 +126,7 @@ export async function seedDummyData({
       currencyCode: stop.currencyCode,
       tempRange: stop.tempRange,
       isCandidate: stop.isCandidate ?? false,
+      isFlexMargin: stop.isFlexMargin ?? false,
       ownerPerson: clearOwners ? null : stop.ownerPerson ?? null,
       isLocal: stop.isLocal ?? false,
     };
@@ -219,6 +220,7 @@ export async function seedDummyData({
 
   // --- Notas (contenido que el bot de Spitwise puede citar vía /api/notes) --
   console.log("Generando notas dummy...");
+  // GENERALES: tips del viaje entero. Nada de un solo país (eso va en la parada).
   const globalNotes = [
     {
       title: "UK ETA",
@@ -233,15 +235,20 @@ export async function seedDummyData({
     {
       title: "Monedas no-Euro",
       body:
-        "CHF (Suiza) · CZK (Chequia) · PLN (Polonia) · HUF (Hungría — cajero OTP Bank, NUNCA Euronet). " +
-        "En Polonia: dziękuję al pagar = 'quedate el cambio' — no decir gracias hasta recibir el vuelto.",
+        "CHF (Suiza) · CZK (Chequia) · PLN (Polonia) · HUF (Hungría). " +
+        "En Hungría: cajero OTP Bank, nunca Euronet. Cambiar poco y pagar contactless cuando se pueda.",
       pinned: true,
     },
     {
-      title: "Domingo en Polonia",
+      title: "Eurail / trenes",
       body:
-        "Zakaz handlu: súper grandes cerrados la mayoría de los domingos. " +
-        "El domingo del tramo Cracovia NO es comercial → comprar el sábado. Abren Żabka, panaderías, gastronomía.",
+        "Activar el pass en la ventana correcta. Reservas obligatorias en Eurostar, algunos TGV e Italo. " +
+        "En Italia preferir tren a bus interurbano.",
+      pinned: false,
+    },
+    {
+      title: "eSIM y datos",
+      body: "Plan de datos largo (3–4 meses). Guardar QR offline; Roam/Airalo como backup si falla la red local.",
       pinned: false,
     },
   ];

@@ -575,6 +575,12 @@ export const STOP_DUMMY: Record<string, StopDummy> = {
         body: "Efectivo milk bars. Propina ~10% cash. dziękuję al pagar = no querés vuelto.",
       },
       {
+        title: "Domingo comercial",
+        body:
+          "Zakaz handlu: súper grandes cerrados la mayoría de los domingos. " +
+          "Comprar el sábado. Abren Żabka, panaderías y gastronomía.",
+      },
+      {
         title: "Schindler lunes",
         body: "Fábrica cerrada lunes; sinagogas Kazimierz cerradas sábados. Mochila Auschwitz max chica.",
       },
@@ -637,6 +643,58 @@ export const STOP_DUMMY: Record<string, StopDummy> = {
       { label: "Postojna / Predjama", kind: "ticket", note: "Day trip cuevas (dummy)" },
       { label: "Ljubljana Card", kind: "voucher", note: "Transporte + museos si rinde (dummy)" },
       { label: "Alojamiento Liubliana", kind: "checkin", note: "Noches Eslovenia (dummy)" },
+    ],
+  },
+  bled: {
+    notes: [
+      {
+        title: "Lago + isla",
+        body: "Pletna a la isla o remar. Castillo arriba. Si nubes: Vintgar o Bohinj; si abre el cielo, priorizar miradores.",
+      },
+      {
+        title: "Vintgar Gorge",
+        body: "Slot en tickets.vintgar.si (suele 9–15h). Un solo sentido; shuttle desde parkings oficiales.",
+      },
+      {
+        title: "Ojstrica / Mala Osojnica",
+        body: "Mini treks a miradores; con lluvia reciente Ojstrica suele ser más seguro que los altos.",
+      },
+      {
+        title: "Bohinj day trip",
+        body: "~30' en auto: más salvaje y menos postal que Bled. Savica = escalones; Mostnica 2–3h.",
+      },
+    ],
+    docs: [
+      { label: "Vintgar Gorge", kind: "ticket", note: "tickets.vintgar.si · slot (dummy)" },
+      { label: "Pletna / bote isla", kind: "voucher", note: "Lago Bled (dummy)" },
+      { label: "Castillo de Bled", kind: "ticket", note: "Entrada + vista (dummy)" },
+      { label: "Hostel / apt Bled", kind: "checkin", note: "Candidata lagos (dummy)" },
+    ],
+  },
+  bovec: {
+    notes: [
+      {
+        title: "Valle del Soča",
+        body: "Capital de hiking en Eslovenia. ~1h30 en auto desde Bled (pasa por Italia). En bus no conviene.",
+      },
+      {
+        title: "Octubre corto",
+        body: "Un trekking principal + 2–3 paradas cortas. Kozjak + gargantas de Tolmin si hay energía.",
+      },
+      {
+        title: "Clima manda",
+        body: "Si está feo, no meterse profundo en montaña; quedarse más cerca de Kobarid/Tolmin.",
+      },
+      {
+        title: "Rafting off-season",
+        body: "El Soča es icónico pero en octubre hace frío: priorizar senderos y cascadas.",
+      },
+    ],
+    docs: [
+      { label: "Parking / info Tolmin", kind: "voucher", note: "Gargantas · temporada (dummy)" },
+      { label: "Alojamiento Bovec", kind: "checkin", note: "Candidata Soča (dummy)" },
+      { label: "Mapa Triglav / Soča", kind: "other", note: "Offline en el celu (dummy)" },
+      { label: "Bus / transfer Bled", kind: "train", note: "Si no hay auto (dummy)" },
     ],
   },
   florencia: {
@@ -717,82 +775,82 @@ export const STOP_DUMMY: Record<string, StopDummy> = {
       { label: "Hostel Napoles", kind: "checkin", note: "Antes salida Sur (dummy)" },
     ],
   },
-  bari: {
+  puglia: {
     notes: [
       {
-        title: "Bari Vecchia",
-        body: "Orecchiette en Via dell'Arco Basso; focaccia barese €2–3 en Panificio Fiore.",
+        title: "Base Bari",
+        body: "Orecchiette en Via dell'Arco Basso; focaccia barese €2–3. Hub a Polignano (~30'), Matera (~75' bus), Alberobello.",
       },
       {
-        title: "Hub trenes",
-        body: "Polignano 30 min, Matera bus ~75 min, Alberobello ~1h. Evitar finde Polignano masificado.",
+        title: "Valle d'Itria",
+        body: "Ostuni / Locorotondo / Alberobello: trulli y pueblos blancos. Evitar Polignano masificado el finde.",
       },
       {
-        title: "Ciudad real",
-        body: "Menos postal que Lecce pero auténtica. Octubre: sin playa; focaccia + Matera de noche.",
+        title: "Trenes > buses",
+        body: "En Italia priorizar tren; buses interurbanos suelen ser más lentos e impredecibles.",
       },
       {
-        title: "Castillo Svevo",
-        body: "Entrada ~€10. Base buena para Puglia sin auto obligatorio.",
+        title: "Noviembre sin playa",
+        body: "Focaccia, Matera de noche y cascos históricos. Castillo Svevo ~€10 si hay hueco.",
       },
     ],
     docs: [
+      { label: "Hostel Bari / Puglia", kind: "checkin", note: "5 noches hub (dummy)" },
       { label: "Tren/bus Matera", kind: "train", note: "Bus suele ser más rápido (dummy)" },
       { label: "Castello Svevo", kind: "ticket", note: "AditusCulture online (dummy)" },
-      { label: "Hostel Bari", kind: "checkin", note: "Hub Puglia 2–3 noches (dummy)" },
       { label: "Tren Bari → Lecce", kind: "train", note: "Frecuente · barato (dummy)" },
     ],
   },
-  catania: {
+  calabria: {
     notes: [
       {
-        title: "Etna octubre",
-        body: "Teleférico + 4x4 opcional; Silvestri gratis. Capas: 0–5 °C arriba vs 20 °C abajo.",
+        title: "Candidata Tropea/Scilla",
+        body: "Ritmo lento, menos turismo. Encaja si se baja hacia Sicilia en auto/ferry Messina.",
       },
       {
-        title: "Arancino catanés",
-        body: "En Catania es arancino (masc.); pasta alla Norma local. Pescheria caótica auténtica.",
+        title: "Logística noviembre",
+        body: "Día corto; 1 pueblo fuerte por día. Verificar ferry Villa S. Giovanni ↔ Messina si se cruza con auto.",
       },
       {
-        title: "Base este",
-        body: "Aeropuerto barato a BCN; tren a Siracusa/Taormina. Monastero Benedettini vale.",
+        title: "Comida de costa",
+        body: "Pesce spada, 'nduja, granita. Menos postal que Amalfi; más sur profundo.",
       },
       {
-        title: "Viento Etna",
-        body: "Verificar funiviaetna.com antes; día gris → mercados / ciudad.",
+        title: "Plan B",
+        body: "Si el tiempo o las ganas no dan, saltear y volar/trenes directo a Sicilia desde Nápoles.",
       },
     ],
     docs: [
-      { label: "Funivia Etna", kind: "ticket", note: "funiviaetna.com · capas (dummy)" },
-      { label: "Monastero Benedettini", kind: "ticket", note: "Tour horario (dummy)" },
-      { label: "Hostel Catania", kind: "checkin", note: "Base este Sicilia (dummy)" },
-      { label: "Vuelo Catania salida", kind: "flight", note: "Opcional BCN · equipaje (dummy)" },
+      { label: "Ferry / auto Messina", kind: "other", note: "Cruce Calabria→Sicilia (dummy)" },
+      { label: "Alojamiento Tropea", kind: "checkin", note: "Candidata 2–3n (dummy)" },
+      { label: "Tren Lamezia / Reggio", kind: "train", note: "Hub costa (dummy)" },
+      { label: "Mapa costa tirrena", kind: "other", note: "Offline (dummy)" },
     ],
   },
-  palermo: {
+  sicilia: {
     notes: [
       {
-        title: "Ballarò street food",
-        body: "Mercado: arancina, panelle, cannolo rellenado al momento €2–3.",
+        title: "Eje Palermo–Catania",
+        body: "Palermo mercados/Ballarò; Catania base Etna + salida. Auto para Agrigento/Val di Noto; ciudad a pie.",
       },
       {
-        title: "Cappella Palatina",
-        body: "Mosaicos bizantinos — no saltear. Monreale bus 389 ~20 min UNESCO.",
+        title: "Etna noviembre",
+        body: "Teleférico + 4x4 opcional; capas 0–5 °C arriba. Día gris → mercados / Monastero Benedettini.",
       },
       {
-        title: "Caos = experiencia",
-        body: "Ruidosa como Nápoles; mochila adelante. Vucciria/Ballarò de noche bares.",
+        title: "Ortigia / Noto",
+        body: "Siracusa caminable sin playa; Val di Noto barroco más tranquilo. No fragmentar demasiado al final del viaje.",
       },
       {
-        title: "Teatro Massimo",
-        body: "Tour guiado; escena El Padrino III. Catacumbas Capuchinos macabras pero baratas.",
+        title: "Street food",
+        body: "Arancina/arancino, panelle, cannolo al momento €2–3. Cappella Palatina no saltear.",
       },
     ],
     docs: [
-      { label: "Palazzo dei Normanni", kind: "ticket", note: "Cappella Palatina horario (dummy)" },
-      { label: "Teatro Massimo tour", kind: "ticket", note: "Guided · reserva (dummy)" },
-      { label: "Hostel Palermo", kind: "checkin", note: "Zona Politeama (dummy)" },
-      { label: "Tren / ferry sur", kind: "train", note: "Agrigento o Catania según ruta (dummy)" },
+      { label: "Hostel Palermo / Catania", kind: "checkin", note: "8 noches Sicilia (dummy)" },
+      { label: "Funivia Etna", kind: "ticket", note: "funiviaetna.com · capas (dummy)" },
+      { label: "Valle dei Templi", kind: "ticket", note: "Agrigento · online (dummy)" },
+      { label: "Vuelo / ferry salida", kind: "flight", note: "Hacia BCN · equipaje (dummy)" },
     ],
   },
   barcelona: {
