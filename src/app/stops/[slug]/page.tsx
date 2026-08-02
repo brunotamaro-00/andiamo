@@ -187,16 +187,23 @@ export default async function StopPage({ params }: Props) {
         {/* Publish the current stop to the TabBar so "Hoy" lights up here */}
         <CurrentStopSync slug={currentSlug} />
 
-        {/* City header — flag, trip day, temp/sun, countdown */}
+        {/* City header — the hero of this screen. border-2 is the signature
+            width for the city card; "estás acá" turns it into the gold sticker
+            (same treatment as the current-stop card in /stops). */}
         <div
-          className={`bg-surface border border-border rounded-xl p-4 card-shadow ${
-            isActive ? "border-t-[3px] border-t-brick" : ""
-          }`}
+          className={[
+            "rounded-xl p-4 card-shadow border-2",
+            isHere
+              ? "bg-gold-bg/60 border-gold"
+              : isActive
+              ? "bg-surface border-border border-t-brick"
+              : "bg-surface border-border",
+          ].join(" ")}
         >
           <div className="flex items-center justify-between gap-3">
             {tripDay !== null ? (
-              <p className="label-caps text-ink-3">
-                Día {tripDay} del viaje
+              <p className={`label-caps ${isHere ? "text-gold-ink" : "text-ink-3"}`}>
+                {isHere ? `Estás acá · Día ${tripDay} del viaje` : `Día ${tripDay} del viaje`}
               </p>
             ) : (
               <span />
@@ -220,7 +227,7 @@ export default async function StopPage({ params }: Props) {
           <div className="flex items-center gap-3 mt-2">
             <Flag flag={stop.countryFlag} className="text-4xl" />
             <div className="min-w-0">
-              <h1 className="text-3xl font-display uppercase text-ink leading-tight tracking-wide truncate">
+              <h1 className="text-3xl font-display uppercase text-ink leading-tight truncate">
                 {stop.name}
               </h1>
               <p className="text-sm text-ink-2">{stop.country}</p>
