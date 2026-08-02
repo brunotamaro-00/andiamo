@@ -30,7 +30,7 @@ export function Flag({
   // caller (e.g. `text-4xl`) scale it just like the emoji it replaces.
   return (
     <span
-      className={`fi fi-${code} rounded-[2px] align-[-0.15em] ${className}`}
+      className={`fi fi-${code} rounded-xs align-[-0.15em] ${className}`}
       role="img"
       aria-hidden="true"
     />

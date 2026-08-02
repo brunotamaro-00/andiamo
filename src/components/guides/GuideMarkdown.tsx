@@ -40,7 +40,7 @@ function prettyUrl(url: string): string {
 function TaskCheck({ state }: { state: "done" | "todo" | "maybe" }) {
   if (state === "done") {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-[3px] bg-success align-middle shrink-0">
+      <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-xs bg-success align-middle shrink-0">
         <Check size={11} strokeWidth={3} className="text-surface" aria-hidden="true" />
         <span className="sr-only">hecho</span>
       </span>
@@ -48,7 +48,7 @@ function TaskCheck({ state }: { state: "done" | "todo" | "maybe" }) {
   }
   if (state === "maybe") {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-[3px] bg-special align-middle shrink-0">
+      <span className="inline-flex items-center justify-center w-4 h-4 mr-1.5 -mt-0.5 rounded-xs bg-special align-middle shrink-0">
         <HelpCircle size={11} strokeWidth={3} className="text-surface" aria-hidden="true" />
         <span className="sr-only">quizás</span>
       </span>
@@ -56,7 +56,7 @@ function TaskCheck({ state }: { state: "done" | "todo" | "maybe" }) {
   }
   return (
     <span
-      className="inline-block w-4 h-4 mr-1.5 -mt-0.5 rounded-[3px] border-2 border-border-strong align-middle shrink-0"
+      className="inline-block w-4 h-4 mr-1.5 -mt-0.5 rounded-xs border-2 border-border-strong align-middle shrink-0"
       aria-hidden="true"
     />
   );
@@ -136,7 +136,7 @@ const components: Components = {
   input: ({ type, checked }) =>
     type === "checkbox" ? <TaskCheck state={checked ? "done" : "todo"} /> : null,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-[3px] border-gold bg-gold-bg/40 px-3 py-2 rounded-r-[4px] [&>p]:m-0">
+    <blockquote className="border-l-[3px] border-gold bg-gold-bg/40 px-3 py-2 rounded-r-sm [&>p]:m-0">
       {children}
     </blockquote>
   ),

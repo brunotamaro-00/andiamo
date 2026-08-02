@@ -21,7 +21,7 @@ export default function NotFound() {
 
       <Link
         href="/stops"
-        className="px-5 py-2.5 bg-brick text-surface text-sm font-display uppercase tracking-wide rounded-[6px] hard-shadow-ink active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150"
+        className="px-5 py-2.5 bg-brick text-surface text-sm font-display uppercase tracking-wide rounded-md hard-shadow-ink hover:bg-brick-hover active:bg-brick-press active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:active:translate-x-0 motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/50 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-all duration-150"
       >
         Ver itinerario
       </Link>
