@@ -34,7 +34,6 @@ const TRIP_WIDE_FILES = new Set([
 ]);
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  Reino_Unido: "🇬🇧",
   Paises_Bajos: "🇳🇱",
   Francia: "🇫🇷",
   Portugal: "🇵🇹",
@@ -47,6 +46,40 @@ const COUNTRY_FLAGS: Record<string, string> = {
   Eslovenia: "🇸🇮",
   Italia: "🇮🇹",
   España: "🇪🇸",
+};
+
+interface CountryPart {
+  /** Section name shown in /guias (the slug is derived from it). */
+  name: string;
+  flag: string;
+  /** Guide folders (exact dir names) that belong to this part. */
+  guides: string[];
+  /** Loose country docs (exact filenames) exclusive to this part. Files no
+   *  part claims are shared: they get copied into every part. */
+  docs?: string[];
+}
+
+/** Source country folders that render as more than one section in /guias.
+ *  `01_Reino_Unido` is a single folder in the Itinerary, but Inglaterra and
+ *  Escocia are separate nations with separate flags — and /guias is the one
+ *  screen that shows a flag per section, so the UK flag was wrong on both.
+ *  Unclaimed loose docs are duplicated into each part on purpose:
+ *  `frases_utiles.md` is the same English either side of the border. */
+const COUNTRY_SPLITS: Record<string, CountryPart[]> = {
+  Reino_Unido: [
+    {
+      name: "Inglaterra",
+      flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      guides: ["Londres", "York"],
+      docs: ["costumbres_inglaterra.md"],
+    },
+    {
+      name: "Escocia",
+      flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+      guides: ["Edimburgo", "Highlands"],
+      docs: ["costumbres_escocia.md"],
+    },
+  ],
 };
 
 /** Canonical order of the standard per-city docs; extras follow alphabetically. */
@@ -67,6 +100,23 @@ const TRAILING_DOCS = new Set(["notas_katia"]);
 /** Nested region container treated as a group of guides, not a guide itself. */
 const REGION_CONTAINERS = new Set(["Sur de Italia"]);
 
+/** Filenames that carry the country in the name (`costumbres_escocia`) folded
+ *  onto the bare kind. Inside its own country section the qualifier is noise —
+ *  and after the Reino Unido split each nation has exactly one Costumbres. */
+const DOC_ALIASES: Record<string, string> = {
+  costumbres_escocia: "costumbres",
+  costumbres_inglaterra: "costumbres",
+};
+
+/** Titles for the loose country-level docs. `README.md` is the country's
+ *  overview wherever it exists, but its own h1 is a different sentence in
+ *  every folder ("Suiza — Región Jungfrau…"), so it's named here instead of
+ *  in `PRETTY_NAMES`: a README nested inside a guide (Sur de Italia) keeps
+ *  its heading. */
+const COUNTRY_DOC_NAMES: Record<string, string> = {
+  readme: "Resumen",
+};
+
 const PRETTY_NAMES: Record<string, string> = {
   actividades: "Actividades",
   nightlife: "Nightlife",
@@ -75,6 +125,12 @@ const PRETTY_NAMES: Record<string, string> = {
   transporte: "Transporte",
   desvios_cercanos: "Desvíos cercanos",
   contexto_historico: "Contexto histórico",
+  // Country-level docs: their h1 repeats the country ("Costumbres en Italia",
+  // "Frases Útiles — Chequia (checo)"), which is the section header right
+  // above them in /guias. The label only needs the kind.
+  costumbres: "Costumbres",
+  frases_utiles: "Frases útiles",
+  trekkings: "Trekkings",
   // The file's own `# Notas Katia — <destino>` heading repeats the guide name
   // in every chip and breadcrumb; the doc label only needs the kind.
   "notas-katia": "Notas Katia",
@@ -98,9 +154,10 @@ function listDir(dir: string): { dirs: string[]; files: string[] } {
 }
 
 /** Human title: first `# ` heading without leading emojis, else prettified filename. */
-function titleFor(sourceFile: string): string {
-  const base = path.basename(sourceFile, ".md");
-  const known = PRETTY_NAMES[base.toLowerCase()];
+function titleFor(sourceFile: string, base: string, countryLevel = false): string {
+  const known =
+    (countryLevel ? COUNTRY_DOC_NAMES[base.toLowerCase()] : undefined) ??
+    PRETTY_NAMES[base.toLowerCase()];
   if (known) return known;
 
   const content = readFileSync(sourceFile, "utf8");
@@ -126,16 +183,18 @@ function docSortKey(slug: string): [number, string] {
 function copyDoc(
   sourceFile: string,
   destRelDir: string,
-  opts: { titleOverride?: string; slugPrefix?: string } = {}
+  opts: { titleOverride?: string; slugPrefix?: string; countryLevel?: boolean } = {}
 ): GuideDoc {
-  const baseSlug = slugify(path.basename(sourceFile, ".md"));
+  const rawBase = path.basename(sourceFile, ".md");
+  const base = DOC_ALIASES[rawBase.toLowerCase()] ?? rawBase;
+  const baseSlug = slugify(base);
   const relFile = path.posix.join(destRelDir, `${baseSlug}.md`);
   const destFile = path.join(DEST, relFile);
   mkdirSync(path.dirname(destFile), { recursive: true });
   cpSync(sourceFile, destFile);
   return {
     slug: opts.slugPrefix ? `${opts.slugPrefix}-${baseSlug}` : baseSlug,
-    title: opts.titleOverride ?? titleFor(sourceFile),
+    title: opts.titleOverride ?? titleFor(sourceFile, base, opts.countryLevel),
     file: relFile,
   };
 }
@@ -229,6 +288,67 @@ function buildGuide(
   };
 }
 
+/** One manifest country: its loose docs plus every guide folder it claims.
+ *  Usually one per source folder, but a split country (Reino Unido →
+ *  Inglaterra / Escocia) builds one per part out of the same folder. */
+function buildCountry(
+  countryDir: string,
+  part: CountryPart,
+  order: number,
+  looseFiles: string[],
+  exclusiveDocs: Set<string>
+): GuideCountry {
+  const country: GuideCountry = {
+    order,
+    slug: slugify(part.name),
+    name: part.name,
+    flag: part.flag,
+    guides: [],
+    countryDocs: [],
+  };
+
+  for (const f of looseFiles) {
+    if (exclusiveDocs.has(f) && !part.docs?.includes(f)) continue;
+    country.countryDocs.push(
+      copyDoc(path.join(countryDir, f), country.slug, { countryLevel: true })
+    );
+  }
+  country.countryDocs = trailingLast(country.countryDocs);
+
+  for (const cityDir of part.guides) {
+    const fullCityDir = path.join(countryDir, cityDir);
+    if (REGION_CONTAINERS.has(cityDir)) {
+      // Container guide (Sur de Italia): decision docs at the root, and each
+      // subfolder is a nested guide (Sicilia, Puglia, Itinerarios…).
+      const { dirs: regionDirs, files: regionFiles } = listDir(fullCityDir);
+      const regionSlug = slugify(cityDir);
+      const nested = regionDirs
+        .map((sub) => buildGuide(path.join(fullCityDir, sub), country, { parentSlug: regionSlug }))
+        .sort((a, b) => a.title.localeCompare(b.title, "es"));
+      const docs = trailingLast(
+        regionFiles.map((f) =>
+          copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
+        )
+      );
+      country.guides.push({
+        slug: regionSlug,
+        title: cityDir,
+        country: country.name,
+        countryFlag: country.flag,
+        docs,
+        dayTrips: [],
+        cities: [],
+        guides: nested,
+      });
+    } else {
+      country.guides.push(buildGuide(fullCityDir, country));
+    }
+  }
+
+  country.guides.sort((a, b) => a.title.localeCompare(b.title, "es"));
+  return country;
+}
+
 function main() {
   if (!existsSync(SOURCE)) {
     console.error(`Source not found: ${SOURCE}`);
@@ -266,61 +386,41 @@ function main() {
     const [, orderStr, rawNameNfd] = match;
     // macOS returns NFD-decomposed names ("España" as "n" + combining tilde)
     const rawName = rawNameNfd.normalize("NFC");
-    const flag = COUNTRY_FLAGS[rawName];
-    if (!flag) {
-      console.error(`Unknown country (no flag mapped): ${dir}`);
-      process.exit(1);
-    }
-    const country: GuideCountry = {
-      order: Number(orderStr),
-      slug: slugify(rawName),
-      name: rawName.replace(/_/g, " "),
-      flag,
-      guides: [],
-      countryDocs: [],
-    };
     const countryDir = path.join(SOURCE, dir);
     const { dirs: cityDirs, files: looseFiles } = listDir(countryDir);
 
-    for (const f of looseFiles) {
-      country.countryDocs.push(copyDoc(path.join(countryDir, f), country.slug));
+    const split = COUNTRY_SPLITS[rawName];
+    if (!split && !COUNTRY_FLAGS[rawName]) {
+      console.error(`Unknown country (no flag mapped): ${dir}`);
+      process.exit(1);
     }
-    country.countryDocs = trailingLast(country.countryDocs);
-
-    for (const cityDir of cityDirs) {
-      const fullCityDir = path.join(countryDir, cityDir);
-      if (REGION_CONTAINERS.has(cityDir)) {
-        // Container guide (Sur de Italia): decision docs at the root, and each
-        // subfolder is a nested guide (Sicilia, Puglia, Itinerarios…).
-        const { dirs: regionDirs, files: regionFiles } = listDir(fullCityDir);
-        const regionSlug = slugify(cityDir);
-        const nested = regionDirs
-          .map((sub) =>
-            buildGuide(path.join(fullCityDir, sub), country, { parentSlug: regionSlug })
-          )
-          .sort((a, b) => a.title.localeCompare(b.title, "es"));
-        const docs = trailingLast(
-          regionFiles.map((f) =>
-            copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
-          )
-        );
-        country.guides.push({
-          slug: regionSlug,
-          title: cityDir,
-          country: country.name,
-          countryFlag: country.flag,
-          docs,
-          dayTrips: [],
-          cities: [],
-          guides: nested,
-        });
-      } else {
-        country.guides.push(buildGuide(fullCityDir, country));
+    const parts: CountryPart[] = split ?? [
+      {
+        name: rawName.replace(/_/g, " "),
+        flag: COUNTRY_FLAGS[rawName],
+        guides: cityDirs,
+        docs: looseFiles,
+      },
+    ];
+    if (split) {
+      // A folder silently dropped from every part would vanish from the app.
+      const claimed = new Set(split.flatMap((p) => p.guides));
+      const orphans = cityDirs.filter((d) => !claimed.has(d));
+      if (orphans.length > 0) {
+        console.error(`Unassigned guide folders in ${dir}: ${orphans.join(", ")}`);
+        process.exit(1);
       }
     }
+    // Loose docs no part claims belong to all of them (frases_utiles.md).
+    const exclusiveDocs = new Set(parts.flatMap((p) => p.docs ?? []));
 
-    country.guides.sort((a, b) => a.title.localeCompare(b.title, "es"));
-    manifest.countries.push(country);
+    for (const [partIdx, part] of parts.entries()) {
+      // Split parts land side by side (10, 11) without colliding with the
+      // next country (20): `order` only drives section order in /guias.
+      manifest.countries.push(
+        buildCountry(countryDir, part, Number(orderStr) * 10 + partIdx, looseFiles, exclusiveDocs)
+      );
+    }
   }
 
   manifest.countries.sort((a, b) => a.order - b.order);
@@ -331,6 +431,14 @@ function main() {
   const dupGuides = guideSlugs.filter((s, i) => guideSlugs.indexOf(s) !== i);
   if (dupGuides.length > 0) {
     console.error(`Duplicate guide slugs: ${dupGuides.join(", ")}`);
+    process.exit(1);
+  }
+  // "El viaje" (general + recursos) reads under a single /general/[doc]
+  // namespace, so a slug can't repeat across the two lists.
+  const tripSlugs = [...manifest.general, ...manifest.resources].map((d) => d.slug);
+  const dupTrip = tripSlugs.filter((s, i) => tripSlugs.indexOf(s) !== i);
+  if (dupTrip.length > 0) {
+    console.error(`Duplicate trip-wide doc slugs: ${dupTrip.join(", ")}`);
     process.exit(1);
   }
   // Doc slugs must be unique across the whole guide (region docs, region day

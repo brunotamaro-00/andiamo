@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
+import { BookOpen, ChevronRight, FileText } from "lucide-react";
 import { getManifest, guideDocs } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
@@ -18,26 +18,9 @@ export default function GuidesIndexPage() {
       <PageHeader subtitle="Guías del viaje" />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
-        {/* Trip-wide docs — empty in the demo, which drops them entirely */}
-        {manifest.general.length + manifest.resources.length > 0 && (
-        <section className="animate-fade-in">
-          <p className={`${SECTION_LABEL} mb-2 flex items-center gap-2`}>
-            <Globe size={12} strokeWidth={2} aria-hidden="true" className="shrink-0" />
-            El viaje
-            <span className="h-px flex-1 bg-border" aria-hidden="true" />
-          </p>
-          <div className={`${cardClass} divide-y divide-border`}>
-            {manifest.general.map((doc) => (
-              <DocRow key={doc.slug} href={`/guias/general/${doc.slug}`} title={doc.title} />
-            ))}
-            {manifest.resources.map((doc) => (
-              <DocRow key={doc.slug} href={`/guias/recursos/${doc.slug}`} title={doc.title} />
-            ))}
-          </div>
-        </section>
-        )}
-
-        {/* Per-country guides */}
+        {/* Per-country guides. The trip-wide docs ("El viaje": Eurail,
+            presupuesto, packing list) are not here — they read at /general,
+            with the rest of the trip-wide material. */}
         {manifest.countries.map((country, idx) => (
           <section
             key={country.slug}
@@ -94,17 +77,17 @@ export default function GuidesIndexPage() {
               })}
             </div>
 
-            {/* Country-wide docs ("Costumbres en X", "Frases útiles") — the
-                country name is redundant inside its own section, so they ride
-                as short chips instead of one full-width card each. */}
+            {/* Country-wide docs (Costumbres, Frases útiles) — short titles by
+                construction (the sync strips the country, which is the section
+                header right above), so they ride as chips instead of one
+                full-width card each. */}
             {country.countryDocs.length > 0 && (
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {country.countryDocs.map((doc, i) => (
                   <DocChip
                     key={doc.slug}
                     href={`/guias/${country.slug}/${doc.slug}`}
-                    label={countryDocLabel(doc.title, country.name)}
-                    title={doc.title}
+                    label={doc.title}
                     // Odd count: the last chip fills the row so the block stays
                     // a flush rectangle instead of leaving a hole.
                     wide={country.countryDocs.length % 2 === 1 && i === country.countryDocs.length - 1}
@@ -119,34 +102,18 @@ export default function GuidesIndexPage() {
   );
 }
 
-function DocRow({ href, title }: { href: string; title: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 min-h-[44px] px-3.5 py-2.5 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
-    >
-      <FileText size={16} strokeWidth={1.5} className="text-ink-3 shrink-0" aria-hidden="true" />
-      <span className="flex-1 min-w-0 text-sm font-semibold text-ink truncate">{title}</span>
-      <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
-    </Link>
-  );
-}
-
 function DocChip({
   href,
   label,
-  title,
   wide,
 }: {
   href: string;
   label: string;
-  title: string;
   wide?: boolean;
 }) {
   return (
     <Link
       href={href}
-      title={title}
       className={`flex items-center justify-center gap-1.5 min-h-[44px] min-w-0 px-3 rounded-full border border-border bg-surface card-shadow text-meta font-semibold text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${
         wide ? "col-span-2" : ""
       }`}
@@ -155,35 +122,4 @@ function DocChip({
       <span className="truncate">{label}</span>
     </Link>
   );
-}
-
-/** Fold case + diacritics so "Países Bajos" matches folder-derived "Paises Bajos". */
-function fold(s: string): string {
-  return s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
-}
-
-/** Display-only shortening for country-wide doc titles. Inside "🇮🇹 Italia" the
- *  country name is noise, but Reino Unido has one "Costumbres" per nation, so
- *  the qualifier survives when it isn't just the country again. */
-function countryDocLabel(title: string, countryName: string): string {
-  const bare = (s: string) => s.replace(/\s*\([^)]*\)\s*$/, "").trim();
-
-  if (/^frases\s+útiles\s*[—–-]/i.test(title)) return "Frases útiles";
-
-  const customs = title.match(/^costumbres\s+en\s+(.+)$/i);
-  if (customs) {
-    const where = bare(customs[1]);
-    return fold(where) === fold(countryName)
-      ? "Costumbres"
-      : `Costumbres · ${where}`;
-  }
-
-  if (/^readme$/i.test(title)) return "Resumen";
-
-  const prefixed = title.match(
-    new RegExp(`^${countryName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[—–-]\\s*(.+)$`, "i"),
-  );
-  if (prefixed) return bare(prefixed[1]);
-
-  return title;
 }

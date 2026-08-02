@@ -1,180 +1,78 @@
 {
   "countries": [
     {
-      "order": 1,
-      "slug": "reino-unido",
-      "name": "Reino Unido",
-      "flag": "🇬🇧",
+      "order": 10,
+      "slug": "inglaterra",
+      "name": "Inglaterra",
+      "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       "guides": [
-        {
-          "slug": "edimburgo",
-          "title": "Edimburgo",
-          "country": "Reino Unido",
-          "countryFlag": "🇬🇧",
-          "docs": [
-            {
-              "slug": "actividades",
-              "title": "Actividades",
-              "file": "reino-unido/edimburgo/actividades.md"
-            },
-            {
-              "slug": "nightlife",
-              "title": "Nightlife",
-              "file": "reino-unido/edimburgo/nightlife.md"
-            },
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "reino-unido/edimburgo/gastronomia.md"
-            },
-            {
-              "slug": "alojamiento",
-              "title": "Alojamiento",
-              "file": "reino-unido/edimburgo/alojamiento.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "reino-unido/edimburgo/transporte.md"
-            },
-            {
-              "slug": "desvios-cercanos",
-              "title": "Desvíos cercanos",
-              "file": "reino-unido/edimburgo/desvios-cercanos.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "reino-unido/edimburgo/contexto-historico.md"
-            },
-            {
-              "slug": "notas-katia",
-              "title": "Notas Katia",
-              "file": "reino-unido/edimburgo/notas-katia.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [],
-          "guides": []
-        },
-        {
-          "slug": "highlands",
-          "title": "Highlands",
-          "country": "Reino Unido",
-          "countryFlag": "🇬🇧",
-          "docs": [
-            {
-              "slug": "actividades",
-              "title": "Actividades",
-              "file": "reino-unido/highlands/actividades.md"
-            },
-            {
-              "slug": "nightlife",
-              "title": "Nightlife",
-              "file": "reino-unido/highlands/nightlife.md"
-            },
-            {
-              "slug": "gastronomia",
-              "title": "Gastronomía",
-              "file": "reino-unido/highlands/gastronomia.md"
-            },
-            {
-              "slug": "alojamiento",
-              "title": "Alojamiento",
-              "file": "reino-unido/highlands/alojamiento.md"
-            },
-            {
-              "slug": "transporte",
-              "title": "Transporte",
-              "file": "reino-unido/highlands/transporte.md"
-            },
-            {
-              "slug": "desvios-cercanos",
-              "title": "Desvíos cercanos",
-              "file": "reino-unido/highlands/desvios-cercanos.md"
-            },
-            {
-              "slug": "contexto-historico",
-              "title": "Contexto histórico",
-              "file": "reino-unido/highlands/contexto-historico.md"
-            },
-            {
-              "slug": "notas-katia",
-              "title": "Notas Katia",
-              "file": "reino-unido/highlands/notas-katia.md"
-            }
-          ],
-          "dayTrips": [],
-          "cities": [],
-          "guides": []
-        },
         {
           "slug": "londres",
           "title": "Londres",
-          "country": "Reino Unido",
-          "countryFlag": "🇬🇧",
+          "country": "Inglaterra",
+          "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
           "docs": [
             {
               "slug": "actividades",
               "title": "Actividades",
-              "file": "reino-unido/londres/actividades.md"
+              "file": "inglaterra/londres/actividades.md"
             },
             {
               "slug": "nightlife",
               "title": "Nightlife",
-              "file": "reino-unido/londres/nightlife.md"
+              "file": "inglaterra/londres/nightlife.md"
             },
             {
               "slug": "gastronomia",
               "title": "Gastronomía",
-              "file": "reino-unido/londres/gastronomia.md"
+              "file": "inglaterra/londres/gastronomia.md"
             },
             {
               "slug": "alojamiento",
               "title": "Alojamiento",
-              "file": "reino-unido/londres/alojamiento.md"
+              "file": "inglaterra/londres/alojamiento.md"
             },
             {
               "slug": "transporte",
               "title": "Transporte",
-              "file": "reino-unido/londres/transporte.md"
+              "file": "inglaterra/londres/transporte.md"
             },
             {
               "slug": "desvios-cercanos",
               "title": "Desvíos cercanos",
-              "file": "reino-unido/londres/desvios-cercanos.md"
+              "file": "inglaterra/londres/desvios-cercanos.md"
             },
             {
               "slug": "contexto-historico",
               "title": "Contexto histórico",
-              "file": "reino-unido/londres/contexto-historico.md"
+              "file": "inglaterra/londres/contexto-historico.md"
             },
             {
               "slug": "notas-katia",
               "title": "Notas Katia",
-              "file": "reino-unido/londres/notas-katia.md"
+              "file": "inglaterra/londres/notas-katia.md"
             }
           ],
           "dayTrips": [
             {
               "slug": "bath",
               "title": "Day Trip: Bath",
-              "file": "reino-unido/londres/day-trips/bath.md"
+              "file": "inglaterra/londres/day-trips/bath.md"
             },
             {
               "slug": "cambridge",
               "title": "Day Trip: Cambridge",
-              "file": "reino-unido/londres/day-trips/cambridge.md"
+              "file": "inglaterra/londres/day-trips/cambridge.md"
             },
             {
               "slug": "cotswolds",
               "title": "Day Trip: Cotswolds",
-              "file": "reino-unido/londres/day-trips/cotswolds.md"
+              "file": "inglaterra/londres/day-trips/cotswolds.md"
             },
             {
               "slug": "oxford",
               "title": "Day Trip: Oxford",
-              "file": "reino-unido/londres/day-trips/oxford.md"
+              "file": "inglaterra/londres/day-trips/oxford.md"
             }
           ],
           "cities": [],
@@ -183,48 +81,48 @@
         {
           "slug": "york",
           "title": "York",
-          "country": "Reino Unido",
-          "countryFlag": "🇬🇧",
+          "country": "Inglaterra",
+          "countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
           "docs": [
             {
               "slug": "actividades",
               "title": "Actividades",
-              "file": "reino-unido/york/actividades.md"
+              "file": "inglaterra/york/actividades.md"
             },
             {
               "slug": "nightlife",
               "title": "Nightlife",
-              "file": "reino-unido/york/nightlife.md"
+              "file": "inglaterra/york/nightlife.md"
             },
             {
               "slug": "gastronomia",
               "title": "Gastronomía",
-              "file": "reino-unido/york/gastronomia.md"
+              "file": "inglaterra/york/gastronomia.md"
             },
             {
               "slug": "alojamiento",
               "title": "Alojamiento",
-              "file": "reino-unido/york/alojamiento.md"
+              "file": "inglaterra/york/alojamiento.md"
             },
             {
               "slug": "transporte",
               "title": "Transporte",
-              "file": "reino-unido/york/transporte.md"
+              "file": "inglaterra/york/transporte.md"
             },
             {
               "slug": "desvios-cercanos",
               "title": "Desvíos cercanos",
-              "file": "reino-unido/york/desvios-cercanos.md"
+              "file": "inglaterra/york/desvios-cercanos.md"
             },
             {
               "slug": "contexto-historico",
               "title": "Contexto histórico",
-              "file": "reino-unido/york/contexto-historico.md"
+              "file": "inglaterra/york/contexto-historico.md"
             },
             {
               "slug": "notas-katia",
               "title": "Notas Katia",
-              "file": "reino-unido/york/notas-katia.md"
+              "file": "inglaterra/york/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -234,24 +132,141 @@
       ],
       "countryDocs": [
         {
-          "slug": "costumbres-escocia",
-          "title": "Costumbres en Escocia (Edimburgo y Highlands)",
-          "file": "reino-unido/costumbres-escocia.md"
-        },
-        {
-          "slug": "costumbres-inglaterra",
-          "title": "Costumbres en Inglaterra (Londres y York)",
-          "file": "reino-unido/costumbres-inglaterra.md"
+          "slug": "costumbres",
+          "title": "Costumbres",
+          "file": "inglaterra/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Reino Unido (inglés)",
-          "file": "reino-unido/frases-utiles.md"
+          "title": "Frases útiles",
+          "file": "inglaterra/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 2,
+      "order": 11,
+      "slug": "escocia",
+      "name": "Escocia",
+      "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+      "guides": [
+        {
+          "slug": "edimburgo",
+          "title": "Edimburgo",
+          "country": "Escocia",
+          "countryFlag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "escocia/edimburgo/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "escocia/edimburgo/nightlife.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "escocia/edimburgo/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "escocia/edimburgo/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "escocia/edimburgo/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "escocia/edimburgo/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "escocia/edimburgo/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "escocia/edimburgo/notas-katia.md"
+            }
+          ],
+          "dayTrips": [],
+          "cities": [],
+          "guides": []
+        },
+        {
+          "slug": "highlands",
+          "title": "Highlands",
+          "country": "Escocia",
+          "countryFlag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+          "docs": [
+            {
+              "slug": "actividades",
+              "title": "Actividades",
+              "file": "escocia/highlands/actividades.md"
+            },
+            {
+              "slug": "nightlife",
+              "title": "Nightlife",
+              "file": "escocia/highlands/nightlife.md"
+            },
+            {
+              "slug": "gastronomia",
+              "title": "Gastronomía",
+              "file": "escocia/highlands/gastronomia.md"
+            },
+            {
+              "slug": "alojamiento",
+              "title": "Alojamiento",
+              "file": "escocia/highlands/alojamiento.md"
+            },
+            {
+              "slug": "transporte",
+              "title": "Transporte",
+              "file": "escocia/highlands/transporte.md"
+            },
+            {
+              "slug": "desvios-cercanos",
+              "title": "Desvíos cercanos",
+              "file": "escocia/highlands/desvios-cercanos.md"
+            },
+            {
+              "slug": "contexto-historico",
+              "title": "Contexto histórico",
+              "file": "escocia/highlands/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "escocia/highlands/notas-katia.md"
+            }
+          ],
+          "dayTrips": [],
+          "cities": [],
+          "guides": []
+        }
+      ],
+      "countryDocs": [
+        {
+          "slug": "costumbres",
+          "title": "Costumbres",
+          "file": "escocia/costumbres.md"
+        },
+        {
+          "slug": "frases-utiles",
+          "title": "Frases útiles",
+          "file": "escocia/frases-utiles.md"
+        }
+      ]
+    },
+    {
+      "order": 20,
       "slug": "paises-bajos",
       "name": "Paises Bajos",
       "flag": "🇳🇱",
@@ -322,18 +337,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Países Bajos",
+          "title": "Costumbres",
           "file": "paises-bajos/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Países Bajos (neerlandés)",
+          "title": "Frases útiles",
           "file": "paises-bajos/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 3,
+      "order": 30,
       "slug": "francia",
       "name": "Francia",
       "flag": "🇫🇷",
@@ -512,18 +527,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Francia",
+          "title": "Costumbres",
           "file": "francia/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Francia (francés)",
+          "title": "Frases útiles",
           "file": "francia/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 4,
+      "order": 40,
       "slug": "portugal",
       "name": "Portugal",
       "flag": "🇵🇹",
@@ -645,18 +660,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Portugal",
+          "title": "Costumbres",
           "file": "portugal/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Portugal (portugués)",
+          "title": "Frases útiles",
           "file": "portugal/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 5,
+      "order": 50,
       "slug": "alemania",
       "name": "Alemania",
       "flag": "🇩🇪",
@@ -737,18 +752,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Alemania",
+          "title": "Costumbres",
           "file": "alemania/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Alemania (alemán)",
+          "title": "Frases útiles",
           "file": "alemania/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 6,
+      "order": 60,
       "slug": "suiza",
       "name": "Suiza",
       "flag": "🇨🇭",
@@ -876,7 +891,7 @@
       "countryDocs": [
         {
           "slug": "readme",
-          "title": "Suiza — Región Jungfrau (Berner Oberland)",
+          "title": "Resumen",
           "file": "suiza/readme.md"
         },
         {
@@ -886,12 +901,12 @@
         },
         {
           "slug": "costumbres",
-          "title": "Costumbres en Suiza",
+          "title": "Costumbres",
           "file": "suiza/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Suiza (alemán suizo)",
+          "title": "Frases útiles",
           "file": "suiza/frases-utiles.md"
         },
         {
@@ -912,7 +927,7 @@
       ]
     },
     {
-      "order": 7,
+      "order": 70,
       "slug": "austria",
       "name": "Austria",
       "flag": "🇦🇹",
@@ -1029,18 +1044,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Austria",
+          "title": "Costumbres",
           "file": "austria/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Austria (alemán)",
+          "title": "Frases útiles",
           "file": "austria/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 8,
+      "order": 80,
       "slug": "chequia",
       "name": "Chequia",
       "flag": "🇨🇿",
@@ -1111,18 +1126,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Chequia",
+          "title": "Costumbres",
           "file": "chequia/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Chequia (checo)",
+          "title": "Frases útiles",
           "file": "chequia/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 9,
+      "order": 90,
       "slug": "polonia",
       "name": "Polonia",
       "flag": "🇵🇱",
@@ -1198,18 +1213,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Polonia",
+          "title": "Costumbres",
           "file": "polonia/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Polonia (polaco)",
+          "title": "Frases útiles",
           "file": "polonia/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 10,
+      "order": 100,
       "slug": "hungria",
       "name": "Hungria",
       "flag": "🇭🇺",
@@ -1290,18 +1305,18 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Hungría",
+          "title": "Costumbres",
           "file": "hungria/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Hungría (húngaro)",
+          "title": "Frases útiles",
           "file": "hungria/frases-utiles.md"
         }
       ]
     },
     {
-      "order": 11,
+      "order": 110,
       "slug": "eslovenia",
       "name": "Eslovenia",
       "flag": "🇸🇮",
@@ -1525,22 +1540,22 @@
       "countryDocs": [
         {
           "slug": "readme",
-          "title": "README",
+          "title": "Resumen",
           "file": "eslovenia/readme.md"
         },
         {
           "slug": "costumbres",
-          "title": "Costumbres en Eslovenia",
+          "title": "Costumbres",
           "file": "eslovenia/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Eslovenia (esloveno)",
+          "title": "Frases útiles",
           "file": "eslovenia/frases-utiles.md"
         },
         {
           "slug": "trekkings",
-          "title": "Trekkings — Alpes Julianos / Parque Nacional del Triglav",
+          "title": "Trekkings",
           "file": "eslovenia/trekkings.md"
         },
         {
@@ -1551,7 +1566,7 @@
       ]
     },
     {
-      "order": 12,
+      "order": 120,
       "slug": "italia",
       "name": "Italia",
       "flag": "🇮🇹",
@@ -2640,12 +2655,12 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en Italia",
+          "title": "Costumbres",
           "file": "italia/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — Italia (italiano)",
+          "title": "Frases útiles",
           "file": "italia/frases-utiles.md"
         },
         {
@@ -2656,7 +2671,7 @@
       ]
     },
     {
-      "order": 13,
+      "order": 130,
       "slug": "espana",
       "name": "España",
       "flag": "🇪🇸",
@@ -2799,12 +2814,12 @@
       "countryDocs": [
         {
           "slug": "costumbres",
-          "title": "Costumbres en España",
+          "title": "Costumbres",
           "file": "espana/costumbres.md"
         },
         {
           "slug": "frases-utiles",
-          "title": "Frases Útiles — España (español + catalán)",
+          "title": "Frases útiles",
           "file": "espana/frases-utiles.md"
         }
       ]

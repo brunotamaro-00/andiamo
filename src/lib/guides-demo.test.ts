@@ -65,9 +65,10 @@ describe("demoDocMarkdown", () => {
   });
 
   it("resolves a country doc that qualifies its kind in the slug", () => {
-    // Reino Unido splits costumbres in two: costumbres-escocia / -inglaterra
-    expect(demoDocMarkdown({ docSlug: "costumbres-escocia", place: "Reino Unido" })).toBe(
-      demoDocMarkdown({ docSlug: "costumbres", place: "Reino Unido" })
+    // The sync folds these back to a bare `costumbres`, but the fallback keeps
+    // any future qualified slug off the generic template.
+    expect(demoDocMarkdown({ docSlug: "costumbres-escocia", place: "Escocia" })).toBe(
+      demoDocMarkdown({ docSlug: "costumbres", place: "Escocia" })
     );
   });
 

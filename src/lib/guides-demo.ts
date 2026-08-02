@@ -119,9 +119,8 @@ const GENERIC: Template = {
   ],
 };
 
-/** Some country-level docs qualify the kind in their own slug
- *  (`costumbres-escocia`, `costumbres-inglaterra` under Reino Unido), so an
- *  exact hit isn't enough — fall back to the kind the slug starts with. */
+/** A doc slug may qualify its kind (`costumbres-escocia`), so an exact hit
+ *  isn't enough — fall back to the kind the slug starts with. */
 function templateFor(kind: string): Template {
   const exact = TEMPLATES[kind];
   if (exact) return exact;
