@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentStopSlug } from "@/lib/current-stop";
-import { todayStr, dateToStr, itineraryNights } from "@/lib/trip";
+import { todayStr, dateToStr, daysBetween, itineraryNights, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
@@ -48,6 +48,29 @@ export default async function StopsPage() {
   // Fallback: compute start date from first confirmed stop's arrivalDate
   const tripStartFallback = tripStartDate ? dateToStr(tripStartDate) : "";
 
+  // Album pages: consecutive same-country runs become one group, so the flag
+  // and country name live once in a header and rows breathe. Numbering keeps
+  // the whole-trip index (the sticker number), not per-group.
+  const visibleStops = stops.filter((s) => !s.isFlexMargin);
+  const orderIndex = new Map(visibleStops.map((s, i) => [s.id, i]));
+  const groups: {
+    country: string;
+    countryFlag: string;
+    startIdx: number;
+    stops: typeof visibleStops;
+  }[] = [];
+  for (const s of visibleStops) {
+    const last = groups.at(-1);
+    if (last && last.country === s.country) last.stops.push(s);
+    else
+      groups.push({
+        country: s.country,
+        countryFlag: s.countryFlag,
+        startIdx: orderIndex.get(s.id)!,
+        stops: [s],
+      });
+  }
+
   return (
     <div className="min-h-full bg-canvas">
       {/* Header */}
@@ -68,126 +91,191 @@ export default async function StopsPage() {
       <HashScroller block="center" fallbackId="current" />
 
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
-        {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-3 mb-5 animate-fade-in">
-          <Stat
-            label="Paradas"
-            value={confirmedWithDates.length.toString()}
-          />
+        {/* Quick stats — one editorial strip, not three competing boxes. The
+            focal point of this screen is the current stop, so the numbers
+            share a single quiet card. */}
+        <div className="flex items-stretch bg-surface rounded-xl border border-border card-shadow px-4 py-3 mb-5 animate-fade-in">
+          <Stat label="Paradas" value={confirmedWithDates.length.toString()} />
+          <span className="w-px bg-border mx-4" aria-hidden="true" />
           <Stat
             label="Noches"
             value={tripNights > 0 ? tripNights.toString() : "—"}
             highlight
           />
+          <span className="w-px bg-border mx-4" aria-hidden="true" />
           <Stat
             label="Países"
             value={[...new Set(realStops.map((s) => s.country))].length.toString()}
           />
         </div>
 
-        {/* Timeline */}
-        <div className="space-y-3">
-          {stops.filter((s) => !s.isFlexMargin).length === 0 && (
+        {/* Timeline — album pages: one group per country run, stops numbered
+            through the whole trip, the current stop as the gold sticker. */}
+        <div className="space-y-5">
+          {visibleStops.length === 0 && (
             <EmptyState
               icon={MapPin}
               title="Sin paradas todavía"
               description="Agregá tu primera ciudad y empezá a armar el itinerario."
             />
           )}
-          {stops
-            .filter((s) => !s.isFlexMargin)
-            .map((stop, idx) => {
-              const isActive = stop.slug === currentSlug;
-              const isPast = stop.departureDate && today > dateToStr(stop.departureDate);
-              const isCandidate = stop.isCandidate;
-              // 40ms per item (--duration-stagger), capped so the total stays
-              // ≤240ms on a long itinerary and later rows share the max delay
-              // instead of popping in ahead of the earlier ones.
-              const staggerDelay = `${Math.min(idx, 6) * 40}ms`;
+          {groups.map((group) => (
+            <section key={`${group.country}-${group.startIdx}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <Flag flag={group.countryFlag} className="text-sm leading-none shrink-0" />
+                <h2 className="label-caps text-ink-3">{group.country}</h2>
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+              </div>
+              <div className="space-y-2">
+                {group.stops.map((stop) => {
+                  const idx = orderIndex.get(stop.id)!;
+                  const isActive = stop.slug === currentSlug;
+                  const isPast = stop.departureDate && today > dateToStr(stop.departureDate);
+                  const isCandidate = stop.isCandidate;
+                  // 40ms per item (--duration-stagger), capped so the total stays
+                  // ≤240ms on a long itinerary and later rows share the max delay
+                  // instead of popping in ahead of the earlier ones.
+                  const staggerDelay = `${Math.min(idx, 6) * 40}ms`;
 
-              return (
-                <Link
-                  key={stop.id}
-                  id={isActive ? "current" : undefined}
-                  href={`/stops/${stop.slug}`}
-                  style={{ animationDelay: staggerDelay }}
-                  className={[
-                    "flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all duration-150 animate-fade-in",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
-                    "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
-                    isActive
-                      ? "bg-brick-bg border-brick card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-brick"
-                      : isCandidate
-                      ? "bg-surface/60 border-dashed border-border/50 opacity-60"
-                      : isPast
-                      ? "bg-surface/40 border-border/40 opacity-45"
-                      : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  {/* Order indicator — past (visited) stops show a check
-                      instead of the number to tell them apart from tentativas */}
-                  <div
-                    className={[
-                      "w-7 shrink-0 font-numeral text-sm text-center flex items-center justify-center",
-                      isActive
-                        ? "text-brick-ink"
-                        : isPast && !isCandidate
-                        ? "text-success"
-                        : "text-ink-3",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {isPast && !isActive && !isCandidate ? (
-                      <Check size={16} strokeWidth={2.5} aria-label="Visitada" />
-                    ) : (
-                      idx + 1
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Flag flag={stop.countryFlag} className="text-xl leading-none shrink-0" />
-                      <span
-                        className={`font-display uppercase text-title-lg leading-tight truncate ${
-                          isActive ? "text-brick-ink" : "text-ink"
-                        }`}
+                  if (isActive) {
+                    // La figurita dorada — the one card of the album that shines.
+                    const arrivalStr = stop.arrivalDate ? dateToStr(stop.arrivalDate) : null;
+                    const departureStr = stop.departureDate ? dateToStr(stop.departureDate) : null;
+                    const isHere =
+                      arrivalStr !== null &&
+                      departureStr !== null &&
+                      arrivalStr <= today &&
+                      today < departureStr;
+                    const tripDay = isHere
+                      ? tripDayNumber(stop.arrivalDate, tripStartDate)
+                      : null;
+                    const daysLeft =
+                      isHere && departureStr ? Math.max(0, daysBetween(today, departureStr)) : null;
+                    const daysUntil =
+                      !isHere && arrivalStr && today < arrivalStr
+                        ? daysBetween(today, arrivalStr)
+                        : null;
+                    return (
+                      <Link
+                        key={stop.id}
+                        id="current"
+                        href={`/stops/${stop.slug}`}
+                        style={{ animationDelay: staggerDelay }}
+                        className={[
+                          "block px-4 py-4 rounded-xl border-2 border-gold bg-gold-bg card-shadow",
+                          "transition-all duration-150 animate-fade-in",
+                          "hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
+                          "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
+                        ].join(" ")}
                       >
-                        {stop.name}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span className="text-caption text-ink-3 font-medium">{stop.country}</span>
-                      {stop.nights > 0 && (
-                        <>
-                          <span className="text-border-strong text-caption">·</span>
-                          <span className="text-caption text-ink-3 font-medium">{stop.nights} {stop.nights === 1 ? "noche" : "noches"}</span>
-                        </>
-                      )}
-                      {stop.arrivalDate && (
-                        <>
-                          <span className="text-border-strong text-caption">·</span>
-                          <span className="text-caption text-ink-3 font-medium">
-                            {formatShortDate(new Date(stop.arrivalDate))}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="label-caps text-gold-ink">
+                            {isHere
+                              ? tripDay !== null
+                                ? `Estás acá · Día ${tripDay}`
+                                : "Estás acá"
+                              : "Próxima parada"}
                           </span>
-                        </>
-                      )}
-                      {isCandidate && <Badge variant="special">tentativa</Badge>}
-                    </div>
-                  </div>
+                          <MapPin size={14} strokeWidth={2.5} className="text-gold shrink-0" aria-hidden="true" />
+                        </div>
+                        <div className="flex items-center gap-2.5 mt-1.5 min-w-0">
+                          <Flag flag={stop.countryFlag} className="text-3xl leading-none shrink-0" />
+                          <span className="font-display uppercase text-2xl leading-none text-ink truncate">
+                            {stop.name}
+                          </span>
+                        </div>
+                        <p className="text-caption text-ink-2 font-medium mt-2">
+                          {[
+                            stop.nights > 0 && `${stop.nights} ${stop.nights === 1 ? "noche" : "noches"}`,
+                            isHere && daysLeft !== null
+                              ? daysLeft === 1
+                                ? "última noche"
+                                : `quedan ${daysLeft} días`
+                              : daysUntil !== null
+                              ? daysUntil === 1
+                                ? "llegás mañana"
+                                : `llegás en ${daysUntil} días`
+                              : stop.arrivalDate && formatShortDate(new Date(stop.arrivalDate)),
+                            stop.departureDate && `hasta el ${formatShortDate(new Date(stop.departureDate))}`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      </Link>
+                    );
+                  }
 
-                  <ChevronRight
-                    size={15}
-                    strokeWidth={2}
-                    className={isActive ? "text-brick" : "text-border-strong"}
-                    aria-hidden="true"
-                  />
-                </Link>
-              );
-            })}
+                  return (
+                    <Link
+                      key={stop.id}
+                      href={`/stops/${stop.slug}`}
+                      style={{ animationDelay: staggerDelay }}
+                      className={[
+                        "flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all duration-150 animate-fade-in",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40",
+                        "focus-visible:ring-offset-1 focus-visible:ring-offset-canvas",
+                        isCandidate
+                          ? "bg-surface/60 border-dashed border-border/50 opacity-60"
+                          : isPast
+                          ? "bg-surface/40 border-border/40 opacity-45"
+                          : "bg-surface border-border hover:border-border-strong card-shadow hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {/* Order indicator — past (visited) stops show a check
+                          instead of the number to tell them apart from tentativas */}
+                      <div
+                        className={[
+                          "w-7 shrink-0 font-numeral text-sm text-center flex items-center justify-center",
+                          isPast && !isCandidate ? "text-success" : "text-ink-3",
+                        ].join(" ")}
+                      >
+                        {isPast && !isCandidate ? (
+                          <Check size={16} strokeWidth={2.5} aria-label="Visitada" />
+                        ) : (
+                          idx + 1
+                        )}
+                      </div>
+
+                      {/* Info — the group header owns flag + country, rows stay clean */}
+                      <div className="flex-1 min-w-0">
+                        <span className="block font-display uppercase text-title-lg leading-tight truncate text-ink">
+                          {stop.name}
+                        </span>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          {stop.nights > 0 && (
+                            <span className="text-caption text-ink-3 font-medium">
+                              {stop.nights} {stop.nights === 1 ? "noche" : "noches"}
+                            </span>
+                          )}
+                          {stop.arrivalDate && (
+                            <>
+                              {stop.nights > 0 && (
+                                <span className="text-border-strong text-caption" aria-hidden="true">·</span>
+                              )}
+                              <span className="text-caption text-ink-3 font-medium">
+                                {formatShortDate(new Date(stop.arrivalDate))}
+                              </span>
+                            </>
+                          )}
+                          {isCandidate && <Badge variant="special">tentativa</Badge>}
+                        </div>
+                      </div>
+
+                      <ChevronRight
+                        size={15}
+                        strokeWidth={2}
+                        className="text-border-strong"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
 
         {/* Add stop — the spine comes from `allStops`, not the person-filtered
@@ -211,8 +299,8 @@ export default async function StopsPage() {
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   const numeric = /^\d+$/.test(value) ? Number(value) : null;
   return (
-    <div className="bg-surface rounded-xl px-3 py-3 text-center border border-border card-shadow">
-      <p className={`text-4xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>
+    <div className="flex-1 min-w-0">
+      <p className={`text-2xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>
         {numeric !== null ? <AnimatedNumber value={numeric} /> : value}
       </p>
       <p className="label-caps text-ink-3 mt-1">{label}</p>
