@@ -47,6 +47,7 @@ export function EditStopPanel(props: Props) {
         label="Editar ciudad"
         icon={Pencil}
         iconSize={15}
+        variant="quiet"
         onClick={() => setOpen(true)}
       />
       {open && <EditModal {...props} onClose={() => setOpen(false)} />}

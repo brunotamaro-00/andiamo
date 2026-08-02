@@ -225,12 +225,9 @@ export default async function StopPage({ params }: Props) {
               </h1>
               <p className="text-sm text-ink-2">{stop.country}</p>
             </div>
-            {/* Edit trigger in the header's top-right slot. It used to override
-                IconButton's w-11/h-11 down to the bare 15px icon, which measured
-                15×15 on a phone — a third of the 44px floor, for the only way
-                into "editar ciudad". Keep the quiet look, keep the target: the
-                negative margins hold the visual density. */}
-            <div className="ml-auto shrink-0 -m-2 [&_button]:text-border-strong [&_button]:hover:bg-transparent [&_button]:hover:text-ink">
+            {/* Edit trigger in the header's top-right slot — IconButton's quiet
+                variant keeps the 44px target; negative margins hold density. */}
+            <div className="ml-auto shrink-0 -m-2">
               <EditStopPanel
                 stopId={stop.id}
                 slug={stop.slug}
