@@ -223,12 +223,14 @@ select {
   transform-origin: left center;
 }
 
-@utility stagger-1 { animation-delay: 60ms; }
-@utility stagger-2 { animation-delay: 120ms; }
-@utility stagger-3 { animation-delay: 180ms; }
-@utility stagger-4 { animation-delay: 240ms; }
-@utility stagger-5 { animation-delay: 300ms; }
-@utility stagger-6 { animation-delay: 360ms; }
+/* Steps of --duration-stagger (40ms) — same offset the JS-computed stagger in
+   /stops uses, so both mechanisms cascade at one rhythm. */
+@utility stagger-1 { animation-delay: 40ms; }
+@utility stagger-2 { animation-delay: 80ms; }
+@utility stagger-3 { animation-delay: 120ms; }
+@utility stagger-4 { animation-delay: 160ms; }
+@utility stagger-5 { animation-delay: 200ms; }
+@utility stagger-6 { animation-delay: 240ms; }
 
 /* ── Card hover — sticker shift ──────────────────────── */
 @utility card-hover {

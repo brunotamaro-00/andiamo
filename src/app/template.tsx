@@ -10,9 +10,10 @@ import { easeSmooth } from "@/lib/motion";
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      // Tokens: y = --distance-base (8px), duration = --duration-fast (250ms).
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.22, ease: easeSmooth }}
+      transition={{ duration: 0.25, ease: easeSmooth }}
     >
       {children}
     </motion.div>

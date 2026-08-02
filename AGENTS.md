@@ -94,9 +94,10 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 
 - **`motion` (motion/react)** for interactive animation — springs by default, only in `"use client"` components. `MotionConfig reducedMotion="user"` lives in `Providers.tsx` (mounted in `layout.tsx`); pages stay RSC.
 - Canonical springs: sheet/Modal `{stiffness:420, damping:38}` · nav/segmented pill `{stiffness:480, damping:36}` · toast `{stiffness:500, damping:32}`
-- Page transition = `src/app/template.tsx` (fade + rise 0.22s, ease `[0.22,1,0.36,1]`) — do NOT add `animate-fade-in` at page-container level (double animation); per-card `animate-fade-in` + `stagger-*` is fine
+- Page transition = `src/app/template.tsx` (fade + rise 8px/0.25s — `--distance-base`/`--duration-fast` — ease `[0.22,1,0.36,1]`) — do NOT add `animate-fade-in` at page-container level (double animation); per-card `animate-fade-in` + `stagger-*` is fine
+- Open/close asymmetry: sheets/modals/toasts open with their spring but **exit in 150ms** (`--duration-quick` + `easeSmooth`) — closes must never feel springy
 - `animate-fade-in` — `fadeIn var(--duration-slow) var(--ease-smooth-out) both` (Y 8px → 0, opacity 0→1); `animate-slide-up` — same tokens (Y 16px → 0). Defined once as `@utility` in `globals.css` (no `--animate-*` mirrors in `@theme`)
-- `stagger-1` … `stagger-6` — animation-delay 60ms…360ms for list items
+- `stagger-1` … `stagger-6` — animation-delay in 40ms steps (40…240ms, `--duration-stagger`), same rhythm as the JS-computed stagger in `/stops`
 - `animate-pulse-skeleton` + `skeleton-shimmer` — skeleton loaders (Skeleton component has both)
 - `prefers-reduced-motion` is handled globally in `globals.css` (entry animations off, smooth scroll off) — new keyframe utilities must be added to that media query; gate hover translates with `motion-reduce:`; motion springs are covered by `MotionConfig reducedMotion="user"` + `useReducedMotion` where imperative
 

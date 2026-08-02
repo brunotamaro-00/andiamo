@@ -10,7 +10,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { IconButton } from "./IconButton";
-import { springSheet } from "@/lib/motion";
+import { easeSmooth, springSheet } from "@/lib/motion";
 
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -162,7 +162,7 @@ export function Modal({ title, onClose, children, locked = false, onBack }: Moda
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          exit={{ opacity: 0, transition: reduced ? { duration: 0 } : { duration: 0.15 } }}
           transition={reduced ? { duration: 0 } : { duration: 0.18 }}
           className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm px-4 pt-4 pb-0 sm:p-4"
           onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose(); }}
@@ -174,7 +174,13 @@ export function Modal({ title, onClose, children, locked = false, onBack }: Moda
             aria-labelledby={titleId}
             initial={isSheet ? { y: "100%" } : { opacity: 0, scale: 0.96, y: 8 }}
             animate={isSheet ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
-            exit={isSheet ? { y: "100%" } : { opacity: 0, scale: 0.97, y: 8 }}
+            // Close faster than open (--duration-quick): the user already
+            // decided to leave — a springy exit would feel like friction.
+            exit={
+              isSheet
+                ? { y: "100%", transition: reduced ? { duration: 0 } : { duration: 0.15, ease: easeSmooth } }
+                : { opacity: 0, scale: 0.97, y: 8, transition: reduced ? { duration: 0 } : { duration: 0.15, ease: easeSmooth } }
+            }
             transition={reduced ? { duration: 0 } : springSheet}
             // Drag-to-dismiss: mobile sheet only. The drag listens on the
             // handle+header zone (dragControls), never the scrollable body.
