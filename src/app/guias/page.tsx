@@ -17,7 +17,7 @@ export default function GuidesIndexPage() {
     <div className="min-h-full bg-canvas">
       <PageHeader subtitle="Guías del viaje" />
 
-      <main className="px-4 py-4 max-w-lg mx-auto space-y-4 pb-24">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         {/* Trip-wide docs — empty in the demo, which drops them entirely */}
         {manifest.general.length + manifest.resources.length > 0 && (
         <section className="animate-fade-in">

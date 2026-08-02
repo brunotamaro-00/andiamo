@@ -5,7 +5,7 @@ export default function Loading() {
   return (
     <div className="min-h-full bg-canvas">
       <HeaderSkeleton />
-      <main className="px-4 py-4 max-w-lg mx-auto space-y-4 pb-24">
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         {/* "El viaje" list */}
         <Skeleton className="h-36 rounded-xl" />
         {/* Country: grouped guide rows + doc chips */}
