@@ -47,7 +47,7 @@ export function Field({ label, name, type = "text", hint, ...rest }: FieldProps)
         {label}
       </label>
       <input id={id} name={name} type={type} className={inputClass} {...rest} />
-      {hint && <p className="text-caption text-ink-faint mt-1">{hint}</p>}
+      {hint && <p className="text-caption text-ink-3 mt-1">{hint}</p>}
     </div>
   );
 }

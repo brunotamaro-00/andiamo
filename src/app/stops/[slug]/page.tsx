@@ -210,7 +210,7 @@ export default async function StopPage({ params }: Props) {
             )}
             <div className="flex items-center gap-2 shrink-0">
               {daysLeft !== null && (
-                <p className="label-caps text-brick">
+                <p className="label-caps text-brick-ink">
                   {/* isActive requires arrival <= today < departure, so daysLeft is
                       never 0 here: on the last night it's exactly 1. Keying "Última
                       noche" off 0 made it unreachable and showed "1 día acá". */}

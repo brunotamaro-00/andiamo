@@ -13,8 +13,8 @@
   --color-border:        #D8CFB4;   /* default border / rule */
   --color-border-strong: #C2B08A;   /* hover / active border */
   --color-ink:           #1B1A17;   /* warm near-black text */
-  --color-ink-2:         #6B6452;   /* secondary text */
-  --color-ink-3:         #8A7F6A;   /* muted / subtle */
+  --color-ink-2:        #5A5242;   /* secondary text */
+  --color-ink-3:        #6E6455;   /* muted / subtle */
   --color-ink-faint:     #ABA090;   /* placeholder / disabled */
 
   /* ── Ladrillo accent ───────────────────────────────── */
@@ -33,7 +33,7 @@
   /* ── Semantic (light) ───────────────────────────────── */
   --color-success:      #2F7D4F;
   --color-success-bg:   #E4F0EB;
-  --color-warning:      #B7791F;
+  --color-warning:      #8F5D17;
   --color-warning-bg:   #FBF3E2;
   --color-danger:       #C13515;
   --color-danger-bg:    #FDEDE9;

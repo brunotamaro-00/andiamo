@@ -67,8 +67,8 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 | `border` | Default border / rule `#D8CFB4` |
 | `border-strong` | Hover/active border `#C2B08A` |
 | `ink` | Primary text — warm near-black `#1B1A17` |
-| `ink-2` | Secondary text `#6B6452` |
-| `ink-3` | Muted / labels `#8A7F6A` |
+| `ink-2` | Secondary text `#5A5242` |
+| `ink-3` | Muted / labels `#6E6455` |
 | `ink-faint` | Placeholder / disabled `#ABA090` |
 | `brick` | `#C44428` — ladrillo CTA / accent (was `coral`) |
 | `brick-hover` / `brick-press` | Hover / press states |

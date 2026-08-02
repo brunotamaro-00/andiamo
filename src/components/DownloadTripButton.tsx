@@ -222,7 +222,7 @@ export function DownloadTripButton() {
         </Button>
       </div>
 
-      <p className="mt-2 flex items-center gap-1.5 text-caption text-ink-faint">
+      <p className="mt-2 flex items-center gap-1.5 text-caption text-ink-3">
         <WifiOff size={12} strokeWidth={2} aria-hidden="true" />
         Offline es solo lectura — para editar necesitás conexión.
       </p>

@@ -771,7 +771,7 @@ function UploadForm({
             disabled={uploading}
             className={`${inputClass} h-[42px] py-0 flex items-center cursor-pointer file:mr-3 file:my-0 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-border file:text-ink hover:file:bg-border-strong`}
           />
-          <p className="text-caption text-ink-faint mt-1">
+          <p className="text-caption text-ink-3 mt-1">
             PDF, JPG, PNG o WebP · máximo 20 MB
           </p>
         </div>
