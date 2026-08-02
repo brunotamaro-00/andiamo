@@ -89,13 +89,50 @@ const PSEUDO_GUIDES: Guide[] = [
     })),
 ];
 
+/** The two pseudo-guides that hold the trip-wide docs. They keep the guide
+ *  shape (so lookup, search and export stay uniform) but they have no page
+ *  under /guias: "El viaje" reads at `/general/[doc]`, next to the trip-wide
+ *  notes and documents it belongs with. */
+const TRIP_GUIDE_SLUGS = new Set(["general", "recursos"]);
+
+export function isTripGuide(guideSlug: string): boolean {
+  return TRIP_GUIDE_SLUGS.has(guideSlug);
+}
+
+/** Where a guide doc reads. Trip-wide docs answer at `/general/[doc]`. */
+export function guideDocHref(guideSlug: string, docSlug: string): string {
+  return isTripGuide(guideSlug) ? `/general/${docSlug}` : `/guias/${guideSlug}/${docSlug}`;
+}
+
 export function getManifest(): GuideManifest {
   return manifest;
 }
 
-/** Every guide with a `/guias/[slug]` route — top-level and nested children. */
+/** Every guide, including the trip-wide pseudo-guides. For anything that
+ *  builds `/guias` URLs use `getRoutedGuides()` instead. */
 export function getAllGuides(): Guide[] {
   return [...flattenGuides(manifest.countries.flatMap((c) => c.guides)), ...PSEUDO_GUIDES];
+}
+
+/** Guides with a `/guias/[slug]` page — top-level and nested children. */
+export function getRoutedGuides(): Guide[] {
+  return getAllGuides().filter((g) => !isTripGuide(g.slug));
+}
+
+/** Trip-wide docs in the order /general lists them. Empty in the demo. */
+export function getTripDocs(): GuideDoc[] {
+  return [...manifest.general, ...manifest.resources];
+}
+
+/** Trip-wide doc behind `/general/[doc]`. The two pseudo-guides share one
+ *  route namespace, so the slug is looked up across both (the sync rejects a
+ *  collision). */
+export function getTripDoc(docSlug: string): GuideDocHit | null {
+  for (const slug of TRIP_GUIDE_SLUGS) {
+    const hit = getDoc(slug, docSlug);
+    if (hit) return hit;
+  }
+  return null;
 }
 
 export function getGuide(slug: string): Guide | null {
@@ -242,7 +279,9 @@ export function searchGuides(query: string, limit = 12): GuideSearchHit[] {
 
   const hits: GuideSearchHit[] = [];
   for (const guide of getAllGuides()) {
-    if (normalize(guide.title).includes(needle)) {
+    // A trip pseudo-guide has no page of its own — only its docs are reachable
+    // (/general/[doc]), so matching "El viaje" alone would be a dead result.
+    if (!isTripGuide(guide.slug) && normalize(guide.title).includes(needle)) {
       hits.push({ guide });
     }
     for (const doc of [...guide.docs, ...guide.dayTrips]) {

@@ -16,7 +16,7 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import { docKind, getAllGuides, getGuide, guideDocs, stopSlugsForGuide } from "@/lib/guides";
+import { docKind, getRoutedGuides, getGuide, guideDocs, stopSlugsForGuide } from "@/lib/guides";
 import type { GuideDoc } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
@@ -25,7 +25,7 @@ import { cardClass } from "@/components/ui/Card";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getAllGuides().map((g) => ({ guide: g.slug }));
+  return getRoutedGuides().map((g) => ({ guide: g.slug }));
 }
 
 export async function generateMetadata({

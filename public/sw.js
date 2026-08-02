@@ -23,7 +23,7 @@
 // HTML de offline disfrazado de PDF), "Descargar viaje" que cuenta bytes recién
 // escritos y precachea también los chunks de /_next/static que el HTML necesita
 // para hidratar.
-const CACHE_VERSION = "v16";
+const CACHE_VERSION = "v17";
 const SHELL_CACHE = `andiamo-shell-${CACHE_VERSION}`;
 const TRIP_CACHE  = `andiamo-trip-${CACHE_VERSION}`;  // on-demand precache of stop/guide route HTML
 // Document files are addressed by immutable id and don't depend on the build.

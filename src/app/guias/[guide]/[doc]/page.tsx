@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getAllGuides, getDoc, guideDocs, readDocMarkdown } from "@/lib/guides";
+import { getRoutedGuides, getDoc, guideDocs, readDocMarkdown } from "@/lib/guides";
 import { demoDocMarkdown } from "@/lib/guides-demo";
 import { IS_DEMO } from "@/lib/demo";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
@@ -13,7 +13,7 @@ import { cardClass } from "@/components/ui/Card";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getAllGuides().flatMap((guide) =>
+  return getRoutedGuides().flatMap((guide) =>
     guideDocs(guide).map((doc) => ({ guide: guide.slug, doc: doc.slug }))
   );
 }

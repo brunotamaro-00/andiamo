@@ -8,7 +8,11 @@ import {
   getDoc,
   getGuide,
   getManifest,
+  getRoutedGuides,
+  getTripDoc,
+  getTripDocs,
   guideCityForStop,
+  guideDocHref,
   guideDocs,
   guidesForStop,
   searchGuides,
@@ -204,5 +208,52 @@ describe("getDoc", () => {
   it("resolves pseudo-guides for general docs and resources", () => {
     expect(getDoc("general", "presupuesto")).not.toBeNull();
     expect(getDoc("recursos", "packing-list")).not.toBeNull();
+  });
+});
+
+describe("trip-wide docs live under /general", () => {
+  it("keeps the trip pseudo-guides out of the /guias routes", () => {
+    const routed = getRoutedGuides().map((g) => g.slug);
+    expect(routed).not.toContain("general");
+    expect(routed).not.toContain("recursos");
+    expect(routed).toContain("londres");
+  });
+
+  it("resolves every trip doc by slug alone", () => {
+    const docs = getTripDocs();
+    expect(docs.length).toBeGreaterThan(0);
+    for (const doc of docs) expect(getTripDoc(doc.slug)?.doc.file).toBe(doc.file);
+    expect(getTripDoc("no-existe")).toBeNull();
+  });
+
+  it("routes trip docs to /general and guide docs to /guias", () => {
+    expect(guideDocHref("general", "eurail")).toBe("/general/eurail");
+    expect(guideDocHref("recursos", "packing-list")).toBe("/general/packing-list");
+    expect(guideDocHref("paris", "actividades")).toBe("/guias/paris/actividades");
+  });
+});
+
+describe("country sections", () => {
+  it("gives England and Scotland their own section and flag", () => {
+    const countries = getManifest().countries;
+    const byName = (n: string) => countries.find((c) => c.name === n);
+    expect(byName("Reino Unido")).toBeUndefined();
+    expect(byName("Inglaterra")?.flag).toBe("\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}");
+    expect(byName("Escocia")?.flag).toBe("\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}");
+    expect(byName("Inglaterra")?.guides.map((g) => g.slug)).toEqual(["londres", "york"]);
+    expect(byName("Escocia")?.guides.map((g) => g.slug)).toEqual(["edimburgo", "highlands"]);
+  });
+
+  it("names country docs by kind, without the country", () => {
+    for (const country of getManifest().countries) {
+      // No "Costumbres en Italia" / "Frases Útiles — Chequia (checo)": the
+      // section header right above already says the country.
+      for (const doc of country.countryDocs) expect(doc.title).not.toMatch(/ en | — /);
+    }
+    const uk = getManifest().countries.filter((c) => ["inglaterra", "escocia"].includes(c.slug));
+    // Same English either side of the border: the file is copied into both.
+    for (const c of uk) {
+      expect(c.countryDocs.map((d) => d.slug)).toEqual(["costumbres", "frases-utiles"]);
+    }
   });
 });

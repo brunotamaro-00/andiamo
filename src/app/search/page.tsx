@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import {
   Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
 } from "lucide-react";
-import { searchGuides } from "@/lib/guides";
+import { guideDocHref, isTripGuide, searchGuides } from "@/lib/guides";
 import { Flag } from "@/components/Flag";
 import { getPerson } from "@/lib/person-server";
 import { stopVisibleTo } from "@/lib/person";
@@ -133,14 +133,16 @@ export default async function SearchPage({ searchParams }: Props) {
               {guideHits.map(({ guide, doc, city }) => (
                 <ResultRow
                   key={doc ? `${guide.slug}/${doc.slug}` : guide.slug}
-                  href={doc ? `/guias/${guide.slug}/${doc.slug}` : `/guias/${guide.slug}`}
+                  href={doc ? guideDocHref(guide.slug, doc.slug) : `/guias/${guide.slug}`}
                   flag={guide.countryFlag}
                   title={doc ? doc.title : guide.title}
                   subtitle={
                     doc
-                      ? city
-                        ? `${city.title} · Guía de ${guide.title}`
-                        : `Guía de ${guide.title}`
+                      ? isTripGuide(guide.slug)
+                        ? guide.title
+                        : city
+                          ? `${city.title} · Guía de ${guide.title}`
+                          : `Guía de ${guide.title}`
                       : guide.country
                   }
                 />
