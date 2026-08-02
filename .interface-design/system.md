@@ -53,7 +53,11 @@ Fuente de verdad de la *dirección* visual. Los tokens viven en `src/app/globals
   Jerarquía por peso y color antes que por tamaño (Hanken 400–800).
 - Densidad: mobile cómodo — cards `p-4`, listas `gap-3`, grupos separados por
   `space-y-5`+; dentro de un grupo `space-y-2/3`. Base 4px.
-- Texto: 4 niveles — `ink` / `ink-2` / `ink-3` / `ink-faint`.
+- Texto: 4 niveles — `ink` / `ink-2` / `ink-3` / `ink-faint`. Los tres primeros
+  pasan WCAG AA sobre canvas/surface (ink-3 = 4.9:1 en canvas — no aclarar);
+  `ink-faint` es solo placeholder/disabled, nunca texto informativo.
+- Acentos como texto: `gold` y `brick` NO alcanzan AA en tamaños chicos — para
+  labels usar `gold-ink` / `brick-ink` (los tonos "tinta" existen para eso).
 
 ## Profundidad y superficie (elegida, no mezclar)
 
