@@ -39,6 +39,17 @@
   --color-danger-bg:    #FDEDE9;
   --color-special:      #7C3AED;
   --color-special-bg:   #F2ECFD;
+
+  /* ── Type scale — named steps, no arbitrary text-[..px] ──
+     Two voices share one ladder: Hanken utility text (caption/meta) and the
+     Anton display titles (title-*). Steps ~1.15 apart; whole pixels. */
+  --text-caption: 11px;      --text-caption--line-height: 1.2;   /* labels, hints — the 11px floor */
+  --text-meta: 12px;         --text-meta--line-height: 1.4;      /* metadata rows, banner copy */
+  --text-title-sm: 13px;     --text-title-sm--line-height: 1.25; /* compact titles (picker, doc cards) */
+  --text-title: 15px;        --text-title--line-height: 1.3;     /* row + modal display titles */
+  --text-title-lg: 17px;     --text-title-lg--line-height: 1.3;  /* timeline stop names */
+  --text-title-xl: 22px;     --text-title-xl--line-height: 1.2;  /* hero figures (spend total) */
+  --text-numeral: 26px;      --text-numeral--line-height: 1;     /* editorial numerals (stepper) */
 }
 
 /* Entry/skeleton animations are defined once, as @utility (below), so they can

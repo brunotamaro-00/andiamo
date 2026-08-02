@@ -19,12 +19,12 @@ export function DemoBanner() {
       className="shrink-0 bg-gold border-b-2 border-gold-ink/25 px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-gold-ink"
     >
       <FlaskConical size={13} strokeWidth={2.5} aria-hidden="true" className="shrink-0" />
-      <span className="text-[12px] font-extrabold uppercase tracking-[0.08em]">Demo pública</span>
-      <span className="text-[12px] font-semibold">datos inventados, no es un viaje real</span>
+      <span className="text-meta font-extrabold uppercase tracking-[0.08em]">Demo pública</span>
+      <span className="text-meta font-semibold">datos inventados, no es un viaje real</span>
       {spitwise ? (
         <a
           href={spitwise}
-          className="text-[12px] font-extrabold uppercase tracking-[0.08em] underline underline-offset-2 decoration-2"
+          className="text-meta font-extrabold uppercase tracking-[0.08em] underline underline-offset-2 decoration-2"
         >
           Ver Spitwise ↗
         </a>

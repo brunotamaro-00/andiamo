@@ -136,7 +136,8 @@ Copy de marca (título, tagline, `SITE_URL`, path del og-image) en `src/lib/bran
 - Buttons primary: `rounded-[6px]` + `hard-shadow-ink` + `font-display uppercase` — sticker CTA style
 - Buttons secondary/ghost: `rounded-full` + `border-2 border-ink`
 - Inputs: `rounded-xl` — use `Field`/`inputClass`/`Label` from `ui/`, never reimplement inline
-- Type floor: **11px** — never `text-[9px]`/`text-[10px]`
+- Type scale: named tokens in `@theme` — `text-caption` (11) · `text-meta` (12) · `text-title-sm` (13) · `text-title` (15) · `text-title-lg` (17) · `text-title-xl` (22) · `text-numeral` (26); standard Tailwind steps (`text-xs`…`text-7xl`) for everything else. **No arbitrary `text-[..px]`.**
+- Type floor: **11px** (`text-caption`) — never `text-[9px]`/`text-[10px]`
 - Touch targets: **44px minimum everywhere** (`min-h-[44px]`, `rowActionBtn`, `h-11 w-11`; use negative margins to keep visual density)
 - Transitions: `duration-150`
 - Focus rings: `ring-brick/40`

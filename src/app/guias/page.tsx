@@ -80,7 +80,7 @@ export default function GuidesIndexPage() {
                     className="flex items-center gap-3 min-h-[44px] px-3.5 py-2.5 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
                   >
                     <BookOpen size={16} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
-                    <span className="flex-1 min-w-0 font-display uppercase text-[15px] leading-tight text-ink truncate">
+                    <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate">
                       {guide.title}
                     </span>
                     <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">
@@ -145,7 +145,7 @@ function DocChip({
     <Link
       href={href}
       title={title}
-      className={`flex items-center justify-center gap-1.5 min-h-[44px] min-w-0 px-3 rounded-full border border-border bg-surface card-shadow text-[12px] font-semibold text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${
+      className={`flex items-center justify-center gap-1.5 min-h-[44px] min-w-0 px-3 rounded-full border border-border bg-surface card-shadow text-meta font-semibold text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${
         wide ? "col-span-2" : ""
       }`}
     >

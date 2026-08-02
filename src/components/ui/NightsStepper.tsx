@@ -52,7 +52,7 @@ export function NightsStepper({
               onChange(Number.isFinite(n) ? clamp(n) : 0);
             }}
             aria-describedby={`${id}-unit`}
-            className="w-full bg-transparent text-center font-numeral text-[26px] leading-none text-ink [appearance:textfield] focus:outline-none focus-visible:text-brick [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="w-full bg-transparent text-center font-numeral text-numeral leading-none text-ink [appearance:textfield] focus:outline-none focus-visible:text-brick [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
           <span
             id={`${id}-unit`}

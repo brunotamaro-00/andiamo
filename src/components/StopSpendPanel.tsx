@@ -58,11 +58,11 @@ export default async function StopSpendPanel({
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
             {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
           </p>
-          <p className="font-display uppercase text-[22px] leading-tight text-ink font-tabular">
+          <p className="font-display uppercase text-title-xl leading-tight text-ink font-tabular">
             USD <AnimatedNumber value={total} decimals={0} />
           </p>
           {detail.itinerary_days > 0 && (
-            <p className="text-[12px] text-ink-2 font-tabular">
+            <p className="text-meta text-ink-2 font-tabular">
               ≈ USD {usd(detail.avg_per_day_usd)}/día · {detail.itinerary_days}{" "}
               {detail.itinerary_days === 1 ? "día" : "días"}
             </p>
@@ -85,7 +85,7 @@ export default async function StopSpendPanel({
                     <Icon size={12} strokeWidth={2} className="shrink-0 text-gold" aria-hidden="true" />
                     {cat.name ?? "Otros"}
                   </span>
-                  <span className="font-tabular text-[12px] font-bold text-ink shrink-0">
+                  <span className="font-tabular text-meta font-bold text-ink shrink-0">
                     USD {usd(cat.total_usd)}
                   </span>
                 </div>

@@ -389,7 +389,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
         <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
           Guía ·
         </span>
-        <span className="flex-1 min-w-0 font-display uppercase text-[15px] leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
+        <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
           {city ? `${primary.title} · ${city.title}` : primary.title}
         </span>
         <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />

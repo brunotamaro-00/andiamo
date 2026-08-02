@@ -152,7 +152,7 @@ export default async function StopsPage() {
                     <div className="flex items-center gap-2">
                       <Flag flag={stop.countryFlag} className="text-xl leading-none shrink-0" />
                       <span
-                        className={`font-display uppercase text-[17px] leading-tight truncate ${
+                        className={`font-display uppercase text-title-lg leading-tight truncate ${
                           isActive ? "text-brick-ink" : "text-ink"
                         }`}
                       >

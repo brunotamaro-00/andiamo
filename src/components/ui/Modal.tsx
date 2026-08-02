@@ -210,7 +210,7 @@ export function Modal({ title, onClose, children, locked = false, onBack }: Moda
                       className="-ml-3 shrink-0"
                     />
                   )}
-                  <h3 id={titleId} className="font-display text-[15px] uppercase tracking-wide text-ink leading-none truncate">
+                  <h3 id={titleId} className="font-display text-title uppercase tracking-wide text-ink leading-none truncate">
                     {title}
                   </h3>
                 </div>

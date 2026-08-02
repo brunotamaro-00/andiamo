@@ -73,7 +73,7 @@ function DocGrid({
             className="flex flex-col gap-2 bg-surface rounded-xl border border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
           >
             <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
-            <span className="text-[13px] font-extrabold text-ink leading-snug">{doc.title}</span>
+            <span className="text-title-sm font-extrabold text-ink leading-snug">{doc.title}</span>
           </Link>
         );
       })}
@@ -160,7 +160,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
                     className="flex items-center gap-3 min-h-[44px] px-3.5 py-2.5 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-inset"
                   >
                     <BookOpen size={16} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
-                    <span className="flex-1 min-w-0 font-display uppercase text-[15px] leading-tight text-ink truncate">
+                    <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate">
                       {child.title}
                     </span>
                     <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">

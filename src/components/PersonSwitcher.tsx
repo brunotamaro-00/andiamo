@@ -76,7 +76,7 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
                   >
                     {opt.label}
                   </span>
-                  <span className="block text-[12px] text-ink-2 mt-0.5">{opt.hint}</span>
+                  <span className="block text-meta text-ink-2 mt-0.5">{opt.hint}</span>
                 </button>
               );
             })}

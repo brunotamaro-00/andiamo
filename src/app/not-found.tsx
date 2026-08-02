@@ -8,7 +8,7 @@ export default function NotFound() {
       <Lockup size="lg" tagline={BRAND_TAGLINE} />
 
       <div className="space-y-1">
-        <p className="font-numeral text-[72px] leading-none text-border font-black select-none">
+        <p className="font-numeral text-7xl leading-none text-border font-black select-none">
           404
         </p>
         <p className="text-lg font-display uppercase tracking-wide text-ink">

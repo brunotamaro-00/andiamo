@@ -101,7 +101,7 @@ export function ItineraryPositionPicker({
               >
                 <span className="flex items-baseline gap-2">
                   <Flag flag={moving.countryFlag} className="text-sm" />
-                  <span className="font-display text-[13px] uppercase tracking-wide text-brick-ink">
+                  <span className="font-display text-title-sm uppercase tracking-wide text-brick-ink">
                     {moving.name || "Nueva ciudad"}
                   </span>
                   <span className="ml-auto text-[11px] font-semibold text-brick-ink">
