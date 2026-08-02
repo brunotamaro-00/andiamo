@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 import { useToast } from "@/components/ui/Toast";
+import { fetchWithTimeout, TIMEOUT_INTERACTIVE_MS } from "@/lib/fetch-timeout";
 import { haptics } from "@/lib/haptics";
+import { precacheOutcome } from "@/lib/offline-download";
 
 /* "Descargar viaje": warms the service worker caches with every stop/guide
  * page and every uploaded document so the trip is readable in airplane mode.
@@ -21,7 +23,9 @@ const LS_KEY = "andiamo:trip-downloaded";
  *  the SW is gone, not that the download is slow. */
 const STALL_TIMEOUT_MS = 30_000;
 
-/** The download finished but some files never made it into the cache. */
+/** The download finished but some files never made it into the cache *for a
+ *  reason a retry can fix* — quota, a timeout, the network dropping. See
+ *  `precacheOutcome`: orphaned (`gone`) docs are not this. */
 class PartialDownloadError extends Error {
   constructor(readonly failed: number, readonly total: number) {
     super(`partial: ${failed}/${total}`);
@@ -57,10 +61,20 @@ function formatSince(at: number): string {
   return `hace ${days} d`;
 }
 
+/** How long to wait for a service worker that is still installing. `ready` never
+ *  rejects: if `install` stalls (it precaches the shell over the network), it
+ *  simply never settles, and awaiting it left the button dead — no spinner, no
+ *  error, nothing to retry. The SW now bounds its own install fetches too, but
+ *  the UI must not depend on that to stay responsive. */
+const CONTROLLER_TIMEOUT_MS = 10_000;
+
 async function getController(): Promise<ServiceWorker | null> {
   if (!("serviceWorker" in navigator)) return null;
   if (navigator.serviceWorker.controller) return navigator.serviceWorker.controller;
-  const reg = await navigator.serviceWorker.ready.catch(() => null);
+  const reg = await Promise.race([
+    navigator.serviceWorker.ready.catch(() => null),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), CONTROLLER_TIMEOUT_MS)),
+  ]);
   return reg?.active ?? null;
 }
 
@@ -95,8 +109,13 @@ export function DownloadTripButton() {
     setProgress({ done: 0, total: 0, bytes: 0 });
     haptics.tap();
 
+    let gone = 0;
     try {
-      const res = await fetch("/api/offline/manifest");
+      // The manifest fetch used to sit outside the watchdog below AND have no
+      // deadline of its own, so a socket that stalled here left the button on
+      // "Descargando…" and `disabled` permanently — precisely the state the
+      // watchdog exists to prevent.
+      const res = await fetchWithTimeout("/api/offline/manifest", {}, TIMEOUT_INTERACTIVE_MS);
       if (!res.ok) throw new Error("manifest");
       const { routes, docs } = (await res.json()) as { routes: string[]; docs: string[] };
 
@@ -108,43 +127,53 @@ export function DownloadTripButton() {
         // button stuck on "Descargando…" with no way to retry but a reload.
         // Reset on every message, so a slow-but-progressing download is fine.
         let stallTimer: ReturnType<typeof setTimeout>;
+
+        // Always tear the channel down: leaving the ports open kept both this
+        // one and the SW's precache alive for the life of the page on every
+        // abandoned attempt.
+        const close = () => {
+          clearTimeout(stallTimer);
+          channel.port1.onmessage = null;
+          channel.port1.close();
+        };
+        const settle = (fn: () => void) => {
+          close();
+          fn();
+        };
+
         const armWatchdog = () => {
           clearTimeout(stallTimer);
-          stallTimer = setTimeout(() => {
-            channel.port1.onmessage = null;
-            reject(new Error("stalled"));
-          }, STALL_TIMEOUT_MS);
+          stallTimer = setTimeout(
+            () => settle(() => reject(new Error("stalled"))),
+            STALL_TIMEOUT_MS,
+          );
         };
 
         channel.port1.onmessage = (event) => {
           const data = event.data;
           armWatchdog();
           if (data?.error) {
-            clearTimeout(stallTimer);
-            reject(new Error(data.error));
+            settle(() => reject(new Error(data.error)));
             return;
           }
           if (typeof data?.done === "number" && typeof data?.total === "number") {
             setProgress({ done: data.done, total: data.total, bytes: data.bytes ?? 0 });
           }
           if (data?.finished) {
-            clearTimeout(stallTimer);
-            // The SW now reports what it failed to write (quota, 4xx, network).
-            // Reporting a clean success over a half-empty cache is worse than
-            // no download: you only find out in airplane mode, when it's too
-            // late to do anything about it.
-            if (typeof data.failed === "number" && data.failed > 0) {
-              reject(new PartialDownloadError(data.failed, data.total ?? 0));
+            const outcome = precacheOutcome(data);
+            if (outcome.status === "fatal") {
+              settle(() => reject(new PartialDownloadError(outcome.failed, outcome.total)));
               return;
             }
-            const saved: DownloadedMeta = { at: Date.now(), bytes: data.bytes ?? 0 };
+            gone = outcome.gone;
+            const saved: DownloadedMeta = { at: Date.now(), bytes: outcome.bytes };
             try {
               localStorage.setItem(LS_KEY, JSON.stringify(saved));
             } catch {
               /* storage may be full — the cache still succeeded */
             }
             setMeta(saved);
-            resolve();
+            settle(resolve);
           }
         };
 
@@ -153,7 +182,11 @@ export function DownloadTripButton() {
       });
 
       haptics.success();
-      toast("Viaje descargado para offline");
+      toast(
+        gone > 0
+          ? `Viaje descargado · ${gone} ${gone === 1 ? "archivo ya no existe" : "archivos ya no existen"}`
+          : "Viaje descargado para offline",
+      );
     } catch (e) {
       haptics.error();
       setError(

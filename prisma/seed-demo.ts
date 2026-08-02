@@ -16,6 +16,8 @@ import { runDummySeed } from "./seed-dummy";
  *      Pititas, dejar el owner en Lisboa/Porto le abriría a Katia un hueco de 8
  *      noches y cada viewer vería un total distinto al de Spitwise.
  *   4. Vouchers sin los montos de compra reales.
+ *   5. `fullPools: true` — cada parada recibe todo su pool de notas/docs
+ *      (no un sample al azar), para que Bled/Bovec/Sur no se vean a medias.
  *
  * DESTRUCTIVO. Lo corre el cron nocturno de Railway para limpiar lo que hayan
  * dejado los visitantes. Nunca apuntarlo a la DATABASE_URL de producción.
@@ -35,6 +37,7 @@ runDummySeed({
   shiftDates: false,
   excludeSlugs: ["pititas", ...EXPIRED_CANDIDATES],
   clearOwners: true,
+  fullPools: true,
   globalDocNotes: {
     "Vuelo ida BUE → LHR": "Con millas · confirmado (data ficticia)",
     "Seguro PAX Assistance Long Stay": "Cobertura larga estadía · contratado (ficticio)",

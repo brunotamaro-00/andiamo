@@ -44,6 +44,10 @@ export type DummySeedOptions = {
   /** Pisa la nota de un documento global, por label. La demo no publica los
    *  montos de compra reales que sirven para el uso propio. */
   globalDocNotes?: Record<string, string>;
+  /** Si true, siembra todo el pool de notas/docs por parada (no 1–4 al azar).
+   *  La demo pública necesita cobertura completa en paradas nuevas (Bled, Bovec,
+   *  Sur) para que el portfolio no se vea a medias. */
+  fullPools?: boolean;
 };
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
@@ -76,6 +80,7 @@ export async function seedDummyData({
   excludeSlugs = [],
   clearOwners = false,
   globalDocNotes = {},
+  fullPools = false,
 }: DummySeedOptions) {
   const offset = shiftDates ? daysBetween(vienaOrig, addDaysStr(today, -2)) : 0;
   const shift = (dateStr: string | null): string | null =>
@@ -137,6 +142,21 @@ export async function seedDummyData({
     });
   }
 
+  // Keep tripStartDate in lockstep with the shifted walk. Without this,
+  // seed:dev moves every stop around today but leaves the Setting on the
+  // production start date, so the next recalculateItinerary (and
+  // itinerary:check) would rewrite every booked date — the opposite of a
+  // fixed point.
+  const firstDated = stopsToSeed.find((s) => !s.isCandidate && s.arrivalDate);
+  const tripStart = shift(firstDated?.arrivalDate ?? null);
+  if (tripStart) {
+    await prisma.setting.upsert({
+      where: { key: "tripStartDate" },
+      create: { key: "tripStartDate", value: tripStart },
+      update: { value: tripStart },
+    });
+  }
+
   const dbStops = await prisma.stop.findMany({ orderBy: { order: "asc" } });
   const currentStop = dbStops.find((s) => {
     if (!s.arrivalDate) return false;
@@ -190,7 +210,7 @@ export async function seedDummyData({
     });
   }
 
-  // --- Documentos por parada (pool Itinerary, 1–4 al azar) -------------------
+  // --- Documentos por parada (pool Itinerary; demo = pool completo) ----------
   let stopDocCount = 0;
   const missingDocSlugs: string[] = [];
   for (const stop of dbStops) {
@@ -199,7 +219,8 @@ export async function seedDummyData({
       missingDocSlugs.push(stop.slug);
       continue;
     }
-    for (const d of pickN(pool, randInt(1, 4))) {
+    const picked = fullPools ? pool : pickN(pool, randInt(1, 4));
+    for (const d of picked) {
       await prisma.document.create({
         data: {
           stopId: stop.id,
@@ -264,7 +285,8 @@ export async function seedDummyData({
       missingNoteSlugs.push(stop.slug);
       continue;
     }
-    for (const n of pickN(pool, randInt(1, 4))) {
+    const picked = fullPools ? pool : pickN(pool, randInt(1, 4));
+    for (const n of picked) {
       await prisma.note.create({
         data: {
           stopId: stop.id,

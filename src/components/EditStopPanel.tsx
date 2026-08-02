@@ -104,11 +104,14 @@ function EditModal({
     haptics.warning();
     startTransition(async () => {
       try {
+        // deleteStop always redirects or throws (its return type is `never`),
+        // so there is no resolved { error } to check here — unlike its siblings.
         await deleteStop(stopId);
       } catch {
         haptics.error();
         setMutationError("No se pudo borrar la ciudad. Intentá de nuevo.");
-        setConfirmDelete(false);
+        // Keep the dialog mounted: it is what renders `error`, so closing it
+        // here pushed the message off to the edit form below the fold.
       }
     });
   }

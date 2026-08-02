@@ -79,6 +79,13 @@ export async function createStop(formData: FormData) {
   after(() => notifyStopsChanged());
 
   revalidatePath("/stops");
+  // Same reason as updateStop/deleteStop: recalculateItinerary just rewrote the
+  // dates of every stop after the insertion point, so their cached detail pages
+  // would keep the old arrival and countdown for the whole staleTimes window.
+  revalidatePath("/stops/[slug]", "page");
+  // /search indexes stop name and country — without this the city just added is
+  // not findable by name until the cache expires.
+  revalidatePath("/search");
   redirect(`/stops/${slug}`);
 }
 

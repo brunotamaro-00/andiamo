@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Pin, Trash2, Plus, Pencil, Check, StickyNote, Loader2, AlertCircle } from "lucide-react";
 import { createNote, toggleNotePin, deleteNote, updateNote } from "@/app/actions/notes";
 import { haptics } from "@/lib/haptics";
+import { isTempId, tempId } from "@/lib/temp-id";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -37,10 +38,11 @@ type OptimisticAction =
 
 export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   const [open, setOpen] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const { items: optimisticNotes, mutate, mutationError, isPending } = useOptimisticList(
+  const { items: optimisticNotes, mutate, run, mutationError, isPending } = useOptimisticList(
     notes,
     (state, action: OptimisticAction) => {
       switch (action.type) {
@@ -59,11 +61,17 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
   const detailNote = detailId ? optimisticNotes.find((n) => n.id === detailId) ?? null : null;
 
   function handleTogglePin(id: string) {
+    if (isTempId(id)) return;
     haptics.tap();
     mutate({ type: "togglePin", id }, () => toggleNotePin(id, path), "No se pudo guardar el cambio. Reintentá.");
   }
 
   function handleDelete(id: string) {
+    // deleteNote treats "already gone" (P2025) as success — correct for a real
+    // id, a lie for a temp one. Deleting a still-optimistic row reported "Nota
+    // borrada" while the original createNote committed underneath and the note
+    // came back on the next revalidation.
+    if (isTempId(id)) return;
     setDetailId(null);
     haptics.warning();
     mutate({ type: "delete", id }, () => deleteNote(id, path), "No se pudo borrar la nota. Reintentá.", () => toast("Nota borrada"));
@@ -74,34 +82,55 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
     if (slug) formData.set("slug", slug);
     const pinned = formData.get("pinned") === "true";
     const temp: Note = {
-      id: `temp-${Date.now()}`,
+      id: tempId(),
       title: (formData.get("title") as string) || "—",
       body: (formData.get("body") as string) || "",
       pinned,
       createdAt: new Date(),
     };
-    setOpen(false);
+    setAddError(null);
     haptics.success();
-    mutate({ type: "add", note: temp }, () => createNote(formData), "No se pudo agregar la nota. Reintentá.", () => toast("Nota agregada"));
+    // The sheet closes on success, not before: on failure it stays open with the
+    // typed text still in it and the error inside, so "Reintentá" means something.
+    mutate(
+      { type: "add", note: temp },
+      () => createNote(formData),
+      "No se pudo agregar la nota. Reintentá.",
+      () => {
+        setOpen(false);
+        toast("Nota agregada");
+      },
+      (msg) => setAddError(msg),
+    );
   }
 
+  /** Autosave callback for the editor. Routed through the list hook so a failed
+   *  edit reaches the panel's error banner and triggers the reconciling
+   *  refresh — calling updateNote directly meant a failure was invisible
+   *  everywhere except a line of text inside the editor, and completely silent
+   *  on the unmount flush (flicking the sheet down right after typing). */
   async function handleSave(id: string, title: string, body: string): Promise<"ok" | "error"> {
+    // The create is still in flight: there is no row to update yet.
+    if (isTempId(id)) return "error";
+
     const fd = new FormData();
     fd.set("title", title);
     fd.set("body", body);
-    try {
-      // updateNote resolves { error } on validation failure instead of throwing
-      const result = await updateNote(id, fd, path);
-      if (result?.error) {
-        haptics.error();
-        return "error";
-      }
-      haptics.success();
-      return "ok";
-    } catch {
-      haptics.error();
-      return "error";
-    }
+
+    let outcome: "ok" | "error" = "error";
+    await new Promise<void>((resolve) => {
+      run(
+        () => updateNote(id, fd, path),
+        "No se pudo guardar la nota. Reintentá.",
+        () => {
+          outcome = "ok";
+          haptics.success();
+          resolve();
+        },
+        () => resolve(),
+      );
+    });
+    return outcome;
   }
 
   const pinned = optimisticNotes.filter((n) => n.pinned);
@@ -143,6 +172,7 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
             <NoteRow
               key={note.id}
               note={note}
+              pending={isTempId(note.id)}
               onOpen={() => setDetailId(note.id)}
               onTogglePin={() => handleTogglePin(note.id)}
             />
@@ -151,7 +181,12 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
       )}
 
       {open && (
-        <AddNoteModal onSubmit={handleAdd} onClose={() => setOpen(false)} />
+        <AddNoteModal
+          onSubmit={handleAdd}
+          onClose={() => setOpen(false)}
+          error={addError}
+          busy={isPending}
+        />
       )}
 
       {detailNote && (
@@ -170,9 +205,11 @@ export function NotesPanel({ stopId, slug, notes, path }: NotesPanelProps) {
  *  target that opens the detail sheet. The pin toggle is the only inline
  *  action; edit/delete live in the sheet (matches Documentos/Puntos de interés). */
 function NoteRow({
-  note, onOpen, onTogglePin,
+  note, pending, onOpen, onTogglePin,
 }: {
   note: Note;
+  /** Optimistic row: the create has not come back, so there is no id to act on. */
+  pending?: boolean;
   onOpen: () => void;
   onTogglePin: () => void;
 }) {
@@ -191,8 +228,9 @@ function NoteRow({
       <div className={`flex gap-1 ${hasBody ? "items-start" : "items-center"}`}>
         <button
           onClick={onOpen}
+          disabled={pending}
           aria-label={`Ver nota "${note.title}"`}
-          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+          className="flex-1 min-w-0 text-left rounded-lg -m-1 p-1 transition-colors hover:bg-surface-2/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick disabled:cursor-default"
         >
           <div className="flex items-center gap-1.5">
             {note.pinned && (
@@ -214,9 +252,10 @@ function NoteRow({
 
         <button
           onClick={onTogglePin}
+          disabled={pending}
           aria-label={note.pinned ? "Quitar pin" : "Fijar arriba"}
           aria-pressed={note.pinned}
-          className={`${actionBtn} shrink-0 ${hasBody ? "" : "-my-1.5"} ${
+          className={`${actionBtn} shrink-0 disabled:opacity-50 ${hasBody ? "" : "-my-1.5"} ${
             note.pinned
               ? "text-warning hover:bg-surface-2"
               : "text-ink-faint hover:text-ink-2 hover:bg-surface-2"
@@ -310,8 +349,11 @@ function NoteEditor({
   /* Actually flush the pending save on unmount — this used to only clear the
      timer, so anything typed in the last 700 ms was silently dropped. The sheet
      is drag-to-dismiss: flicking it down right after typing the Ryanair booking
-     code lost the code. Fire-and-forget is fine here; the panel that owns
-     onSave outlives this editor and reconciles from the server. */
+     code lost the code.
+     Fire-and-forget is safe *now*: onSave routes through the panel's
+     useOptimisticList, which outlives this editor and shows the error banner and
+     refreshes on failure. While it called updateNote directly, dropping this
+     result meant a failed flush looked exactly like a successful save. */
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
@@ -409,40 +451,72 @@ function NoteEditor({
   );
 }
 
+/** The fields are controlled state, not an uncontrolled `<form action={fn}>`:
+ *  React 19 resets an action form's DOM inputs once the action settles, which
+ *  would wipe the note the moment we stopped closing the sheet on submit — the
+ *  exact text this change exists to preserve. */
 function AddNoteModal({
-  onSubmit, onClose,
+  onSubmit, onClose, error, busy,
 }: {
   onSubmit: (formData: FormData) => void;
   onClose: () => void;
+  error: string | null;
+  busy: boolean;
 }) {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [pinned, setPinned] = useState(false);
+
+  function submit() {
+    if (busy) return;
+    const fd = new FormData();
+    fd.set("title", title);
+    fd.set("body", body);
+    if (pinned) fd.set("pinned", "true");
+    onSubmit(fd);
+  }
+
   return (
-    <Modal title="Nueva nota" onClose={onClose}>
-      <form action={onSubmit} className="space-y-3">
+    <Modal title="Nueva nota" onClose={onClose} locked={busy}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        className="space-y-3"
+      >
         <Field
           label="Título (opcional)"
           name="title"
           placeholder="Ej: Hostel paga en cash"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextareaField
           label="Cuerpo"
           name="body"
           placeholder="Detalles..."
           rows={3}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
         />
         <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
           <input
             type="checkbox"
             name="pinned"
             value="true"
+            checked={pinned}
+            onChange={(e) => setPinned(e.target.checked)}
             className="rounded border-ink-faint accent-brick focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
           />
           Fijar arriba
         </label>
+        <MutationErrorBanner message={error} />
         <div className="flex gap-2 pt-1">
-          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+          <Button type="button" variant="secondary" className="flex-1" onClick={onClose} disabled={busy}>
             Cancelar
           </Button>
-          <Button type="submit" variant="primary" className="flex-1">
+          <Button type="submit" variant="primary" className="flex-1" loading={busy}>
             Guardar
           </Button>
         </div>

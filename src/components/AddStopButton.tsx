@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { NightsStepper } from "@/components/ui/NightsStepper";
 import { ToggleRow } from "@/components/ui/ToggleRow";
 import { flagFromCountryCode } from "@/lib/country-currency";
+import { fetchWithTimeout, TIMEOUT_INTERACTIVE_MS } from "@/lib/fetch-timeout";
 import {
   ItineraryPositionPicker,
   PositionField,
@@ -106,7 +107,13 @@ function AddStopModal({
       const requestId = ++requestIdRef.current;
       setSearching(true);
       try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
+        // Without a deadline a stalled request left "Buscando…" up forever:
+        // the catch that shows the error never ran.
+        const res = await fetchWithTimeout(
+          `/api/geocode?q=${encodeURIComponent(val)}`,
+          {},
+          TIMEOUT_INTERACTIVE_MS,
+        );
         if (!res.ok) throw new Error(`geocode ${res.status}`);
         const data = await res.json();
         if (requestId !== requestIdRef.current) return;

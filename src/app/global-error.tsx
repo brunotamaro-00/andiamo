@@ -73,6 +73,11 @@ export default function GlobalError({
           >
             Reintentar
           </button>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages --
+              global-error replaces the root layout when it renders, so there is
+              no Next router mounted for next/link to use. A full page load is
+              the only way out of here, and it is also what we want: it rebuilds
+              the app from scratch. */}
           <a
             href="/stops"
             style={{

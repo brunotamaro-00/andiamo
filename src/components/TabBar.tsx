@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { BookOpen, List, MapPin, FileText, Search } from "lucide-react";
 import { haptics } from "@/lib/haptics";
@@ -56,10 +56,15 @@ export function TabBar() {
   // Remember the last stop detail visited this session, so returning to the
   // Itinerario tab reopens it instead of the list. Tapping Itinerario while
   // already on a stop detail goes back up to the list.
+  //
+  // Derived from `pathname` during render, not synced from an effect (that
+  // cascaded a second paint — react-hooks/set-state-in-effect) and not a ref
+  // (react-hooks/refs forbids reading refs during render, and the href of the
+  // Itinerario tab *is* rendered). React's "adjust state when a prop changes"
+  // pattern: the update is discarded and re-run before commit, so there is no
+  // second visible render.
   const [lastStopPath, setLastStopPath] = useState<string | null>(null);
-  useEffect(() => {
-    if (onStopDetail) setLastStopPath(pathname);
-  }, [onStopDetail, pathname]);
+  if (onStopDetail && lastStopPath !== pathname) setLastStopPath(pathname);
 
   if (pathname === "/login") return null;
 

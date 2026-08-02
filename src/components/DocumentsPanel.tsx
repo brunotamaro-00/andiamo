@@ -9,7 +9,9 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { DocumentKind } from "@/generated/prisma/enums";
 import { createDocumentLink, updateDocument, deleteDocument } from "@/app/actions/documents";
+import { fetchWithTimeout, TIMEOUT_INTERACTIVE_MS } from "@/lib/fetch-timeout";
 import { haptics } from "@/lib/haptics";
+import { isTempId, tempId } from "@/lib/temp-id";
 import { useOptimisticList } from "@/lib/use-optimistic-list";
 import { Card, SectionHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -119,7 +121,10 @@ function DownloadDocButton({
     if (saving) return;
     setSaving(true);
     try {
-      const res = await fetch(url);
+      // With no deadline a stalled socket never rejected, so the spinner spun
+      // and `saving` never cleared — at the hostel desk, with the voucher
+      // already in DOCS_CACHE and reachable on a second tap.
+      const res = await fetchWithTimeout(url, {}, TIMEOUT_INTERACTIVE_MS);
       if (!res.ok) throw new Error("fetch failed");
       const blob = await res.blob();
       // Guard against saving a web page as a boarding pass. Uploaded documents
@@ -187,6 +192,8 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   const addMode = IS_DEMO ? "link" : "upload";
   const [mode, setMode] = useState<"link" | "upload" | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { items: optimisticDocs, mutate, mutationError, isPending } = useOptimisticList(
@@ -207,6 +214,9 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
   const openDoc = openId ? optimisticDocs.find((d) => d.id === openId) ?? null : null;
 
   function handleDelete(id: string) {
+    // deleteDocument swallows P2025 as success — a lie for a row whose create is
+    // still in flight: it reported "Documento borrado" and the doc came back.
+    if (isTempId(id)) return;
     setOpenId(null);
     haptics.warning();
     mutate({ type: "delete", id }, () => deleteDocument(id, path), "No se pudo borrar el documento. Reintentá.", () => toast("Documento borrado"));
@@ -222,13 +232,20 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
       externalUrl:
         doc.source === "link" ? (formData.get("url") as string) || doc.externalUrl : doc.externalUrl,
     };
-    setOpenId(null);
+    if (isTempId(doc.id)) return;
+    setEditError(null);
     haptics.success();
+    // Closes on success only: label/nota/fecha/url used to be lost with the
+    // unmounted sheet whenever the save failed.
     mutate(
       { type: "update", doc: updated },
       () => updateDocument(doc.id, formData, path),
       "No se pudo guardar el documento. Reintentá.",
-      () => toast("Documento actualizado"),
+      () => {
+        setOpenId(null);
+        toast("Documento actualizado");
+      },
+      (msg) => setEditError(msg),
     );
   }
 
@@ -236,7 +253,7 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
     if (stopId) formData.set("stopId", stopId);
     if (slug) formData.set("slug", slug);
     const temp: Document = {
-      id: `temp-${Date.now()}`,
+      id: tempId(),
       label: (formData.get("label") as string) || "—",
       note: ((formData.get("note") as string) ?? "").trim() || null,
       kind: (formData.get("kind") as string) || "other",
@@ -246,9 +263,18 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
       sizeBytes: null,
       docDate: (formData.get("docDate") as string) || null,
     };
-    setMode(null);
+    setLinkError(null);
     haptics.success();
-    mutate({ type: "add", doc: temp }, () => createDocumentLink(formData), "No se pudo agregar el link. Reintentá.", () => toast("Link agregado"));
+    mutate(
+      { type: "add", doc: temp },
+      () => createDocumentLink(formData),
+      "No se pudo agregar el link. Reintentá.",
+      () => {
+        setMode(null);
+        toast("Link agregado");
+      },
+      (msg) => setLinkError(msg),
+    );
   }
 
   return (
@@ -297,7 +323,8 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
                 {/* Tapping the card opens the detail sheet (edit/delete). */}
                 <button
                   onClick={() => setOpenId(doc.id)}
-                  className="flex-1 min-w-0 flex items-center gap-2.5 text-left rounded-lg px-1 py-1 -my-1 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick"
+                  disabled={isTempId(doc.id)}
+                  className="flex-1 min-w-0 flex items-center gap-2.5 text-left rounded-lg px-1 py-1 -my-1 transition-colors hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick disabled:cursor-default"
                   aria-label={`Ver detalle de "${doc.label}"`}
                 >
                   <Icon size={18} strokeWidth={1.5} aria-hidden="true" className="text-ink-3 shrink-0" />
@@ -338,6 +365,8 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           stopId={stopId}
           onSubmitLink={handleAddLink}
           onClose={() => setMode(null)}
+          linkError={linkError}
+          linkBusy={isPending}
         />
       )}
 
@@ -347,21 +376,118 @@ export function DocumentsPanel({ stopId, slug, documents, path }: DocumentsPanel
           onSave={(fd) => handleUpdate(openDoc, fd)}
           onDelete={() => handleDelete(openDoc.id)}
           onClose={() => setOpenId(null)}
+          error={editError}
+          busy={isPending}
         />
       )}
     </Card>
   );
 }
 
+function DocEditForm({
+  doc, onSave, onCancel, error, busy,
+}: {
+  doc: Document;
+  onSave: (formData: FormData) => void;
+  onCancel: () => void;
+  error: string | null;
+  busy: boolean;
+}) {
+  const [label, setLabel] = useState(doc.label);
+  const [note, setNote] = useState(doc.note ?? "");
+  const [kind, setKind] = useState(doc.kind);
+  const [docDate, setDocDate] = useState(doc.docDate ?? "");
+  const [url, setUrl] = useState(doc.externalUrl ?? "");
+
+  function submit() {
+    if (busy) return;
+    const fd = new FormData();
+    fd.set("label", label);
+    fd.set("note", note);
+    fd.set("kind", kind);
+    fd.set("docDate", docDate);
+    if (doc.source === "link") fd.set("url", url);
+    onSave(fd);
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+      className="space-y-3"
+    >
+      <Field
+        label="Etiqueta"
+        name="label"
+        required
+        value={label}
+        onChange={(e) => setLabel(e.target.value)}
+        autoFocus
+      />
+      <TextareaField
+        label="Nota"
+        name="note"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="Descripción o detalle del documento…"
+      />
+      <SelectField
+        label="Tipo"
+        name="kind"
+        value={kind}
+        onChange={(e) => setKind(e.target.value)}
+      >
+        {DOCUMENT_KINDS.map((k) => (
+          <option key={k} value={k}>
+            {KIND_LABEL[k]}
+          </option>
+        ))}
+      </SelectField>
+      <Field
+        label="Fecha (entrada/reserva)"
+        name="docDate"
+        type="date"
+        value={docDate}
+        onChange={(e) => setDocDate(e.target.value)}
+        hint="Opcional — ordena los documentos por esta fecha"
+      />
+      {doc.source === "link" && (
+        <Field
+          label="URL"
+          name="url"
+          type="url"
+          required
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://..."
+        />
+      )}
+      <MutationErrorBanner message={error} />
+      <div className="flex gap-2 pt-1">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onCancel} disabled={busy}>
+          Cancelar
+        </Button>
+        <Button type="submit" variant="primary" className="flex-1" loading={busy}>
+          Guardar
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 /** Per-document detail sheet: open/download the file, or switch to an inline
  *  edit form, or delete. Replaces the old row action icons. */
 function DocDetailModal({
-  doc, onSave, onDelete, onClose,
+  doc, onSave, onDelete, onClose, error, busy,
 }: {
   doc: Document;
   onSave: (formData: FormData) => void;
   onDelete: () => void;
   onClose: () => void;
+  error: string | null;
+  busy: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -370,48 +496,18 @@ function DocDetailModal({
 
   if (editing) {
     return (
-      <Modal title="Editar documento" onClose={onClose}>
-        <form action={onSave} className="space-y-3">
-          <Field label="Etiqueta" name="label" required defaultValue={doc.label} autoFocus />
-          <TextareaField
-            label="Nota"
-            name="note"
-            defaultValue={doc.note ?? ""}
-            placeholder="Descripción o detalle del documento…"
-          />
-          <SelectField label="Tipo" name="kind" defaultValue={doc.kind}>
-            {DOCUMENT_KINDS.map((k) => (
-              <option key={k} value={k}>
-                {KIND_LABEL[k]}
-              </option>
-            ))}
-          </SelectField>
-          <Field
-            label="Fecha (entrada/reserva)"
-            name="docDate"
-            type="date"
-            defaultValue={doc.docDate ?? ""}
-            hint="Opcional — ordena los documentos por esta fecha"
-          />
-          {doc.source === "link" && (
-            <Field
-              label="URL"
-              name="url"
-              type="url"
-              required
-              defaultValue={doc.externalUrl ?? ""}
-              placeholder="https://..."
-            />
-          )}
-          <div className="flex gap-2 pt-1">
-            <Button type="button" variant="secondary" className="flex-1" onClick={() => setEditing(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" variant="primary" className="flex-1">
-              Guardar
-            </Button>
-          </div>
-        </form>
+      <Modal title="Editar documento" onClose={onClose} locked={busy}>
+        {/* Controlled fields, not `<form action={fn}>` with defaultValue: React
+            19 resets an action form's inputs once the action settles, so now
+            that the sheet survives a failed save, the edits have to survive with
+            it. */}
+        <DocEditForm
+          doc={doc}
+          onSave={onSave}
+          onCancel={() => setEditing(false)}
+          error={error}
+          busy={busy}
+        />
       </Modal>
     );
   }
@@ -475,15 +571,20 @@ function DocDetailModal({
 /** One "Agregar" modal for both sources; a segmented control switches
  *  between subir archivo y pegar link. */
 function AddDocumentModal({
-  initialMode, stopId, onSubmitLink, onClose,
+  initialMode, stopId, onSubmitLink, onClose, linkError, linkBusy,
 }: {
   initialMode: "link" | "upload";
   stopId: string | null;
   onSubmitLink: (formData: FormData) => void;
   onClose: () => void;
+  linkError: string | null;
+  linkBusy: boolean;
 }) {
   const [mode, setMode] = useState<"link" | "upload">(initialMode);
-  const [busy, setBusy] = useState(false);
+  const [uploadBusy, setUploadBusy] = useState(false);
+  // The link form now also holds the sheet open while its mutation is in
+  // flight, so either source can lock it.
+  const busy = uploadBusy || linkBusy;
 
   return (
     <Modal title="Agregar documento" onClose={onClose} locked={busy}>
@@ -501,34 +602,70 @@ function AddDocumentModal({
         />
       )}
       {mode === "link" ? (
-        <LinkForm onSubmit={onSubmitLink} onClose={onClose} />
+        <LinkForm onSubmit={onSubmitLink} onClose={onClose} error={linkError} busy={linkBusy} />
       ) : (
-        <UploadForm stopId={stopId} onClose={onClose} onBusyChange={setBusy} />
+        <UploadForm stopId={stopId} onClose={onClose} onBusyChange={setUploadBusy} />
       )}
     </Modal>
   );
 }
 
+/** Controlled for the same reason as DocEditForm: the sheet now stays open when
+ *  the mutation fails, and React 19 would otherwise have reset the fields. */
 function LinkForm({
-  onSubmit, onClose,
+  onSubmit, onClose, error, busy,
 }: {
   onSubmit: (formData: FormData) => void;
   onClose: () => void;
+  error: string | null;
+  busy: boolean;
 }) {
+  const [label, setLabel] = useState("");
+  const [note, setNote] = useState("");
+  const [kind, setKind] = useState("other");
+  const [docDate, setDocDate] = useState("");
+  const [url, setUrl] = useState("");
+
+  function submit() {
+    if (busy) return;
+    const fd = new FormData();
+    fd.set("label", label);
+    fd.set("note", note);
+    fd.set("kind", kind);
+    fd.set("docDate", docDate);
+    fd.set("url", url);
+    onSubmit(fd);
+  }
+
   return (
-    <form action={onSubmit} className="space-y-3">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+      className="space-y-3"
+    >
         <Field
           label="Etiqueta"
           name="label"
           required
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
           placeholder="Ej: Check-in Generator Hostel"
         />
         <TextareaField
           label="Nota"
           name="note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
           placeholder="Opcional — descripción o detalle del documento"
         />
-        <SelectField label="Tipo" name="kind">
+        <SelectField
+          label="Tipo"
+          name="kind"
+          value={kind}
+          onChange={(e) => setKind(e.target.value)}
+        >
           {DOCUMENT_KINDS.map((k) => (
             <option key={k} value={k}>
               {KIND_LABEL[k]}
@@ -539,6 +676,8 @@ function LinkForm({
           label="Fecha (entrada/reserva)"
           name="docDate"
           type="date"
+          value={docDate}
+          onChange={(e) => setDocDate(e.target.value)}
           hint="Opcional — ordena los documentos por esta fecha"
         />
         <Field
@@ -546,14 +685,17 @@ function LinkForm({
           name="url"
           type="url"
           required
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
           placeholder="https://..."
           hint="Link a la reserva, entrada o check-in online"
         />
+        <MutationErrorBanner message={error} />
         <div className="flex gap-2 pt-1">
-          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+          <Button type="button" variant="secondary" className="flex-1" onClick={onClose} disabled={busy}>
             Cancelar
           </Button>
-          <Button type="submit" variant="primary" className="flex-1">
+          <Button type="submit" variant="primary" className="flex-1" loading={busy}>
             Guardar
           </Button>
         </div>
