@@ -75,7 +75,7 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 | `brick-ink` | Ladrillo text on light bg `#832C18` |
 | `brick-border` / `brick-bg` | Accent border `#EAAD9C` / surface `#FAE8E3` |
 | `gold` | `#C8A24B` — Panini gold accent |
-| `gold-bg` / `gold-ink` / `gold-border` | Gold surface / text / border |
+| `gold-bg` / `gold-ink` | Gold surface / text |
 | `success` / `success-bg` | Success / pitch green `#2F7D4F` |
 | `warning` / `warning-bg` | Warning states |
 | `danger` / `danger-bg` | Error / destructive |
@@ -88,7 +88,6 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 - `hard-shadow-ink` — `2px 2px 0 ink` — CTA buttons
 - `hover-shadow-brick` / `hover-shadow-ink` — hover lifts; NEVER inline hex shadows
 - `card-hover` — transition for hover states
-- Aliases: `shadow-soft` = `card-shadow`, `shadow-soft-lg` = `card-shadow-lg`
 - CTA active state: `active:translate-x-[2px] active:translate-y-[2px] active:shadow-none` — sticker press effect
 
 ### Animations
@@ -96,8 +95,7 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 - **`motion` (motion/react)** for interactive animation — springs by default, only in `"use client"` components. `MotionConfig reducedMotion="user"` lives in `Providers.tsx` (mounted in `layout.tsx`); pages stay RSC.
 - Canonical springs: sheet/Modal `{stiffness:420, damping:38}` · nav/segmented pill `{stiffness:480, damping:36}` · toast `{stiffness:500, damping:32}`
 - Page transition = `src/app/template.tsx` (fade + rise 0.22s, ease `[0.22,1,0.36,1]`) — do NOT add `animate-fade-in` at page-container level (double animation); per-card `animate-fade-in` + `stagger-*` is fine
-- `animate-fade-in` — `fadeIn 400ms ease-out both` (Y 8px → 0, opacity 0→1)
-- `animate-slide-up` — `slideUp 400ms ease-out both` (Y 16px → 0)
+- `animate-fade-in` — `fadeIn var(--duration-slow) var(--ease-smooth-out) both` (Y 8px → 0, opacity 0→1); `animate-slide-up` — same tokens (Y 16px → 0). Defined once as `@utility` in `globals.css` (no `--animate-*` mirrors in `@theme`)
 - `stagger-1` … `stagger-6` — animation-delay 60ms…360ms for list items
 - `animate-pulse-skeleton` + `skeleton-shimmer` — skeleton loaders (Skeleton component has both)
 - `prefers-reduced-motion` is handled globally in `globals.css` (entry animations off, smooth scroll off) — new keyframe utilities must be added to that media query; gate hover translates with `motion-reduce:`; motion springs are covered by `MotionConfig reducedMotion="user"` + `useReducedMotion` where imperative
