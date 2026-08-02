@@ -60,6 +60,10 @@ const DOC_ORDER = [
   "contexto_historico",
 ];
 
+/** Docs that always sort last, after the standard set *and* after any extra.
+ *  Katia's raw notes are a companion to the curated docs, not one of them. */
+const TRAILING_DOCS = new Set(["notas_katia"]);
+
 /** Nested region container treated as a group of guides, not a guide itself. */
 const REGION_CONTAINERS = new Set(["Sur de Italia"]);
 
@@ -71,6 +75,9 @@ const PRETTY_NAMES: Record<string, string> = {
   transporte: "Transporte",
   desvios_cercanos: "Desvíos cercanos",
   contexto_historico: "Contexto histórico",
+  // The file's own `# Notas Katia — <destino>` heading repeats the guide name
+  // in every chip and breadcrumb; the doc label only needs the kind.
+  "notas-katia": "Notas Katia",
 };
 
 function isMarkdown(name: string): boolean {
@@ -107,7 +114,9 @@ function titleFor(sourceFile: string): string {
 }
 
 function docSortKey(slug: string): [number, string] {
-  const idx = DOC_ORDER.indexOf(slug.replace(/-/g, "_"));
+  const key = slug.replace(/-/g, "_");
+  if (TRAILING_DOCS.has(key)) return [DOC_ORDER.length + 1, slug];
+  const idx = DOC_ORDER.indexOf(key);
   return [idx === -1 ? DOC_ORDER.length : idx, slug];
 }
 
@@ -129,6 +138,15 @@ function copyDoc(
     title: opts.titleOverride ?? titleFor(sourceFile),
     file: relFile,
   };
+}
+
+/** Moves TRAILING_DOCS to the end while leaving every other doc where it was.
+ *  Country-level and region-container docs keep their plain alphabetical order
+ *  (they're a grab bag, not the canonical seven), so they can't go through
+ *  `sortDocs` — but Katia's notes still have to land last. */
+function trailingLast(docs: GuideDoc[]): GuideDoc[] {
+  const isTrailing = (d: GuideDoc) => TRAILING_DOCS.has(d.slug.replace(/-/g, "_"));
+  return [...docs.filter((d) => !isTrailing(d)), ...docs.filter(isTrailing)];
 }
 
 function sortDocs(docs: GuideDoc[], slugPrefix = ""): GuideDoc[] {
@@ -267,6 +285,7 @@ function main() {
     for (const f of looseFiles) {
       country.countryDocs.push(copyDoc(path.join(countryDir, f), country.slug));
     }
+    country.countryDocs = trailingLast(country.countryDocs);
 
     for (const cityDir of cityDirs) {
       const fullCityDir = path.join(countryDir, cityDir);
@@ -280,8 +299,10 @@ function main() {
             buildGuide(path.join(fullCityDir, sub), country, { parentSlug: regionSlug })
           )
           .sort((a, b) => a.title.localeCompare(b.title, "es"));
-        const docs = regionFiles.map((f) =>
-          copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
+        const docs = trailingLast(
+          regionFiles.map((f) =>
+            copyDoc(path.join(fullCityDir, f), path.posix.join(country.slug, regionSlug))
+          )
         );
         country.guides.push({
           slug: regionSlug,

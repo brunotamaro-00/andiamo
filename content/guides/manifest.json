@@ -46,6 +46,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "reino-unido/edimburgo/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "reino-unido/edimburgo/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -92,6 +97,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "reino-unido/highlands/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "reino-unido/highlands/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -138,6 +148,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "reino-unido/londres/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "reino-unido/londres/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -205,6 +220,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "reino-unido/york/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "reino-unido/york/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -276,6 +296,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "paises-bajos/amsterdam/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "paises-bajos/amsterdam/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -353,6 +378,11 @@
               "slug": "bici-route-des-vins",
               "title": "En bici por la Route des Vins d'Alsace desde Colmar",
               "file": "francia/colmar/bici-route-des-vins.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "francia/colmar/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -399,6 +429,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "francia/estrasburgo/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "francia/estrasburgo/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -451,6 +486,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "francia/paris/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "francia/paris/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -661,6 +701,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "alemania/friburgo/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "alemania/friburgo/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -728,6 +773,11 @@
               "slug": "transporte",
               "title": "Transporte",
               "file": "suiza/grindelwald/transporte.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "suiza/grindelwald/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -754,6 +804,11 @@
               "slug": "transporte",
               "title": "Transporte",
               "file": "suiza/interlaken/transporte.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "suiza/interlaken/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -780,6 +835,11 @@
               "slug": "transporte",
               "title": "Transporte",
               "file": "suiza/lauterbrunnen/transporte.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "suiza/lauterbrunnen/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -801,6 +861,11 @@
               "slug": "transporte",
               "title": "Transporte",
               "file": "suiza/lucerna/transporte.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "suiza/lucerna/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -838,6 +903,11 @@
           "slug": "trekkings",
           "title": "Trekkings",
           "file": "suiza/trekkings.md"
+        },
+        {
+          "slug": "notas-katia",
+          "title": "Notas Katia",
+          "file": "suiza/notas-katia.md"
         }
       ]
     },
@@ -882,6 +952,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "austria/innsbruck/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "austria/innsbruck/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -928,6 +1003,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "austria/viena/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "austria/viena/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1005,6 +1085,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "chequia/praga/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "chequia/praga/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1082,6 +1167,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "polonia/cracovia/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "polonia/cracovia/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1164,6 +1254,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "hungria/budapest/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "hungria/budapest/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1241,6 +1336,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "eslovenia/costa-eslovena-y-trieste/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "eslovenia/costa-eslovena-y-trieste/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1277,6 +1377,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "eslovenia/karst-y-cuevas/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "eslovenia/karst-y-cuevas/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1313,6 +1418,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "eslovenia/lagos-alpinos/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "eslovenia/lagos-alpinos/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1359,6 +1469,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "eslovenia/liubliana/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "eslovenia/liubliana/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1395,6 +1510,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "eslovenia/valle-del-soca-y-triglav/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "eslovenia/valle-del-soca-y-triglav/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1422,6 +1542,11 @@
           "slug": "trekkings",
           "title": "Trekkings — Alpes Julianos / Parque Nacional del Triglav",
           "file": "eslovenia/trekkings.md"
+        },
+        {
+          "slug": "notas-katia",
+          "title": "Notas Katia",
+          "file": "eslovenia/notas-katia.md"
         }
       ]
     },
@@ -1471,6 +1596,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "italia/florencia/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "italia/florencia/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1538,6 +1668,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "italia/napoles/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "italia/napoles/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -1584,6 +1719,11 @@
               "slug": "contexto-historico",
               "title": "Contexto histórico",
               "file": "italia/roma/contexto-historico.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "italia/roma/notas-katia.md"
             }
           ],
           "dayTrips": [
@@ -1626,6 +1766,11 @@
               "slug": "sur-de-italia-opciones",
               "title": "Sur de Italia — Tablero de decisión",
               "file": "italia/sur-de-italia/sur-de-italia-opciones.md"
+            },
+            {
+              "slug": "notas-katia",
+              "title": "Notas Katia",
+              "file": "italia/sur-de-italia/notas-katia.md"
             }
           ],
           "dayTrips": [],
@@ -2502,6 +2647,11 @@
           "slug": "frases-utiles",
           "title": "Frases Útiles — Italia (italiano)",
           "file": "italia/frases-utiles.md"
+        },
+        {
+          "slug": "notas-katia",
+          "title": "Notas Katia",
+          "file": "italia/notas-katia.md"
         }
       ]
     },
