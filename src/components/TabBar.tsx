@@ -114,7 +114,7 @@ export function TabBar() {
                   />
                 </span>
                 <span
-                  className={`text-[11px] font-extrabold uppercase tracking-[0.08em] transition-colors duration-150 ${
+                  className={`label-caps transition-colors duration-150 ${
                     active ? "text-brick" : "text-ink-3"
                   }`}
                 >

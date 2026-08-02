@@ -183,7 +183,7 @@ export function DownloadTripButton() {
       </p>
 
       {meta && !downloading && (
-        <p className="mt-2 flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-success">
+        <p className="mt-2 flex items-center gap-1.5 label-caps text-success">
           <Check size={13} strokeWidth={2.5} aria-hidden="true" />
           Descargado {formatSince(meta.at)} · {formatBytes(meta.bytes)}
         </p>
@@ -191,7 +191,7 @@ export function DownloadTripButton() {
 
       {downloading && progress && (
         <div className="mt-3" aria-live="polite">
-          <div className="mb-1 flex items-center justify-between text-[11px] text-ink-3">
+          <div className="mb-1 flex items-center justify-between text-caption text-ink-3">
             <span>
               Descargando {progress.done}/{progress.total || "…"}
             </span>
@@ -222,7 +222,7 @@ export function DownloadTripButton() {
         </Button>
       </div>
 
-      <p className="mt-2 flex items-center gap-1.5 text-[11px] text-ink-faint">
+      <p className="mt-2 flex items-center gap-1.5 text-caption text-ink-faint">
         <WifiOff size={12} strokeWidth={2} aria-hidden="true" />
         Offline es solo lectura — para editar necesitás conexión.
       </p>

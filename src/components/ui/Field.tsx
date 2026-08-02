@@ -2,9 +2,10 @@
 
 import { useId } from "react";
 
-/** Canonical label style per AGENTS.md design system spec. */
-export const labelClass =
-  "block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none";
+import { labelClass } from "./Label";
+
+/** Canonical label style — single source in Label.tsx. */
+export { labelClass };
 
 export const inputClass =
   "w-full min-h-[44px] bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-base text-ink " +
@@ -46,7 +47,7 @@ export function Field({ label, name, type = "text", hint, ...rest }: FieldProps)
         {label}
       </label>
       <input id={id} name={name} type={type} className={inputClass} {...rest} />
-      {hint && <p className="text-[11px] text-ink-faint mt-1">{hint}</p>}
+      {hint && <p className="text-caption text-ink-faint mt-1">{hint}</p>}
     </div>
   );
 }

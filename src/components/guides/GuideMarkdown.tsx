@@ -85,7 +85,7 @@ const components: Components = {
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 pt-2">
+    <h3 className="label-caps text-ink-3 pt-2">
       {children}
     </h3>
   ),
@@ -147,7 +147,7 @@ const components: Components = {
   ),
   thead: ({ children }) => <thead className="bg-surface-2">{children}</thead>,
   th: ({ children }) => (
-    <th className="text-left px-2.5 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 border-b-2 border-border whitespace-nowrap">
+    <th className="text-left px-2.5 py-2 label-caps text-ink-3 border-b-2 border-border whitespace-nowrap">
       {children}
     </th>
   ),

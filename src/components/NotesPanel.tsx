@@ -378,7 +378,7 @@ function NoteEditor({
         className="w-full bg-transparent text-base text-ink-2 placeholder:text-ink-faint focus:outline-none resize-none"
       />
       <div className="flex items-center justify-between pt-1">
-        <span className="text-[11px] text-ink-3 flex items-center gap-1" aria-live="polite">
+        <span className="text-caption text-ink-3 flex items-center gap-1" aria-live="polite">
           {status === "saving" && (
             <>
               <Loader2 size={11} className="animate-spin" aria-hidden="true" />
@@ -398,7 +398,7 @@ function NoteEditor({
             </span>
           )}
           {status === "idle" && !title.trim() && body.trim() && (
-            <span className="text-ink-3 text-[11px]">Sin título</span>
+            <span className="text-ink-3 text-caption">Sin título</span>
           )}
         </span>
         <Button variant="ghost" size="sm" onClick={done}>

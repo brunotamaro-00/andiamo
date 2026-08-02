@@ -104,11 +104,11 @@ export function ItineraryPositionPicker({
                   <span className="font-display text-title-sm uppercase tracking-wide text-brick-ink">
                     {moving.name || "Nueva ciudad"}
                   </span>
-                  <span className="ml-auto text-[11px] font-semibold text-brick-ink">
+                  <span className="ml-auto text-caption font-semibold text-brick-ink">
                     {nightsLabel(moving.nights)}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-[11px] text-ink-2">
+                <span className="mt-0.5 block text-caption text-ink-2">
                   {movingRow.arrival
                     ? `Llega el ${formatDay(movingRow.arrival)}`
                     : "Sin fecha — falta el inicio del viaje"}
@@ -129,7 +129,7 @@ export function ItineraryPositionPicker({
                 >
                   {stop.name}
                 </span>
-                <span className="ml-auto shrink-0 text-[11px] tabular-nums text-ink-3">
+                <span className="ml-auto shrink-0 text-caption tabular-nums text-ink-3">
                   {row?.arrival ? formatDay(row.arrival) : nightsLabel(stop.nights)}
                 </span>
               </div>
@@ -192,7 +192,7 @@ export function PositionField({
             {slotLabel(spine, slot)}
           </span>
           {arrival && (
-            <span className="mt-0.5 block text-[11px] text-ink-3">
+            <span className="mt-0.5 block text-caption text-ink-3">
               Llega el {formatDay(arrival)}
             </span>
           )}

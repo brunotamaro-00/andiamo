@@ -116,7 +116,7 @@ export function Lockup({
       {tagline && (
         <p
           className={[
-            "text-[11px] font-extrabold uppercase tracking-[0.08em]",
+            "label-caps",
             tone === "dark" ? "text-canvas/70" : "text-ink-3",
             vertical ? "mt-2" : "",
           ].join(" ")}

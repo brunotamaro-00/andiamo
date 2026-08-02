@@ -36,7 +36,7 @@ export function OfflineBanner() {
       className="shrink-0 bg-warning-bg border-b-2 border-warning/40 px-4 pb-1.5 pt-[calc(0.375rem+env(safe-area-inset-top))] flex items-center justify-center gap-1.5 animate-fade-in"
     >
       <WifiOff size={12} strokeWidth={2} aria-hidden="true" className="text-warning shrink-0" />
-      <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-warning">
+      <span className="label-caps text-warning">
         Sin conexión — viendo datos guardados
       </span>
     </div>

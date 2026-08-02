@@ -99,7 +99,7 @@ type DocAction =
   | { type: "update"; doc: Document };
 
 const docActionBtnClass =
-  "flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 disabled:opacity-40";
+  "flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border-2 border-ink px-3 py-2 label-caps text-ink min-h-[44px] transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 disabled:opacity-40";
 
 /** Downloads an uploaded file to the device. On mobile, prefers the native
  *  share sheet (Save to Files / Photos). Offline cache is automatic via the
@@ -761,7 +761,7 @@ function UploadForm({
           hint="Opcional — ordena los documentos por esta fecha"
         />
         <div>
-          <label htmlFor={fileInputId} className="block text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5 leading-none">Archivo</label>
+          <label htmlFor={fileInputId} className="block text-left label-caps text-ink-3 mb-1.5 leading-none">Archivo</label>
           <input
             id={fileInputId}
             ref={fileRef}
@@ -771,7 +771,7 @@ function UploadForm({
             disabled={uploading}
             className={`${inputClass} h-[42px] py-0 flex items-center cursor-pointer file:mr-3 file:my-0 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-border file:text-ink hover:file:bg-border-strong`}
           />
-          <p className="text-[11px] text-ink-faint mt-1">
+          <p className="text-caption text-ink-faint mt-1">
             PDF, JPG, PNG o WebP · máximo 20 MB
           </p>
         </div>
@@ -785,7 +785,7 @@ function UploadForm({
 
         {uploading && (
           <div aria-live="polite">
-            <div className="flex items-center justify-between text-[11px] text-ink-3 mb-1">
+            <div className="flex items-center justify-between text-caption text-ink-3 mb-1">
               <span>Subiendo {fileName ?? ""}</span>
               <span>{progress}%</span>
             </div>

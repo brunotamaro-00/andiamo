@@ -194,7 +194,7 @@ export default async function StopPage({ params }: Props) {
         >
           <div className="flex items-center justify-between gap-3">
             {tripDay !== null ? (
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+              <p className="label-caps text-ink-3">
                 Día {tripDay} del viaje
               </p>
             ) : (
@@ -202,7 +202,7 @@ export default async function StopPage({ params }: Props) {
             )}
             <div className="flex items-center gap-2 shrink-0">
               {daysLeft !== null && (
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-brick">
+                <p className="label-caps text-brick">
                   {/* isActive requires arrival <= today < departure, so daysLeft is
                       never 0 here: on the last night it's exactly 1. Keying "Última
                       noche" off 0 made it unreachable and showed "1 día acá". */}
@@ -386,7 +386,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
         className="flex items-center gap-2 min-h-[44px] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"
       >
         <BookOpen size={16} strokeWidth={1.5} className="text-brick shrink-0" aria-hidden="true" />
-        <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
+        <span className="label-caps text-ink-3 shrink-0">
           Guía ·
         </span>
         <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate group-hover:text-brick-ink transition-colors duration-150">
@@ -403,7 +403,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
           href={`/guias/${primary.slug}`}
           className="flex items-center gap-2 min-h-[44px] mt-2.5 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
         >
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
+          <span className="label-caps text-ink-3 shrink-0">
             {primary.cities.length} ciudades
           </span>
           <span className="flex-1 min-w-0 text-xs font-semibold text-ink-2 truncate">
@@ -415,7 +415,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
 
       {regionChips.length > 0 && (
         <div className="mt-2.5">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-1.5">
+          <p className="label-caps text-ink-3 mb-1.5">
             Toda {primary.title}
           </p>
           <DocChips guideSlug={primary.slug} docs={regionChips} flush />
@@ -473,7 +473,7 @@ function DocChips({
             key={doc.slug}
             href={`/guias/${guideSlug}/${doc.slug}`}
             title={doc.title}
-            className={`flex items-center justify-center min-w-0 h-11 rounded-full border border-border px-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${span}`}
+            className={`flex items-center justify-center min-w-0 h-11 rounded-full border border-border px-2 label-caps text-ink-2 transition-colors duration-150 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 ${span}`}
           >
             <span className="truncate">{doc.title}</span>
           </Link>

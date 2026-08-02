@@ -60,7 +60,7 @@ export default async function GuideDocPage({
       <main className="px-4 py-5 max-w-lg mx-auto pb-24">
         <Link
           href={`/guias/${found.guide.slug}`}
-          className="inline-flex items-center gap-1 mb-2 min-h-[44px] text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1"
+          className="inline-flex items-center gap-1 mb-2 min-h-[44px] label-caps text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1"
         >
           <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
           <span className="truncate max-w-[16rem]">
@@ -73,7 +73,7 @@ export default async function GuideDocPage({
             <Flag flag={found.guide.countryFlag} className="text-2xl leading-none" />
             <div className="min-w-0">
               {found.city && (
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+                <p className="label-caps text-ink-3">
                   {found.city.title}
                 </p>
               )}

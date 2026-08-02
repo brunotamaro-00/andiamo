@@ -235,6 +235,16 @@ select {
               transform var(--duration-quick) var(--ease-smooth-out);
 }
 
+/* ── Canonical label voice — size/weight/case/tracking only ──
+   Color stays at the call site (text-ink-3 default, text-brick active, …) so
+   utility overrides never fight this rule. Spec lives in AGENTS.md. */
+@utility label-caps {
+  font-size: var(--text-caption);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 /* ── Tabular nums for data ───────────────────────────── */
 @utility font-tabular {
   font-feature-settings: "tnum";

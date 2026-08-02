@@ -185,7 +185,7 @@ function AddStopModal({
             <span className="block truncate font-display text-base uppercase tracking-tight text-ink">
               {selected.name}
             </span>
-            <span className="mt-0.5 block truncate text-[11px] text-ink-3">
+            <span className="mt-0.5 block truncate text-caption text-ink-3">
               {selected.admin1 ? `${selected.admin1} · ` : ""}
               {selected.country}
             </span>
@@ -198,7 +198,7 @@ function AddStopModal({
             }}
             // Quiet on purpose: inside a border-2 card, a second heavy frame
             // would compete with the city name for the focal point.
-            className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full px-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full px-3 label-caps text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
           >
             <RotateCcw size={12} strokeWidth={2} aria-hidden="true" />
             Cambiar

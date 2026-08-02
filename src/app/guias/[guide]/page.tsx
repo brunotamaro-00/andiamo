@@ -99,7 +99,7 @@ function DayTripList({ guideSlug, docs }: { guideSlug: string; docs: GuideDoc[] 
   );
 }
 
-const SECTION_LABEL = "text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2";
+const SECTION_LABEL = "label-caps text-ink-3 mb-2";
 
 export default async function GuidePage({ params }: { params: Promise<{ guide: string }> }) {
   const { guide: slug } = await params;
@@ -119,7 +119,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5 pb-24">
         <Link
           href={backHref}
-          className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
+          className="inline-flex items-center gap-1 label-caps text-ink-3 hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg px-1 -ml-1 py-0.5"
         >
           <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
           {backLabel}
@@ -132,7 +132,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
             <h2 className="font-display uppercase text-2xl leading-tight text-ink tracking-wide">
               {guide.title}
             </h2>
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-0.5">
+            <p className="label-caps text-ink-3 mt-0.5">
               {guide.country}
               {guide.guides.length > 0 &&
                 ` · ${guide.guides.length} ${guide.guides.length === 1 ? "guía" : "guías"}`}
@@ -163,7 +163,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
                     <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate">
                       {child.title}
                     </span>
-                    <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">
+                    <span className="shrink-0 text-caption font-medium font-tabular text-ink-3">
                       {all.length} docs{extra}
                     </span>
                     <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />
@@ -219,7 +219,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {/* Related stops */}
         {relatedStops.length > 0 && (
           <section className="animate-fade-in">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
+            <p className="label-caps text-ink-3 mb-2">
               Paradas relacionadas
             </p>
             <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
                 <Link
                   key={stopSlug}
                   href={`/stops/${stopSlug}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+                  className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 label-caps text-ink transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
                 >
                   <MapPin size={12} strokeWidth={2} aria-hidden="true" />
                   {stopSlug.replace(/-/g, " ")}

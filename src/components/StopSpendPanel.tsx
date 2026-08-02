@@ -37,7 +37,7 @@ export default async function StopSpendPanel({
         <div className="flex items-center gap-3">
           <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+            <p className="label-caps text-ink-3">
               {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
             </p>
             <p className="text-sm text-ink-2">Sin gastos todavía</p>
@@ -55,7 +55,7 @@ export default async function StopSpendPanel({
       <div className="flex items-start gap-3">
         <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0 mt-1" aria-hidden="true" />
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+          <p className="label-caps text-ink-3">
             {person ? `Gastos · ${personLabel(person)}` : "Gastos"}
           </p>
           <p className="font-display uppercase text-title-xl leading-tight text-ink font-tabular">
@@ -81,7 +81,7 @@ export default async function StopSpendPanel({
             return (
               <li key={cat.category_id ?? "otros"}>
                 <div className="flex items-baseline justify-between gap-2 mb-0.5">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2 truncate min-w-0">
+                  <span className="inline-flex items-center gap-1.5 label-caps text-ink-2 truncate min-w-0">
                     <Icon size={12} strokeWidth={2} className="shrink-0 text-gold" aria-hidden="true" />
                     {cat.name ?? "Otros"}
                   </span>
@@ -105,7 +105,7 @@ function SpitwiseLink({ href }: { href: string }) {
       href={href}
       target="_blank"
       rel="noopener"
-      className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink shrink-0 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1.5 label-caps text-ink shrink-0 min-h-[44px] sm:min-h-0 transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
     >
       Spitwise
       <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />

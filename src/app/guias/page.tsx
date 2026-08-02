@@ -7,7 +7,7 @@ import { Flag } from "@/components/Flag";
 
 export const metadata: Metadata = { title: "Guías · Andiamo" };
 
-const SECTION_LABEL = "text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3";
+const SECTION_LABEL = "label-caps text-ink-3";
 
 export default function GuidesIndexPage() {
   const manifest = getManifest();
@@ -83,7 +83,7 @@ export default function GuidesIndexPage() {
                     <span className="flex-1 min-w-0 font-display uppercase text-title leading-tight text-ink truncate">
                       {guide.title}
                     </span>
-                    <span className="shrink-0 text-[11px] font-medium font-tabular text-ink-3">
+                    <span className="shrink-0 text-caption font-medium font-tabular text-ink-3">
                       {meta}
                     </span>
                     <ChevronRight size={14} strokeWidth={2} className="text-border-strong shrink-0" aria-hidden="true" />

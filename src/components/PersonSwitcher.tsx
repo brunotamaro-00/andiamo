@@ -42,7 +42,7 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Ver gastos de: ${personLabel(person)}. Cambiar`}
-        className="min-h-[44px] text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+        className="min-h-[44px] label-caps text-ink-3 hover:text-ink-2 transition-colors duration-150 px-3 rounded-full hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
       >
         {personLabel(person)}
       </button>
@@ -70,7 +70,7 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
                   }`}
                 >
                   <span
-                    className={`block text-[11px] font-extrabold uppercase tracking-[0.08em] ${
+                    className={`block label-caps ${
                       active ? "text-brick-ink" : "text-ink"
                     }`}
                   >

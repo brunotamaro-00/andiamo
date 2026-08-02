@@ -56,7 +56,7 @@ export function NightsStepper({
           />
           <span
             id={`${id}-unit`}
-            className="mt-0.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3"
+            className="mt-0.5 label-caps text-ink-3"
           >
             {value === 0 ? "tránsito · mismo día" : value === 1 ? "noche" : "noches"}
           </span>

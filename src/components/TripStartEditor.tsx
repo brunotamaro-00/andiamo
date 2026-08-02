@@ -64,7 +64,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
           error ? "border-danger/50" : "border-border hover:border-border-strong",
         ].join(" ")}
       >
-        <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 shrink-0">
+        <span className="label-caps text-ink-3 shrink-0">
           Inicio del viaje
         </span>
         <span
@@ -103,7 +103,7 @@ export function TripStartEditor({ value, fallbackValue = "" }: Props) {
         />
       </div>
       {error && (
-        <p className="mt-1.5 text-[11px] font-medium text-danger" role="alert">
+        <p className="mt-1.5 text-caption font-medium text-danger" role="alert">
           {error}
         </p>
       )}

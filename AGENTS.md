@@ -115,10 +115,11 @@ DB runs in Docker: `open -a Docker && docker start trip-postgres` (postgres:17, 
 
 ### Label convention (critical)
 
-All section labels, headers, and metadata use:
+All section labels, headers, and metadata use the `label-caps` utility (globals.css: 11px · 800 · uppercase · 0.08em — color NOT included, pair explicitly):
 ```
-text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3
+label-caps text-ink-3        ← default; text-brick / text-ink for active states
 ```
+Form labels: `<Label>` / `labelClass` from `ui/Label.tsx` (adds `block mb-1.5 leading-none`; `ui/Field.tsx` re-exports it). Never re-type the raw string. Sole exception: the `PageHeader` subtitle uses `font-display tracking-[0.14em]` — brand voice under the wordmark, not a label.
 
 ### Marca
 

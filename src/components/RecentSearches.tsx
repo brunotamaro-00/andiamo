@@ -21,7 +21,7 @@ export function RecentSearches() {
 
   return (
     <div className="animate-fade-in">
-      <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mb-2">
+      <p className="flex items-center gap-1.5 label-caps text-ink-3 mb-2">
         <History size={13} strokeWidth={1.5} aria-hidden="true" />
         Recientes
       </p>

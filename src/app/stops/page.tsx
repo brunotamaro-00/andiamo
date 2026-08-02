@@ -160,17 +160,17 @@ export default async function StopsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span className="text-[11px] text-ink-3 font-medium">{stop.country}</span>
+                      <span className="text-caption text-ink-3 font-medium">{stop.country}</span>
                       {stop.nights > 0 && (
                         <>
-                          <span className="text-border-strong text-[11px]">·</span>
-                          <span className="text-[11px] text-ink-3 font-medium">{stop.nights} {stop.nights === 1 ? "noche" : "noches"}</span>
+                          <span className="text-border-strong text-caption">·</span>
+                          <span className="text-caption text-ink-3 font-medium">{stop.nights} {stop.nights === 1 ? "noche" : "noches"}</span>
                         </>
                       )}
                       {stop.arrivalDate && (
                         <>
-                          <span className="text-border-strong text-[11px]">·</span>
-                          <span className="text-[11px] text-ink-3 font-medium">
+                          <span className="text-border-strong text-caption">·</span>
+                          <span className="text-caption text-ink-3 font-medium">
                             {formatShortDate(new Date(stop.arrivalDate))}
                           </span>
                         </>
@@ -215,7 +215,7 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
       <p className={`text-4xl font-numeral leading-none ${highlight ? "text-gold" : "text-ink"}`}>
         {numeric !== null ? <AnimatedNumber value={numeric} /> : value}
       </p>
-      <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3 mt-1">{label}</p>
+      <p className="label-caps text-ink-3 mt-1">{label}</p>
     </div>
   );
 }

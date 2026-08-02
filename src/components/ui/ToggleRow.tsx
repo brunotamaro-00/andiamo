@@ -40,7 +40,7 @@ export function ToggleRow({
         <span className={`block text-sm ${checked ? "text-special font-semibold" : "text-ink-2"}`}>
           {label}
         </span>
-        {hint && <span className="mt-0.5 block text-[11px] text-ink-3">{hint}</span>}
+        {hint && <span className="mt-0.5 block text-caption text-ink-3">{hint}</span>}
       </span>
     </label>
   );
