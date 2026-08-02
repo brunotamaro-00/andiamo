@@ -401,7 +401,13 @@
               "file": "francia/estrasburgo/contexto-historico.md"
             }
           ],
-          "dayTrips": [],
+          "dayTrips": [
+            {
+              "slug": "baden-baden",
+              "title": "Day Trip: Baden-Baden (Alemania)",
+              "file": "francia/estrasburgo/day-trips/baden-baden.md"
+            }
+          ],
           "cities": [],
           "guides": []
         },
@@ -1467,7 +1473,28 @@
               "file": "italia/florencia/contexto-historico.md"
             }
           ],
-          "dayTrips": [],
+          "dayTrips": [
+            {
+              "slug": "bologna",
+              "title": "Day Trip: Bologna",
+              "file": "italia/florencia/day-trips/bologna.md"
+            },
+            {
+              "slug": "lucca",
+              "title": "Day Trip: Lucca (+ Pisa)",
+              "file": "italia/florencia/day-trips/lucca.md"
+            },
+            {
+              "slug": "san-gimignano",
+              "title": "Day Trip: San Gimignano",
+              "file": "italia/florencia/day-trips/san-gimignano.md"
+            },
+            {
+              "slug": "siena",
+              "title": "Day Trip: Siena",
+              "file": "italia/florencia/day-trips/siena.md"
+            }
+          ],
           "cities": [],
           "guides": []
         },
@@ -2526,7 +2553,28 @@
               "file": "espana/barcelona/contexto-historico.md"
             }
           ],
-          "dayTrips": [],
+          "dayTrips": [
+            {
+              "slug": "colonia-guell",
+              "title": "Day Trip: Colònia Güell (medio día)",
+              "file": "espana/barcelona/day-trips/colonia-guell.md"
+            },
+            {
+              "slug": "girona",
+              "title": "Day Trip: Girona (+ Figueres)",
+              "file": "espana/barcelona/day-trips/girona.md"
+            },
+            {
+              "slug": "montserrat",
+              "title": "Day Trip: Montserrat",
+              "file": "espana/barcelona/day-trips/montserrat.md"
+            },
+            {
+              "slug": "tarragona",
+              "title": "Day Trip: Tarragona",
+              "file": "espana/barcelona/day-trips/tarragona.md"
+            }
+          ],
           "cities": [],
           "guides": []
         },
@@ -2572,7 +2620,28 @@
               "file": "espana/madrid/contexto-historico.md"
             }
           ],
-          "dayTrips": [],
+          "dayTrips": [
+            {
+              "slug": "cuenca",
+              "title": "Day Trip: Cuenca",
+              "file": "espana/madrid/day-trips/cuenca.md"
+            },
+            {
+              "slug": "el-escorial",
+              "title": "Day Trip: El Escorial (+ Valle de Cuelgamuros)",
+              "file": "espana/madrid/day-trips/el-escorial.md"
+            },
+            {
+              "slug": "segovia",
+              "title": "Day Trip: Segovia",
+              "file": "espana/madrid/day-trips/segovia.md"
+            },
+            {
+              "slug": "toledo",
+              "title": "Day Trip: Toledo",
+              "file": "espana/madrid/day-trips/toledo.md"
+            }
+          ],
           "cities": [],
           "guides": []
         }

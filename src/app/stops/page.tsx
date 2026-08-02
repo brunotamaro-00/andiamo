@@ -272,11 +272,11 @@ export default async function StopsPage() {
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   const numeric = /^\d+$/.test(value) ? Number(value) : null;
   return (
-    <div className="flex-1 min-w-0">
-      <p className={`text-2xl font-numeral leading-none ${highlight ? "text-gold-ink" : "text-ink"}`}>
+    <div className="flex-1 min-w-0 text-center">
+      <p className={`text-3xl font-numeral leading-none ${highlight ? "text-gold-ink" : "text-ink"}`}>
         {numeric !== null ? <AnimatedNumber value={numeric} /> : value}
       </p>
-      <p className="label-caps text-ink-3 mt-1">{label}</p>
+      <p className="label-caps text-ink-3 mt-1.5">{label}</p>
     </div>
   );
 }
