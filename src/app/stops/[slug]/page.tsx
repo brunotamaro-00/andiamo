@@ -23,6 +23,7 @@ import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
 import { itinerarySpine } from "@/lib/itinerary-slots";
 import { Flag } from "@/components/Flag";
+import { cardClass } from "@/components/ui/Card";
 import StopSpendPanel, { SpendPanelSkeleton } from "@/components/StopSpendPanel";
 
 export const dynamic = "force-dynamic";
@@ -380,7 +381,7 @@ function GuideCard({ stopSlug }: { stopSlug: string }) {
   const regionChips = city ? stopGuideChips(primary.docs) : [];
 
   return (
-    <div className="bg-surface rounded-xl border border-border card-shadow p-3.5 animate-fade-in">
+    <div className={`${cardClass} p-3.5 animate-fade-in`}>
       <Link
         href={`/guias/${primary.slug}`}
         className="flex items-center gap-2 min-h-[44px] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 rounded-lg"

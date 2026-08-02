@@ -8,6 +8,7 @@ import { IS_DEMO } from "@/lib/demo";
 import { GuideMarkdown } from "@/components/guides/GuideMarkdown";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
+import { cardClass } from "@/components/ui/Card";
 
 export const dynamicParams = false;
 
@@ -68,7 +69,7 @@ export default async function GuideDocPage({
           </span>
         </Link>
 
-        <article className="bg-surface rounded-xl border border-border card-shadow px-4 py-5 animate-fade-in">
+        <article className={`${cardClass} px-4 py-5 animate-fade-in`}>
           <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-border">
             <Flag flag={found.guide.countryFlag} className="text-2xl leading-none" />
             <div className="min-w-0">

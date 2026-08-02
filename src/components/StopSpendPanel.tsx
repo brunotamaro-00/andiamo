@@ -1,5 +1,6 @@
 import { ExternalLink, Wallet } from "lucide-react";
 
+import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { categoryIcon } from "@/lib/categoryIcons";
@@ -33,7 +34,7 @@ export default async function StopSpendPanel({
     // Future stops with no expenses: no dead UI. Current/past: friendly hint.
     if (isFuture || !cityUrl) return null;
     return (
-      <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in">
+      <Card className="animate-fade-in">
         <div className="flex items-center gap-3">
           <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
@@ -44,13 +45,13 @@ export default async function StopSpendPanel({
           </div>
           <SpitwiseLink href={cityUrl} />
         </div>
-      </div>
+      </Card>
     );
   }
 
   const total = Number(detail.total_usd);
   return (
-    <div className="bg-surface rounded-xl border border-border card-shadow p-4 animate-fade-in space-y-4">
+    <Card className="animate-fade-in space-y-4">
       {/* Header */}
       <div className="flex items-start gap-3">
         <Wallet size={18} strokeWidth={1.5} className="text-gold shrink-0 mt-1" aria-hidden="true" />
@@ -95,7 +96,7 @@ export default async function StopSpendPanel({
           })}
         </ul>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -115,11 +116,11 @@ function SpitwiseLink({ href }: { href: string }) {
 
 export function SpendPanelSkeleton() {
   return (
-    <div className="bg-surface rounded-xl border border-border card-shadow p-4 space-y-3 animate-pulse-skeleton">
-      <div className="h-3 w-16 bg-surface-2 rounded-md" />
-      <div className="h-6 w-32 bg-surface-2 rounded-md" />
+    <Card className="space-y-3 animate-pulse-skeleton">
+      <div className="h-3 w-16 bg-surface-2 rounded-lg" />
+      <div className="h-6 w-32 bg-surface-2 rounded-lg" />
       <div className="h-1.5 w-full bg-surface-2 rounded-full" />
       <div className="h-1.5 w-3/4 bg-surface-2 rounded-full" />
-    </div>
+    </Card>
   );
 }

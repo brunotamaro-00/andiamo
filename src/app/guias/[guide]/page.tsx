@@ -20,6 +20,7 @@ import { docKind, getAllGuides, getGuide, guideDocs, stopSlugsForGuide } from "@
 import type { GuideDoc } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
+import { cardClass } from "@/components/ui/Card";
 
 export const dynamicParams = false;
 
@@ -70,7 +71,7 @@ function DocGrid({
           <Link
             key={doc.slug}
             href={`/guias/${guideSlug}/${doc.slug}`}
-            className="flex flex-col gap-2 bg-surface rounded-xl border border-border card-shadow px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas"
+            className={`flex flex-col gap-2 ${cardClass} px-3.5 py-3 transition-all duration-150 hover:border-border-strong hover:-translate-y-[2px] motion-reduce:hover:translate-y-0 hover:hover-shadow-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas`}
           >
             <Icon size={18} strokeWidth={1.5} className="text-brick" aria-hidden="true" />
             <span className="text-title-sm font-extrabold text-ink leading-snug">{doc.title}</span>
@@ -83,7 +84,7 @@ function DocGrid({
 
 function DayTripList({ guideSlug, docs }: { guideSlug: string; docs: GuideDoc[] }) {
   return (
-    <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+    <div className={`${cardClass} divide-y divide-border`}>
       {docs.map((doc) => (
         <Link
           key={doc.slug}
@@ -126,7 +127,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         </Link>
 
         {/* Title card */}
-        <div className="bg-surface rounded-xl border border-border card-shadow px-4 py-4 flex items-center gap-3 animate-fade-in">
+        <div className={`${cardClass} px-4 py-4 flex items-center gap-3 animate-fade-in`}>
           <Flag flag={guide.countryFlag} className="text-4xl leading-none" />
           <div className="min-w-0">
             <h2 className="font-display uppercase text-2xl leading-tight text-ink tracking-wide">
@@ -146,7 +147,7 @@ export default async function GuidePage({ params }: { params: Promise<{ guide: s
         {guide.guides.length > 0 && (
           <section className="animate-fade-in stagger-1">
             <p className={SECTION_LABEL}>Regiones e itinerarios</p>
-            <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+            <div className={`${cardClass} divide-y divide-border`}>
               {guide.guides.map((child) => {
                 const all = guideDocs(child);
                 const extra =

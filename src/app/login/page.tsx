@@ -5,6 +5,7 @@ import { login } from "@/app/actions/auth";
 import { Lockup } from "@/components/Brand";
 import { Field } from "@/components/ui/Field";
 import { Label } from "@/components/ui/Label";
+import { cardClass } from "@/components/ui/Card";
 import { isAuthenticated } from "@/lib/auth";
 import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE } from "@/lib/brand";
 import { DEMO_URL, IS_DEMO } from "@/lib/demo";
@@ -44,7 +45,7 @@ interface Props {
   searchParams: Promise<{ error?: string; from?: string }>;
 }
 
-const CARD = "w-full bg-surface rounded-xl border border-border card-shadow p-6";
+const CARD = `w-full ${cardClass} p-6`;
 
 export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;

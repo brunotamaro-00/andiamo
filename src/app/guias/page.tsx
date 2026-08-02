@@ -4,6 +4,7 @@ import { BookOpen, ChevronRight, FileText, Globe } from "lucide-react";
 import { getManifest, guideDocs } from "@/lib/guides";
 import { PageHeader } from "@/components/PageHeader";
 import { Flag } from "@/components/Flag";
+import { cardClass } from "@/components/ui/Card";
 
 export const metadata: Metadata = { title: "Guías · Andiamo" };
 
@@ -24,7 +25,7 @@ export default function GuidesIndexPage() {
             <Globe size={12} strokeWidth={2} aria-hidden="true" />
             El viaje
           </p>
-          <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+          <div className={`${cardClass} divide-y divide-border`}>
             {manifest.general.map((doc) => (
               <DocRow key={doc.slug} href={`/guias/general/${doc.slug}`} title={doc.title} />
             ))}
@@ -53,7 +54,7 @@ export default function GuidesIndexPage() {
 
             {/* One grouped card per country: divided rows instead of a stack of
                 separate cards — same border for every guide, uniform row height. */}
-            <div className="bg-surface rounded-xl border border-border card-shadow divide-y divide-border">
+            <div className={`${cardClass} divide-y divide-border`}>
               {country.guides.map((guide) => {
                 const all = guideDocs(guide);
                 const tripCount =

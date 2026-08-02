@@ -1,3 +1,8 @@
+/** Card chrome without padding — the single source of the card look. Use it
+ *  directly on `<Link>` cards or `divide-y` list cards that own their inner
+ *  spacing; `<Card>` below adds the default `p-4`. Never re-type the string. */
+export const cardClass = "bg-surface rounded-xl border border-border card-shadow";
+
 interface CardProps {
   children: React.ReactNode;
   className?: string;
@@ -8,7 +13,8 @@ export function Card({ children, className, hover = false }: CardProps) {
   return (
     <div
       className={[
-        "bg-surface rounded-xl border border-border p-4 card-shadow",
+        cardClass,
+        "p-4",
         hover && "card-hover hover:card-shadow-lg",
         className,
       ]
