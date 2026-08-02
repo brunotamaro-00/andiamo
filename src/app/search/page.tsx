@@ -196,10 +196,11 @@ function ResultHeading({
   icon: typeof MapPin; label: string; count: number;
 }) {
   return (
-    <h2 className="flex items-center gap-1.5 text-xs font-semibold text-ink-2 uppercase tracking-[0.08em] mb-2">
-      <Icon size={13} strokeWidth={1.5} aria-hidden="true" />
-      {label}
-      <span className="text-ink-faint normal-case font-normal">({count})</span>
+    <h2 className="flex items-center gap-2 label-caps text-ink-3 mb-2">
+      <Icon size={13} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+      <span className="truncate">{label}</span>
+      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+      <span className="shrink-0 font-tabular">{count}</span>
     </h2>
   );
 }
@@ -215,7 +216,7 @@ function ResultRow({
   badge?: React.ReactNode;
   external?: boolean;
 }) {
-  const className = "flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-surface hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
+  const className = "flex items-center gap-3 px-3 py-3 rounded-lg border border-border bg-surface card-shadow hover:border-border-strong active:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
 
   const inner = (
     <>

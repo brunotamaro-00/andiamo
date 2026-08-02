@@ -28,7 +28,7 @@ export default function Error({
             />
           </div>
         </div>
-        <h1 className="text-lg font-semibold font-display text-ink">
+        <h1 className="text-lg font-display uppercase text-ink">
           Algo salió mal
         </h1>
         <p className="text-sm text-ink-3 mt-1">
