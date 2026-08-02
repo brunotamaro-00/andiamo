@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { login } from "@/app/actions/auth";
 import { Lockup } from "@/components/Brand";
+import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Label } from "@/components/ui/Label";
 import { cardClass } from "@/components/ui/Card";
@@ -83,14 +84,15 @@ export default async function LoginPage({ searchParams }: Props) {
               Andiamo es la app que usamos día a día en el viaje: por eso pide contraseña. La
               demo pública es exactamente la misma app, con datos de ejemplo.
             </p>
-            <a
+            <Button
+              variant="primary"
               href={DEMO_URL}
               rel="noopener"
-              className="mt-4 flex items-center justify-center gap-2 min-h-[48px] px-4 bg-brick text-surface font-display uppercase tracking-wide rounded-[6px] hard-shadow-ink transition-colors duration-150 hover:bg-brick-hover active:bg-brick-press active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas motion-reduce:active:translate-x-0 motion-reduce:active:translate-y-0"
+              className="mt-4 w-full min-h-[48px] gap-2"
             >
               Entrar a la demo
               <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-            </a>
+            </Button>
           </section>
         )}
 
