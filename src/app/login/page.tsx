@@ -10,7 +10,6 @@ import { cardClass } from "@/components/ui/Card";
 import { isAuthenticated } from "@/lib/auth";
 import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE } from "@/lib/brand";
 import { DEMO_URL, IS_DEMO } from "@/lib/demo";
-import { getManifest } from "@/lib/guides";
 
 // `/` redirige acá cuando no hay sesión, así que ESTA es la página que ve un
 // crawler al desplegar la tarjeta del link (Word, WhatsApp, Slack). El título
@@ -56,12 +55,6 @@ export default async function LoginPage({ searchParams }: Props) {
     redirect(isSafePath ? from : "/");
   }
 
-  // Escala real del viaje, leída del manifest de guías (archivo estático — nada
-  // de DB en la puerta de entrada: si Postgres está caído, /login igual carga).
-  // Es la prueba de que atrás hay un proyecto de verdad y no una demo de tres
-  // pantallas, y el numeral grande es la firma editorial del sistema.
-  const regions = getManifest().countries.length;
-
   return (
     <main className="min-h-full flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-7">
       <div className="animate-slide-up">
@@ -95,18 +88,6 @@ export default async function LoginPage({ searchParams }: Props) {
                 documentos y los gastos en vivo. La demo pública es exactamente la misma app,
                 con datos de ejemplo.
               </p>
-
-              {/* Franja editorial: un numeral dominante, nunca tres cajitas
-                  iguales (ver .interface-design/system.md). */}
-              <div className="mt-4 flex items-baseline gap-3 border-t border-border pt-3">
-                <span className="font-numeral text-4xl leading-none text-brick tabular-nums">
-                  {regions}
-                </span>
-                <span className="flex flex-col gap-0.5">
-                  <span className="label-caps text-ink-2">Regiones con guía propia</span>
-                  <span className="text-caption text-ink-3">Ago–Nov 2026 · Europa</span>
-                </span>
-              </div>
 
               <Button
                 variant="primary"
