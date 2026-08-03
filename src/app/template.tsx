@@ -10,6 +10,11 @@ import { easeSmooth } from "@/lib/motion";
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
+      // h-full le da altura definida al wrapper para que el `min-h-full` de cada
+      // página resuelva: contra un padre de altura auto, ese 100% no computa y
+      // una pantalla corta (/login) queda pegada arriba en vez de centrada. El
+      // contenido más alto simplemente desborda — scroll-root es el que scrollea.
+      className="h-full"
       // Tokens: y = --distance-base (8px), duration = --duration-fast (250ms).
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
