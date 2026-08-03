@@ -50,6 +50,12 @@ Fuente de verdad de la *dirección* visual. Los tokens viven en `src/app/globals
 
 - **Un focal point por vista**: `/stops` = la parada de hoy; `/stops/[slug]` = la
   city card; `/guias/[g]/[d]` = la lectura; `/login` = el CTA de demo.
+  - `/login` lo cumple literal desde 2026-08: **una sola card** (copy + franja
+    editorial + CTA + línea de stack) y el gate de contraseña plegado en un
+    `<details>` discreto, abierto server-side solo si hay error. Se fue el
+    separador "o" y la segunda card, que competían con el focal. La franja usa un
+    numeral dominante (`font-numeral text-4xl text-brick` + `label-caps` +
+    caption), no tres cajitas — es la firma #3 aplicada fuera de la app.
 - Escala tipográfica: tokens `text-caption/meta/title-sm/title/title-lg/title-xl/numeral`
   (11/12/13/15/17/22/26) + escala Tailwind estándar. Anton siempre uppercase.
   Jerarquía por peso y color antes que por tamaño (Hanken 400–800).

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { login } from "@/app/actions/auth";
@@ -10,8 +10,7 @@ import { cardClass } from "@/components/ui/Card";
 import { isAuthenticated } from "@/lib/auth";
 import { BRAND_NAME, BRAND_OG_IMAGE, BRAND_TAGLINE, BRAND_TITLE } from "@/lib/brand";
 import { DEMO_URL, IS_DEMO } from "@/lib/demo";
-import { PEOPLE, personLabel, type Person } from "@/lib/person";
-import { getPerson } from "@/lib/person-server";
+import { getManifest } from "@/lib/guides";
 
 // `/` redirige acá cuando no hay sesión, así que ESTA es la página que ve un
 // crawler al desplegar la tarjeta del link (Word, WhatsApp, Slack). El título
@@ -36,7 +35,6 @@ export const metadata: Metadata = {
 };
 
 const ERROR_COPY: Record<string, string> = {
-  person: "Elegí Bruno o Katia para entrar.",
   empty: "Ingresá la contraseña.",
   password: "Contraseña incorrecta.",
   throttled: "Demasiados intentos. Probá de nuevo en un minuto.",
@@ -46,111 +44,128 @@ interface Props {
   searchParams: Promise<{ error?: string; from?: string }>;
 }
 
-const CARD = `w-full ${cardClass} p-6`;
+const CARD = `w-full ${cardClass} p-5`;
 
 export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
   const from = params.from ?? "/";
-  const error = params.error ? (ERROR_COPY[params.error] ?? ERROR_COPY.person) : null;
+  const error = params.error ? (ERROR_COPY[params.error] ?? ERROR_COPY.password) : null;
 
   if (await isAuthenticated()) {
     const isSafePath = /^\/(?![/\\])/.test(from);
     redirect(isSafePath ? from : "/");
   }
 
-  // Enter en el campo de contraseña dispara el PRIMER submit del form, así que
-  // el orden de los chips decide con quién entrás sin tocar la pantalla. La
-  // cookie `trip_person` (365 días) sobrevive a que expire la sesión, no a un
-  // logout explícito — justo el comportamiento que queremos en un dispositivo
-  // compartido: sin pista de quién fue el último.
-  const last = await getPerson();
-  const people: readonly Person[] =
-    last === null ? PEOPLE : [last, ...PEOPLE.filter((p) => p !== last)];
+  // Escala real del viaje, leída del manifest de guías (archivo estático — nada
+  // de DB en la puerta de entrada: si Postgres está caído, /login igual carga).
+  // Es la prueba de que atrás hay un proyecto de verdad y no una demo de tres
+  // pantallas, y el numeral grande es la firma editorial del sistema.
+  const regions = getManifest().countries.length;
 
   return (
-    <main className="min-h-full flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-8">
+    <main className="min-h-full flex flex-col items-center justify-center bg-canvas px-4 py-10 gap-7">
       <div className="animate-slide-up">
         <Lockup size="xl" tagline={BRAND_TAGLINE} />
       </div>
 
-      <div className="w-full max-w-xs flex flex-col gap-5">
-        {/* Puerta principal: casi todo el tráfico de andiamo.lat llega desde el
-            CV, así que la demo es la acción primaria y la contraseña la excepción.
-            En el propio deploy de demo este bloque sobra. */}
-        {!IS_DEMO && (
-          <section className={`${CARD} animate-slide-up stagger-2`}>
-            <Label as="p">¿Venís desde mi CV o LinkedIn?</Label>
+      <div className="w-full max-w-xs flex flex-col gap-4">
+        {IS_DEMO ? (
+          /* En el propio deploy de demo no hay nada que explicar ni que elegir:
+             una pantalla, un botón, adentro. Quién sos lo resuelve el server
+             (siempre Bruno) — ver actions/auth.ts. */
+          <form action={login} className={`${CARD} animate-slide-up stagger-2`}>
+            <input type="hidden" name="from" value={from} />
             <p className="text-sm text-ink-2 leading-relaxed">
-              Andiamo es la app que usamos día a día en el viaje: por eso pide contraseña. La
-              demo pública es exactamente la misma app, con datos de ejemplo.
+              Estás entrando a la demo pública de Andiamo: la misma app que usamos en el viaje,
+              con datos de ejemplo que se regeneran cada noche.
             </p>
-            <Button
-              variant="primary"
-              href={DEMO_URL}
-              rel="noopener"
-              className="mt-4 w-full min-h-[48px] gap-2"
-            >
+            <Button type="submit" variant="primary" className="mt-4 w-full min-h-[52px]">
               Entrar a la demo
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
             </Button>
-          </section>
-        )}
+          </form>
+        ) : (
+          <>
+            {/* Puerta principal: casi todo el tráfico de andiamo.lat llega desde
+                el CV, así que la demo es el único focal de la pantalla y la
+                contraseña se pliega abajo. */}
+            <section className={`${CARD} animate-slide-up stagger-2`}>
+              <Label as="p">¿Venís desde mi CV o LinkedIn?</Label>
+              <p className="text-sm text-ink-2 leading-relaxed">
+                Andiamo es la app que usamos todos los días en el viaje: itinerario, guías,
+                documentos y los gastos en vivo. La demo pública es exactamente la misma app,
+                con datos de ejemplo.
+              </p>
 
-        {!IS_DEMO && (
-          <div className="flex items-center gap-3 animate-slide-up stagger-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-border" />
-            <span className="label-caps text-ink-faint">
-              o
-            </span>
-            <span className="h-px flex-1 bg-border" />
-          </div>
-        )}
+              {/* Franja editorial: un numeral dominante, nunca tres cajitas
+                  iguales (ver .interface-design/system.md). */}
+              <div className="mt-4 flex items-baseline gap-3 border-t border-border pt-3">
+                <span className="font-numeral text-4xl leading-none text-brick tabular-nums">
+                  {regions}
+                </span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="label-caps text-ink-2">Regiones con guía propia</span>
+                  <span className="text-caption text-ink-3">Ago–Nov 2026 · Europa</span>
+                </span>
+              </div>
 
-        <form action={login} className={`${CARD} space-y-5 animate-slide-up stagger-4`}>
-          <input type="hidden" name="from" value={from} />
+              <Button
+                variant="primary"
+                href={DEMO_URL}
+                rel="noopener"
+                className="mt-4 w-full min-h-[52px] gap-2"
+              >
+                Entrar a la demo
+                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              </Button>
+              <p className="mt-2.5 text-caption text-ink-3 text-center text-balance">
+                Next.js 16 · React 19 · Prisma · PWA offline
+              </p>
+            </section>
 
-          {!IS_DEMO && (
-            <Field
-              label="Contraseña"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              enterKeyHint="go"
-              aria-describedby={error ? "login-error" : undefined}
-              aria-invalid={params.error === "password" || params.error === "empty" || undefined}
-            />
-          )}
+            {/* El gate no compite con el CTA: vive plegado y se abre solo cuando
+                hay un error que mostrar. `<details>` nativo — la pantalla sigue
+                funcionando sin JS, igual que el resto del login. */}
+            <details open={error !== null} className="group animate-slide-up stagger-3">
+              <summary className="flex items-center justify-center gap-1 min-h-[44px] cursor-pointer list-none label-caps text-ink-3 hover:text-ink-2 transition-colors duration-150 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40 [&::-webkit-details-marker]:hidden">
+                <ChevronRight
+                  className="w-3.5 h-3.5 transition-transform duration-150 group-open:rotate-90 motion-reduce:transition-none"
+                  aria-hidden="true"
+                />
+                Soy Bruno o Katia
+              </summary>
 
-          <fieldset>
-            <legend>
-              <Label as="span">¿Quién sos?</Label>
-            </legend>
-            <div className="grid grid-cols-2 gap-2">
-              {people.map((p) => (
-                <button
-                  key={p}
-                  type="submit"
-                  name="person"
-                  value={p}
-                  className="flex items-center justify-center min-h-[56px] px-3 bg-surface-2 border-2 border-border rounded-lg text-sm font-extrabold uppercase tracking-[0.08em] text-ink-2 transition-all duration-150 hover:border-brick hover:bg-brick-bg hover:text-brick-ink active:translate-x-[1px] active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+              <form action={login} className={`${CARD} mt-2 space-y-4`}>
+                <input type="hidden" name="from" value={from} />
+
+                <Field
+                  label="Contraseña"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  enterKeyHint="go"
+                  autoFocus={error !== null}
+                  aria-describedby={error ? "login-error" : undefined}
+                  aria-invalid={params.error === "password" || params.error === "empty" || undefined}
+                />
+
+                <Button type="submit" variant="primary" className="w-full">
+                  Entrar
+                </Button>
+
+                {/* Región siempre presente: si apareciera recién con el error,
+                    algunos lectores de pantalla no anuncian el primero. */}
+                <p
+                  id="login-error"
+                  role="alert"
+                  aria-live="polite"
+                  className="text-danger text-xs font-semibold uppercase tracking-wide empty:hidden"
                 >
-                  {personLabel(p)}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          {/* Región siempre presente: si apareciera recién con el error, algunos
-              lectores de pantalla no anuncian el primero. */}
-          <p
-            id="login-error"
-            role="alert"
-            aria-live="polite"
-            className="text-danger text-xs font-semibold uppercase tracking-wide empty:hidden"
-          >
-            {error}
-          </p>
-        </form>
+                  {error}
+                </p>
+              </form>
+            </details>
+          </>
+        )}
       </div>
     </main>
   );
