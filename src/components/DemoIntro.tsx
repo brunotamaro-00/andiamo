@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/Button";
  * localStorage y se lee recién cuando hidratamos (mismo patrón que `Modal` para
  * el portal): leerlo en el snapshot del server desincroniza la hidratación, y
  * hacerlo en un efecto mete un render de más con el modal ya pintado.
+ *
+ * Solo explica y se cierra: la puerta real es el CTA de /login.
  */
 const SEEN_KEY = "andiamo_demo_intro_v1";
 
@@ -59,13 +61,12 @@ export function DemoIntro() {
         Se integra en vivo con <strong className="text-ink">Spitwise</strong>, mi app de gastos:
         el gasto de cada ciudad que ves acá sale de su API. El link está arriba, en la barra.
       </p>
-      {/* Único foco del diálogo. Con un link acá adentro, el foco inicial caía
-          ahí (React 19 no emite el atributo `autofocus`, así que el fallback de
-          Modal agarra el primer focusable) y un Enter se llevaba al visitante a
-          la otra app en vez de cerrar. El cross-link vive en el banner, que
-          además queda visible siempre. */}
+      {/* Sin CTA de "entrar": el login es la puerta. Con un link acá adentro,
+          el foco inicial caía ahí (React 19 no emite `autofocus`, así que el
+          fallback de Modal agarra el primer focusable) y un Enter se llevaba
+          a Spitwise. El cross-link vive en el banner. */}
       <Button onClick={dismiss} className="w-full">
-        Entrar a la demo
+        Entendido
       </Button>
     </Modal>
   );
