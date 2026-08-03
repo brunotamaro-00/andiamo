@@ -1,17 +1,69 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useSyncExternalStore, useTransition } from "react";
 import { setPerson } from "@/app/actions/person";
 import { PEOPLE, personLabel, type PersonView } from "@/lib/person";
 import { Modal } from "@/components/ui/Modal";
 import { MutationErrorBanner } from "@/components/ui/MutationErrorBanner";
 
+/** "Ya preguntamos en esta pestaña". sessionStorage y no un ref: cada navegación
+ *  remonta el componente, así que sin esto el prompt reaparecería al volver a la
+ *  lista. Se marca al cerrarlo, no al abrirlo — si el visitante se fue de la
+ *  pantalla sin contestar, la pregunta sigue pendiente. */
+const ASKED_KEY = "andiamo_person_asked";
+
+/* El estado inicial no puede leer sessionStorage (no existe en el server), así
+ * que el prompt se decide recién con la app hidratada — mismo patrón que
+ * DemoIntro. Derivado en el render, no en un efecto: un setState sincrónico en
+ * useEffect encadena renders (y lo prohíbe react-hooks/set-state-in-effect). */
+const subscribeNoop = () => () => {};
+const getTrue = () => true;
+const getFalse = () => false;
+
+function alreadyAsked(): boolean {
+  try {
+    return sessionStorage.getItem(ASKED_KEY) === "1";
+  } catch {
+    // Safari en modo privado tira al tocar el storage. Sin memoria preferimos no
+    // insistir: "Ambos" es un estado válido, no un formulario a medio llenar.
+    return true;
+  }
+}
+
+function markAsked() {
+  try {
+    sessionStorage.setItem(ASKED_KEY, "1");
+  } catch {
+    /* idem */
+  }
+}
+
+interface Props {
+  person: PersonView;
+  /** Abre el modal solo/solita la primera vez de la sesión. Lo pasa `/stops`
+   *  cuando no hay cookie `trip_person` — el login ya no pregunta quién sos, así
+   *  que la pregunta se hace acá, una vez, con la app ya a la vista. */
+  promptWhenUnset?: boolean;
+}
+
 /** Header chip showing who is viewing the expenses, with a modal to switch.
  *  Only the Spitwise spend surfaces read this — everything else is shared. */
-export function PersonSwitcher({ person }: { person: PersonView }) {
+export function PersonSwitcher({ person, promptWhenUnset = false }: Props) {
+  const hydrated = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
   const [open, setOpen] = useState(false);
+  const [promptAnswered, setPromptAnswered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const prompting = promptWhenUnset && hydrated && !promptAnswered && !alreadyAsked();
+
+  const close = () => {
+    if (prompting) {
+      markAsked();
+      setPromptAnswered(true);
+    }
+    setOpen(false);
+  };
 
   const choose = (value: string) => {
     startTransition(async () => {
@@ -23,7 +75,7 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
         return;
       }
       setError(null);
-      setOpen(false);
+      close();
     });
   };
 
@@ -47,8 +99,8 @@ export function PersonSwitcher({ person }: { person: PersonView }) {
         {personLabel(person)}
       </button>
 
-      {open && (
-        <Modal title="¿Quién sos?" onClose={() => setOpen(false)} locked={isPending}>
+      {(open || prompting) && (
+        <Modal title="¿Quién sos?" onClose={close} locked={isPending}>
           <p className="text-sm text-ink-2 mb-4">
             Define de quién son los gastos que ves. El resto del viaje es igual para los dos.
           </p>

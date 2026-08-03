@@ -10,6 +10,8 @@ import { itinerarySpine } from "@/lib/itinerary-slots";
 import { AddStopButton } from "@/components/AddStopButton";
 import { HashScroller } from "@/components/HashScroller";
 import { PageHeader } from "@/components/PageHeader";
+import { PersonSwitcher } from "@/components/PersonSwitcher";
+import { IS_DEMO } from "@/lib/demo";
 import { TripStartEditor } from "@/components/TripStartEditor";
 import { Badge } from "@/components/ui/Badge";
 import { Check, ChevronRight, MapPin, Search } from "lucide-react";
@@ -56,13 +58,19 @@ export default async function StopsPage() {
       <PageHeader
         subtitle="Europa 2026"
         actions={
-          <Link
-            href="/search"
-            aria-label="Buscar en el viaje"
-            className="h-11 w-11 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
-          >
-            <Search size={17} strokeWidth={1.5} aria-hidden="true" />
-          </Link>
+          <>
+            {/* El login ya no pregunta quién sos, así que la pregunta cae acá:
+                sin cookie `trip_person`, PersonSwitcher abre su modal una vez.
+                La demo entra siempre como Bruno y no pregunta nada. */}
+            <PersonSwitcher person={viewer} promptWhenUnset={!IS_DEMO && viewer === null} />
+            <Link
+              href="/search"
+              aria-label="Buscar en el viaje"
+              className="h-11 w-11 flex items-center justify-center rounded-full text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/40"
+            >
+              <Search size={17} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+          </>
         }
       />
       {/* Auto-center the current stop on load (and when the logo links to

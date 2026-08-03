@@ -18,6 +18,7 @@ import { CurrentStopSync } from "@/components/CurrentStopContext";
 import { PageHeader } from "@/components/PageHeader";
 import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { getPerson } from "@/lib/person-server";
+import { IS_DEMO } from "@/lib/demo";
 import { stopVisibleTo } from "@/lib/person";
 import { tentativeSunTimes } from "@/lib/sun";
 import { assumedDateWindow } from "@/lib/itinerary";
@@ -180,7 +181,15 @@ export default async function StopPage({ params }: Props) {
 
   return (
     <div className="min-h-full bg-canvas">
-      <PageHeader subtitle={stop.name} actions={<PersonSwitcher person={viewer} />} />
+      {/* Este es el aterrizaje real después de un login en producción (`/` manda
+          a la parada de hoy), así que la pregunta "¿quién sos?" —que el login ya
+          no hace— tiene que poder dispararse también acá. */}
+      <PageHeader
+        subtitle={stop.name}
+        actions={
+          <PersonSwitcher person={viewer} promptWhenUnset={!IS_DEMO && viewer === null} />
+        }
+      />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-4 pb-24">
         <HashScroller />

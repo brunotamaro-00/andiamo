@@ -5,6 +5,7 @@ import { requireAuth } from "@/lib/auth";
 import { SearchBox } from "@/components/SearchBox";
 import { RecentSearches } from "@/components/RecentSearches";
 import { PageHeader } from "@/components/PageHeader";
+import { PersonSwitcher } from "@/components/PersonSwitcher";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
   Search, MapPin, StickyNote, FileText, ChevronRight, FolderOpen, BookOpen,
@@ -83,7 +84,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-full bg-canvas">
-      <PageHeader subtitle="Buscar" />
+      <PageHeader subtitle="Buscar" actions={<PersonSwitcher person={viewer} />} />
 
       <main className="px-4 py-5 max-w-lg mx-auto space-y-6 pb-24">
         <div className="animate-fade-in">

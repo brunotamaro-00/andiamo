@@ -6,10 +6,10 @@ import { IS_DEMO } from "@/lib/demo";
 import { isValidLoginPassword } from "@/lib/login-passwords";
 import { FAILURE_DELAY_MS, clearFailures, isThrottled, recordFailure } from "@/lib/login-throttle";
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE, getExpectedToken } from "@/lib/session";
-import { PERSON_COOKIE_NAME, PERSON_MAX_AGE, isPerson } from "@/lib/person";
+import { DEMO_PERSON, PERSON_COOKIE_NAME, PERSON_MAX_AGE } from "@/lib/person";
 
 /** Error codes the login page renders as copy — never echo back what was typed. */
-export type LoginError = "person" | "password" | "empty" | "throttled";
+export type LoginError = "password" | "empty" | "throttled";
 
 function fail(error: LoginError, from: string): never {
   redirect(`/login?error=${error}&from=${encodeURIComponent(from)}`);
@@ -26,11 +26,6 @@ async function clientKey(): Promise<string> {
 
 export async function login(formData: FormData) {
   const from = formData.get("from")?.toString() ?? "/";
-  const person = formData.get("person")?.toString() ?? "";
-
-  if (!isPerson(person)) {
-    fail("person", from);
-  }
 
   // The public demo is meant to be walked into — the gate only guards prod.
   if (!IS_DEMO) {
@@ -61,13 +56,21 @@ export async function login(formData: FormData) {
     path: "/",
   });
 
-  cookieStore.set(PERSON_COOKIE_NAME, person, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: PERSON_MAX_AGE,
-    path: "/",
-  });
+  // Quién sos no se decide acá: el login es solo la puerta. En producción la
+  // cookie `trip_person` (365 días) sobrevive a que expire la sesión, así que en
+  // un dispositivo propio no hay nada que volver a elegir; si no está,
+  // PersonSwitcher pregunta una vez ya adentro.
+  // La demo no pregunta nunca: quien llega desde el CV no sabe quiénes somos, y
+  // esa elección sería el único obstáculo entre él y la app.
+  if (IS_DEMO) {
+    cookieStore.set(PERSON_COOKIE_NAME, DEMO_PERSON, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: PERSON_MAX_AGE,
+      path: "/",
+    });
+  }
 
   // Only allow single-slash internal paths — "//evil.com" and "/\evil.com"
   // are treated as protocol-relative URLs by the browser.

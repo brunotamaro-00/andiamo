@@ -13,6 +13,9 @@ export const PEOPLE = ["bruno", "katia"] as const;
 
 export type Person = (typeof PEOPLE)[number];
 
+/** Con quién entra la demo pública. El visitante no elige — ver actions/auth.ts. */
+export const DEMO_PERSON: Person = "bruno";
+
 /** `null` means "ambos": household totals, the pre-selector behaviour. It is a
  *  real state, not just a fallback — a session from before this feature has no
  *  cookie and must keep working instead of guessing a person. */
