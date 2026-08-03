@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isPerson, personLabel, stopVisibleTo, PEOPLE } from "./person";
+import { countsTowardTripStats, isPerson, personLabel, stopVisibleTo, PEOPLE } from "./person";
 
 describe("isPerson", () => {
   it("accepts the two trip people", () => {
@@ -47,5 +47,22 @@ describe("stopVisibleTo", () => {
   it("shows every stop to the Ambos household view", () => {
     expect(stopVisibleTo(brunos, null)).toBe(true);
     expect(stopVisibleTo(katias, null)).toBe(true);
+  });
+});
+
+describe("countsTowardTripStats", () => {
+  const spine = { isLocal: false };
+  const pititas = { isLocal: true };
+
+  it("always counts spine stops", () => {
+    for (const viewer of ["bruno", "katia", null] as const) {
+      expect(countsTowardTripStats(spine, viewer)).toBe(true);
+    }
+  });
+
+  it("counts isLocal only for a person view (swap replacement)", () => {
+    expect(countsTowardTripStats(pititas, "katia")).toBe(true);
+    expect(countsTowardTripStats(pititas, "bruno")).toBe(true);
+    expect(countsTowardTripStats(pititas, null)).toBe(false);
   });
 });

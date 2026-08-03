@@ -47,5 +47,19 @@ export function stopVisibleTo(
   return stop.ownerPerson === viewer; // swap: solo la del dueño
 }
 
+/** Whether a visible stop counts in the /stops stats strip (Paradas / Países).
+ *
+ *  `isLocal` pseudo-cities (Pititas) replace the parallel owned leg in a person
+ *  view — count them there. "Ambos" keeps the spine only: including Pititas
+ *  next to Lisboa/Porto would inflate the parada count (nights already dedup via
+ *  `itineraryNights`). */
+export function countsTowardTripStats(
+  stop: { isLocal: boolean },
+  viewer: PersonView,
+): boolean {
+  if (!stop.isLocal) return true;
+  return viewer !== null;
+}
+
 /* Reading the cookie lives in person-server.ts: PersonSwitcher is a client
  * component and imports this module, so it must stay free of next/headers. */

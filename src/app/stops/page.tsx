@@ -5,7 +5,7 @@ import { getCurrentStopSlug } from "@/lib/current-stop";
 import { todayStr, dateToStr, daysBetween, itineraryNights, tripDayNumber } from "@/lib/trip";
 import { requireAuth } from "@/lib/auth";
 import { getPerson } from "@/lib/person-server";
-import { stopVisibleTo } from "@/lib/person";
+import { countsTowardTripStats, stopVisibleTo } from "@/lib/person";
 import { itinerarySpine } from "@/lib/itinerary-slots";
 import { AddStopButton } from "@/components/AddStopButton";
 import { HashScroller } from "@/components/HashScroller";
@@ -35,15 +35,18 @@ export default async function StopsPage() {
   // Portugal leg); "Ambos" (null) sees the full household superset.
   const stops = allStops.filter((s) => stopVisibleTo(s, viewer));
 
-  // Derive trip range from DB data — no hardcoded dates. Pseudo-cities (Pititas)
-  // never count as real stops in the stats or the trip range.
-  const realStops = stops.filter((s) => !s.isLocal);
+  // Paradas/Países: isLocal (Pititas) counts only in a person view — it's their
+  // swap replacement. Ambos keeps the spine so Portugal + Pititas don't both
+  // inflate the parada count.
+  const realStops = stops.filter((s) => countsTowardTripStats(s, viewer));
   const confirmedWithDates = realStops.filter((s) => !s.isFlexMargin && !s.isCandidate);
   const tripStartDate = confirmedWithDates.find((s) => s.arrivalDate)?.arrivalDate ?? null;
-  // Noches con parada asignada, no el span de calendario: los días del tramo que
-  // todavía es tentativo no se cuentan. Misma definición que Spitwise, para que
-  // las dos apps muestren el mismo número (ver itineraryNights).
-  const tripNights = itineraryNights(confirmedWithDates);
+  // Noches: include every visible dated stop (isLocal too). Katia needs Pititas
+  // or she loses 8 nights; Ambos sees both legs and itineraryNights dedups the
+  // overlap. Same definition as Spitwise's itinerary_dates.
+  const tripNights = itineraryNights(
+    stops.filter((s) => !s.isFlexMargin && !s.isCandidate),
+  );
   const today = todayStr();
 
   const tripStartValue = tripStartSetting?.value ?? "";
@@ -92,7 +95,7 @@ export default async function StopsPage() {
           <span className="w-px bg-border mx-4" aria-hidden="true" />
           <Stat
             label="Países"
-            value={[...new Set(realStops.map((s) => s.country))].length.toString()}
+            value={[...new Set(realStops.map((s) => s.country).filter(Boolean))].length.toString()}
           />
         </div>
 
