@@ -31,39 +31,88 @@
 | Francia — Colmar | 14-16 sept | 2 | $34.00 | $68.00 | ✅ Reservado (Airbnb) |
 | Alemania — Friburgo | 16-19 sept | 3 | $42.12 | $126.35 | ✅ Reservado (Black Forest Hostel) |
 | Suiza — Interlaken | 19-23 sept | 4 | **$45.67** | **$182.66** | ✅ Reservado |
-| Austria — Innsbruck | 23 sept (tránsito) | 0 | $45-60 | $0–120 | 0 noches en borrador; +1–2 si se confirman |
+| Austria — Innsbruck | 23 sept (tránsito) | 0 | ($45-60) | **$0** | 0 noches en borrador; +$45-60/n si se confirman 1–2 |
 | Austria — Viena | 23-28 sept | 5 | $48-58 | $240-290 | Hostel / privada simple (estilo actual) |
-| Chequia | 28 sept - 3 oct | 5 | $26-34 | $130-170 | |
-| Polonia | 3-7 oct | 4 | $17-25 | $68-100 | |
-| Hungría | 7-11 oct | 4 | $19-28 | $76-112 | |
+| Chequia — Praga | 28 sept - 3 oct | 5 | $26-34 | $130-170 | |
+| Polonia — Cracovia | 3-7 oct | 4 | $17-25 | $68-100 | |
+| Hungría — Budapest | 7-11 oct | 4 | $19-28 | $76-112 | |
 | Eslovenia — Liubliana | 11-15 oct | 4 | $30-42 | $120-168 | Base Liubliana; excursiones por regiones |
-| Italia | 15 oct - 8 nov | 24 | $38-50 | $912-1,200 | Florencia + Roma + Nápoles + Sur (10n) |
-| España | 8-18 nov | 10 | $33-45 | $330-450 | Barcelona + Madrid |
-| **Margen flex (ubicación TBD)** | a usar en el viaje | 3 | $33-45 | $99-135 | Colchón; sumar noches donde interese |
-| **TOTAL (Bruno, 108n)** | | **108** | | **$4,147.5-4,897.5** | |
-| **TOTAL (Katia, 108n)** | | **108** | | **$4,494.0-5,244.0** | |
+| Italia — Florencia | 15-20 oct | 5 | $33-45 | $165-225 | |
+| Italia — Roma | 20-27 oct | 7 | $35-48 | $245-336 | |
+| Italia — Nápoles | 27-29 oct | 2 | $38-50 | $76-100 | |
+| Italia — Sur (por definir) | 29 oct - 8 nov | 10 | $30-50 | $300-500 | Rango según Amalfi vs Puglia/Sicilia/Calabria |
+| España — Barcelona | 8-13 nov | 5 | $28-42 | $140-210 | |
+| España — Madrid | 13-18 nov | 5 | $26-38 | $130-190 | |
+| **Margen flex (ubicación TBD)** | a usar en el viaje | 3 | $30-47 | $90-140 | Colchón; sumar noches donde interese |
+| **TOTAL (Bruno, 108n)** | | **108** | | **$3,952-4,713** | |
+| **TOTAL (Katia, 108n)** | | **108** | | **$4,299-5,060** | |
 
-> **Nota estilo:** vienen reservando hostels/Airbnb en la banda baja-media. Interlaken salió **mucho más barato** que el techo previo ($72-90 → **$45.67**). Las proyecciones post-Suiza bajan un poco respecto al borrador anterior.
+> **Nota estilo:** vienen reservando hostels/Airbnb en la banda baja-media. Interlaken salió **mucho más barato** que el techo previo ($72-90 → **$45.67**). Las proyecciones de Italia y España se ajustaron a la baja contra precios de mercado de **temporada baja (oct-nov)**: dorm Roma €30-35, Florencia €30-45, Barcelona/Madrid €20-35.
 
 ### Alimentación (por persona)
 
-Sin gastos de comida cargados aún (viaje no empezó). Se mantiene estimación; en Suiza se asume más cocina en hostel.
+Sin gastos de comida cargados aún (viaje no empezó). La estimación **no** es un "$X/día" al ojo: se construye desde un **patrón semanal de comidas** definido, con precios unitarios por ciudad.
 
-| Región | $/día pp | Días | Total pp |
+#### Patrón semanal asumido (por persona)
+
+| Comida | Frecuencia | Qué es |
+|--------|-----------|--------|
+| **Desayuno** | 7/7 | Supermercado / cocina del hostel (café, pan, fruta, yogur) |
+| **Almuerzo** | **5/7** | **Picnic o comida en la calle** — supermercado, meal deal, pizza al taglio, bocadillo, street food |
+| **Almuerzo** | **2/7** | **Sentados en un lugar barato** — menú del día, formule, trattoria, pub lunch |
+| **Cena** | **5/7** | **Cocinar en el hostel/alojamiento** (ingredientes de supermercado) |
+| **Cena** | **2/7** | **Salir a comer afuera** — restaurante local de nivel medio-bajo, con una bebida |
+| *Extras* | diario | Café, agua, snack, cerveza/copa ocasional, helado |
+
+Fórmula por ciudad: `$/día = desayuno + (5×picnic + 2×almuerzo_sentado)/7 + (5×cocinar + 2×cena_afuera)/7 + extras`
+
+#### Precios unitarios de referencia (rango bajo-alto, USD pp)
+
+| Nivel de ciudad | Desayuno | Picnic | Alm. sentado | Cocinar cena | Cena afuera | Extras |
+|-----------------|----------|--------|--------------|--------------|-------------|--------|
+| 🇨🇭 Suiza (Interlaken) | $4.5-6.5 | $9-13.5 | $22-31 | $9-12 | $31-45 | $3-6 |
+| 🇬🇧🇳🇱🇫🇷 Occidental caro (Londres, Ámsterdam, París) | $3-5 | $5-9 | $14-23 | $4.5-8 | $20-34 | $3-6 |
+| 🇩🇪🇦🇹🇮🇹🇪🇸 Occidental medio (Alsacia, Friburgo, Viena, Roma, Florencia, Barcelona) | $2.5-4.5 | $5-7.5 | $12-19 | $3.5-6.5 | $17-29 | $3-5 |
+| 🇵🇹🇮🇹 Sur barato (Lisboa, Porto, Nápoles, Sur de Italia, Madrid) | $2-3.5 | $4-6.5 | $9-14 | $3-5 | $14-24 | $2-4 |
+| 🇨🇿🇵🇱🇭🇺🇸🇮 Europa Central | $2-3.5 | $3-6 | $7-14 | $2.5-4.5 | $11-20 | $2-4 |
+
+#### Total por ciudad
+
+| Ciudad | $/día pp | Días | Total pp |
 |--------|---------|------|----------|
-| Reino Unido (ago, temporada alta) | $38-52 | 20 | $760-1,040 |
-| Países Bajos + París | $36-48 | 10 | $360-480 |
-| **Portugal (Bruno)** | $25-38 | 8 | $200-304 |
-| **Pititas — Ámsterdam 3n (Katia)** | $36-48 | 3 | $108-144 |
-| **Pititas — París 5n (Katia)** | $36-48 | 5 | $180-240 |
-| Alsacia + Selva Negra | $32-42 | 7 | $224-294 |
-| Suiza (más cocina en hostel) | $42-60 | 4 | $168-240 |
-| Austria | $34-46 | 5 | $170-230 |
-| Europa Central (CZ, PL, HU, SI) | $17-26 | 17 | $289-442 |
-| Italia + España | $28-40 | 34 | $952-1,360 |
-| **Margen (3 días flex)** | $30-42 | 3 | $90-126 |
-| **TOTAL (Bruno)** | | **108** | **$3,213-4,516** |
-| **TOTAL (Katia, 108n: sin Portugal + Pititas AMS/París)** | | **108** | **$3,301-4,596** |
+| 🇬🇧 Londres | $24-39 | 8 | $192-312 |
+| 🇬🇧 York | $21-34 | 2 | $42-68 |
+| 🇬🇧 Edimburgo (3n + 1n tránsito) | $22-35 | 4 | $88-140 |
+| 🇬🇧 Highlands (casi todo cocinado) | $23-37 | 6 | $138-222 |
+| 🇳🇱 Ámsterdam | $24-38 | 4 | $96-152 |
+| 🇫🇷 París | $23-37 | 6 | $138-222 |
+| **🇵🇹 Lisboa + Porto (Bruno)** | $17-27 | 8 | $136-216 |
+| **🇳🇱 Pititas — Ámsterdam (Katia)** | $24-38 | 3 | $72-114 |
+| **🇫🇷 Pititas — París (Katia)** | $23-37 | 5 | $115-185 |
+| 🇫🇷 Estrasburgo | $22-33 | 2 | $44-66 |
+| 🇫🇷 Colmar | $22-33 | 2 | $44-66 |
+| 🇩🇪 Friburgo | $21-32 | 3 | $63-96 |
+| 🇨🇭 Interlaken | $36-53 | 4 | $144-212 |
+| 🇦🇹 Viena | $21-32 | 5 | $105-160 |
+| 🇨🇿 Praga | $14-22 | 5 | $70-110 |
+| 🇵🇱 Cracovia | $13-21 | 4 | $52-84 |
+| 🇭🇺 Budapest | $13-22 | 4 | $52-88 |
+| 🇸🇮 Eslovenia | $16-25 | 4 | $64-100 |
+| 🇮🇹 Florencia | $21-32 | 5 | $105-160 |
+| 🇮🇹 Roma | $21-32 | 7 | $147-224 |
+| 🇮🇹 Nápoles | $17-26 | 2 | $34-52 |
+| 🇮🇹 Sur de Italia | $18-28 | 10 | $180-280 |
+| 🇪🇸 Barcelona | $21-31 | 5 | $105-155 |
+| 🇪🇸 Madrid | $19-29 | 5 | $95-145 |
+| **Margen (3 días flex)** | $18-30 | 3 | $54-90 |
+| **TOTAL (Bruno)** | | **108** | **$2,188-3,420** |
+| **TOTAL (Katia, 108n: sin Portugal + Pititas AMS/París)** | | **108** | **$2,239-3,503** |
+
+> **Ejemplo de cómo sale el número (Londres, techo del rango):** desayuno $5 + almuerzo `(5×$9 + 2×$23)/7 = $13` + cena `(5×$8 + 2×$34)/7 = $15.4` + extras $6 = **$39/día**. En el piso: $3 + $7.9 + $9.9 + $3 = **$24/día**.
+
+> **Qué implica este patrón:** el presupuesto de comida bajó **~$960-1,030 pp** respecto de la versión anterior (que asumía comer afuera casi todos los días). El ahorro se concentra en Occidente: en Londres son **~$16/día menos**, en Interlaken **~$6/día menos** (allá cocinar es obligatorio, no una opción). En Europa Central el patrón cambia poco porque comer afuera ya cuesta casi lo mismo que cocinar.
+
+> **Requisito operativo:** esto **solo funciona si el alojamiento tiene cocina**. Al reservar las 12 ciudades pendientes, filtrar por hostel/Airbnb **con cocina disponible** — si no, la cena de 5/7 se convierte en 7/7 afuera y el rango vuelve a la banda anterior. Los ya reservados que sí tienen cocina: Black Forest Hostel (Friburgo), hostel Interlaken, Airbnbs de Estrasburgo y Colmar.
 
 ### Transporte (por persona)
 
@@ -83,9 +132,15 @@ Sin gastos de comida cargados aún (viaje no empezó). Se mantiene estimación; 
 | Florencia → Roma → Nápoles (Italo, fuera del pase) | $22-45 |
 | Barcelona → Madrid (Ouigo/AVLO, fuera del pase) | $17-41 |
 | Auto Highlands (7 días) — COMPRADO | **$171** |
-| Transporte local (metro, bus, etc.) | $550-850 |
-| **TOTAL TRANSPORTE (Bruno, sin vuelos Portugal)** | **~$2,280-2,790** |
-| **TOTAL TRANSPORTE (Katia, base compartida)** | **~$2,280-2,790** |
+| **Subtotal interciudad (Bruno, sin Portugal)** | **~$1,737-1,919** |
+| **Subtotal interciudad (Katia, sin Pititas)** | **~$1,729-1,911** |
+| Transporte **local** por ciudad (detalle en Resumen por Ciudad) | $431-1,022 |
+| **TOTAL TRANSPORTE (Bruno, sin vuelos Portugal)** | **~$2,168-2,941** |
+| **TOTAL TRANSPORTE (Katia, sin Pititas)** | **~$2,170-2,958** |
+
+> **Nafta + parkings Highlands:** £100-150 de combustible ÷2 + parkings £5-7/día ≈ **$70-105 pp**. Va contabilizado en el **transporte local** de la fila Highlands (antes faltaba: solo estaba el alquiler $171).
+
+> **Transporte local por ciudad** (rango total $431-1,022 pp): lo caro es Londres ($64-90, tope £8.90/día), París (Navigo Semaine ~$41), Highlands (nafta/parking $70-105), Roma ($25-55) y el Sur de Italia ($60-150, o $140-250 con auto). Gratis o casi: **York y Colmar $0** (todo a pie), **Friburgo $0** (KONUS Card incluida en el alojamiento), Florencia $0-15.
 
 **Portugal — transporte Bruno (1 persona):**
 - Vuelo París → Lisboa (Ryanair) — **$93.77 (COMPRADO)**
@@ -94,27 +149,28 @@ Sin gastos de comida cargados aún (viaje no empezó). Se mantiene estimación; 
 - **Subtotal Portugal transporte: $195.77-223.77**
 
 **Pititas — transporte Katia (Ámsterdam 3n + París 5n):**
-- Tren AMS ↔ París — **$39 (COMPRADO)**
-- Transporte local (GVB / Metro-RER, 8 días) — **$45-80** (también cubierto en “local” del viaje)
-- Regreso a reunión (París/Ámsterdam → Estrasburgo, 12 sept) — **$25-55** (o 1 día Eurail + reserva)
-- **Subtotal Pititas (para el bloque): $109-174**
-- **Extras vs base (tren $39 + reunión, sin recontar local): $64-94**
-- **TOTAL TRANSPORTE (Katia, incl. Pititas): ~$2,345-2,885**
+- Tren AMS → París — **$39 (COMPRADO)**
+- Regreso a reunión (París → Estrasburgo, 12 sept) — **$25-55** (o 1 día Eurail + reserva)
+- **Subtotal interciudad Pititas: $64-94** (el local de esos 8 días ya está en la tabla por ciudad)
+- **TOTAL TRANSPORTE (Bruno, incl. Portugal): ~$2,364-3,165**
+- **TOTAL TRANSPORTE (Katia, incl. Pititas): ~$2,234-3,052**
 
 **Nota:** El Eurail (15 días/2 meses) se activa al inicio del viaje (~7-8 ago) y cubre los tramos **más caros**: bloque UK y **Suiza**. Los trenes UK y el Eurostar **van dentro del pase** (la reserva de asiento Eurostar ya está paga). Lo barato o de operador privado (Italia, España, Praga→Cracovia, buses) se compra suelto.
 
 ### Otros Gastos (por persona)
 
+> **Las actividades/museos ya NO están acá**: pasaron a la columna *Actividades* del **Resumen por Ciudad**. Total pp: **$1,605-3,082 (Bruno) · $1,640-3,152 (Katia)**.
+
 | Concepto | Real / Estimado pp |
 |----------|-------------------|
 | Seguro de viaje — Pax Assistance BASIC — COMPRADO | **$320** |
 | eSIM datos (3.5 meses) | $90-150 |
-| Museos y atracciones (ver confirmados abajo) | $1,500-2,800 |
 | Lavandería (~12 veces) | $55-95 |
-| ETIAS | $8 |
+| UK ETA (~£16) | $20 (ambos) |
+| ETIAS | $8 (**solo Katia**) |
 | Compras Amazon (equipaje/gear) — COMPRADO | **$118 (solo Bruno)** |
-| **TOTAL OTROS (Bruno)** | **~$2,091-3,491** |
-| **TOTAL OTROS (Katia)** | **~$1,973-3,373** |
+| **TOTAL OTROS (Bruno)** | **~$603-703** |
+| **TOTAL OTROS (Katia)** | **~$493-593** |
 
 **Actividades ya compradas (shared → pp):**
 
@@ -128,111 +184,104 @@ Sin gastos de comida cargados aún (viaje no empezó). Se mantiene estimación; 
 
 ---
 
-## Resumen por País (por persona)
+## Resumen por Ciudad (por persona)
 
-### Reino Unido (20 noches: 5-25 ago)
-- Alojamiento: **$915.74** (Londres $37.61/n · York $59.50/n · Edimburgo $45.00/n · Highlands $299.87 · tránsito $61)
-- Comida: $760-1,040
-- Transporte: auto Highlands **$171** (confirmado) + trenes vía Eurail
-- Actividades: **$124.61 confirmado** + resto estimado → **~$320-520** total
-- **Subtotal: ~$2,170-2,650** (~$109-133/día)
+**Cómo leer esta tabla:**
+- **Alojamiento ✅** = monto **real** ya pagado (Spitwise). Sin ✅ = estimado de mercado.
+- **Transporte** de esta tabla = **solo transporte local** (metro/bus/tranvía/bici/nafta y parkings del auto). El transporte **interciudad** (Eurail, vuelos, Italo, ferries, alquiler del auto) va aparte en `### Transporte (por persona)` — no está acá para no duplicar.
+- **$/día** = total de la ciudad ÷ noches.
+- Tipos de cambio de referencia: **€1 ≈ $1.10 · £1 ≈ $1.28 · CHF 1 ≈ $1.12**.
+- Post-Portugal (de Estrasburgo en adelante) las **noches son tentativas**: la tabla presupuesta el borrador actual, no un plan cerrado.
 
-### Países Bajos (4 noches: 25-29 ago)
-- Alojamiento: **$230.42** (ClinkMama)
-- Comida: $144-192
-- Actividades: **$26.87 confirmado** (Ana Frank) + resto → **~$90-160**
-- **Subtotal: ~$490-610** (~$123-153/día)
+### Tabla maestra
 
-### Francia — París (6 noches: 29 ago - 4 sept)
-- Alojamiento: **$266.34**
-- Comida: $216-288
-- Actividades: $140-220
-- **Subtotal: ~$622-774** (~$104-129/día)
+| # | Ciudad | Noches | Alojamiento | Comida | Transp. local | Actividades | Total | $/día |
+|---|--------|--------|-------------|--------|---------------|-------------|-------|-------|
+| 1 | 🇬🇧 Londres | 8 | **$300.86** ✅ | $192-312 | $64-90 | $190-320 | $747-1,023 | $93-128 |
+| 2 | 🇬🇧 York | 2 | **$119.00** ✅ | $42-68 | $0 (a pie) | $35-70 | $196-257 | $98-129 |
+| 3 | 🇬🇧 Edimburgo | 3 | **$135.01** ✅ | $66-105 | $8-22 | $75-130 | $284-392 | $95-131 |
+| 4 | 🇬🇧 Highlands | 6 | **$299.87** ✅ | $138-222 | $70-105 | $60-160 | $568-787 | $95-131 |
+| 5 | 🇬🇧 Edimburgo (tránsito) | 1 | **$61.00** ✅ | $22-35 | $0-8 | — | $83-104 | $83-104 |
+| 6 | 🇳🇱 Ámsterdam | 4 | **$230.42** ✅ | $96-152 | $12-46 | $95-165 | $433-593 | $108-148 |
+| 7 | 🇫🇷 París | 6 | **$266.34** ✅ | $138-222 | $41-55 | $150-240 | $595-783 | $99-131 |
+| **8** | 🇵🇹 **Lisboa** *(Bruno)* | 5 | **$152.87** ✅ | $85-135 | $17-33 | $50-95 | $305-416 | $61-83 |
+| **9** | 🇵🇹 **Porto** *(Bruno)* | 3 | **$111.60** ✅ | $51-81 | $10-19 | $35-75 | $208-287 | $69-96 |
+| **10** | 🇳🇱 **Ámsterdam — Pititas** *(Katia)* | 3 | **~$229** ✅¹ | $72-114 | $12-32 | $40-80 | $353-455 | $118-152 |
+| **11** | 🇫🇷 **París — Pititas** *(Katia)* | 5 | **~$382** ✅¹ | $115-185 | $25-45 | $80-160 | $602-772 | $120-154 |
+| 12 | 🇫🇷 Estrasburgo | 2 | **$118.50** ✅ | $44-66 | $0-11 | $15-40 | $178-236 | $89-118 |
+| 13 | 🇫🇷 Colmar | 2 | **$68.00** ✅ | $44-66 | $0-22 | $15-32 | $127-188 | $64-94 |
+| 14 | 🇩🇪 Friburgo | 3 | **$126.35** ✅ | $63-96 | $0-8 ² | $15-35 | $204-265 | $68-88 |
+| 15 | 🇨🇭 Interlaken / Jungfrau | 4 | **$182.66** ✅ | $144-212 | $15-40 | $60-230 | $402-665 | $101-166 |
+| 16 | 🇦🇹 Innsbruck | 0 ³ | — | — | — | — | — | — |
+| 17 | 🇦🇹 Viena | 5 | $240-290 | $105-160 | $22-40 | $75-140 | $442-630 | $88-126 |
+| 18 | 🇨🇿 Praga | 5 | $130-170 | $70-110 | $10-30 | $55-100 | $265-410 | $53-82 |
+| 19 | 🇵🇱 Cracovia | 4 | $68-100 | $52-84 | $8-20 | $95-140 | $223-344 | $56-86 |
+| 20 | 🇭🇺 Budapest | 4 | $76-112 | $52-88 | $12-20 | $85-130 | $225-350 | $56-88 |
+| 21 | 🇸🇮 Eslovenia (base Liubliana) | 4 | $120-168 | $64-100 | $15-120 ⁴ | $60-120 | $259-508 | $65-127 |
+| 22 | 🇮🇹 Florencia | 5 | $165-225 | $105-160 | $0-15 | $85-150 | $355-550 | $71-110 |
+| 23 | 🇮🇹 Roma | 7 | $245-336 | $147-224 | $25-55 | $110-190 | $527-805 | $75-115 |
+| 24 | 🇮🇹 Nápoles | 2 | $76-100 | $34-52 | $8-20 | $35-70 | $153-242 | $77-121 |
+| 25 | 🇮🇹 Sur de Italia (por definir) | 10 | $300-500 | $180-280 | $60-150 ⁵ | $80-160 | $620-1,090 | $62-109 |
+| 26 | 🇪🇸 Barcelona | 5 | $140-210 | $105-155 | $10-25 | $70-140 | $325-530 | $65-106 |
+| 27 | 🇪🇸 Madrid | 5 | $130-190 | $95-145 | $14-38 | $40-90 | $279-463 | $56-93 |
+| 28 | ⚪ Margen flex (ubicación TBD) | 3 | $90-140 | $54-90 | $10-30 | $20-60 | $174-320 | $58-107 |
 
-### Portugal — Lisboa + Porto (8 noches: 4-12 sept) — Bruno
+> **Cuadre de noches:** la columna suma **116** porque el tramo **4-12 sept aparece dos veces** (filas 8-9 = Bruno · filas 10-11 = Katia). Cada persona hace **108 noches**: Bruno = 116 − 8 (Pititas) · Katia = 116 − 8 (Portugal).
 
-| Concepto | Real / Estimado |
-|----------|----------|
-| Alojamiento — Lisboa $152.87 + Porto $111.60 | **$264.47 (real)** |
-| Comida (8d) | $200-304 |
-| Actividades | $70-130 |
-| Transporte (vuelos + tren interno) | **$195.77-223.77** |
-| **Subtotal** | **$730-922** (~$91-115/día) |
+**Notas de la tabla:**
+1. **Pititas (Katia):** el hospedaje real es **$611 por las 8 noches juntas** (una sola reserva). El split $229 / $382 es prorrateo por noche, no dos pagos separados.
+2. **Friburgo:** el alojamiento incluye **KONUS Card** → transporte regional de la Selva Negra **gratis**. El rango solo cubre eventuales bicis.
+3. **Innsbruck:** en el borrador son **0 noches** (tránsito el 23-sept). Costo marginal si se suman: **~$78-110/noche** (aloj $45-60 + comida $22-33 + transp $8-9 + Nordkette ~€31 si se sube).
+4. **Eslovenia:** el piso ($15) es hacer todo en bus desde Liubliana; el techo ($120) es **alquilar auto** para el loop (€35-55/día ÷2 + viñeta €16.50). Decidir en el viaje.
+5. **Sur de Italia:** transporte local + traslados intra-región. Con auto sube a **$140-250** (€25-45/día ÷2).
 
-### Pititas — Ámsterdam 3n + París 5n (8 noches: 4-12 sept) — Katia
+### Ranking por $/día (de más barato a más caro)
 
-> Solo hospedaje confirmado (**$611**). Comida, transporte y actividades = estimación (mismo nivel que AMS/París del tramo compartido).
+Para decidir dónde estirar las **3 noches de margen** y dónde recortar:
 
-| Concepto | Real / Estimado |
-|----------|-----------------|
-| Alojamiento (Ámsterdam 3n + París 5n) | **$611.00 (real)** |
-| Comida Ámsterdam (3d × $36-48) | $108-144 |
-| Comida París (5d × $36-48) | $180-240 |
-| Actividades / museos | $100-180 |
-| Tren AMS ↔ París | **$39 (COMPRADO)** |
-| Local + regreso a Estrasburgo | $70-135 |
-| **Subtotal** | **~$1,108-1,349** (~$139-169/día) |
+| Ciudad | $/día | Ciudad | $/día |
+|--------|-------|--------|-------|
+| 🇨🇿 Praga | $53-82 | 🇮🇹 Florencia | $71-110 |
+| 🇵🇱 Cracovia | $56-86 | 🇮🇹 Roma | $75-115 |
+| 🇭🇺 Budapest | $56-88 | 🇸🇮 Eslovenia | $65-127 |
+| 🇪🇸 Madrid | $56-93 | 🇮🇹 Nápoles | $77-121 |
+| 🇵🇹 Lisboa | $61-83 | 🇫🇷 Estrasburgo | $89-118 |
+| 🇩🇪 Friburgo | $68-88 | 🇦🇹 Viena | $88-126 |
+| 🇫🇷 Colmar | $64-94 | 🇬🇧 Londres | $93-128 |
+| 🇵🇹 Porto | $69-96 | 🇬🇧 Edimburgo | $95-131 |
+| 🇮🇹 Sur de Italia | $62-109 | 🇬🇧 Highlands | $95-131 |
+| 🇪🇸 Barcelona | $65-106 | 🇬🇧 York | $98-129 |
+| ⚪ Margen flex | $58-107 | 🇫🇷 París | $99-131 |
+| | | 🇳🇱 Ámsterdam | $108-148 |
+| | | 🇨🇭 Interlaken | $101-166 |
 
-### Alsacia + Selva Negra (7 noches: 12-19 sept)
-- Alojamiento: **$312.85** (Estrasburgo $118.50 + Colmar $68.00 + Friburgo $126.35)
-- Comida: $224-294
-- Actividades: $55-95
-- **Subtotal: ~$592-702** (~$85-100/día)
+> **Lectura:** cada noche extra en **Praga / Cracovia / Budapest / Madrid** cuesta **la mitad** que una en Ámsterdam o Interlaken. Si las 3 noches de margen se usan en Europa Central, el impacto es **~$170-270**; si se usan en Ámsterdam/París/Suiza, **~$300-500**.
 
-### Suiza — Interlaken (4 noches: 19-23 sept)
-- Alojamiento: **$182.66** ✅ (antes estimado $288-360)
-- Comida: $168-240 (baja vs techo previo: más cocina)
-- Actividades: $170-300 (Jungfrau/trenes de montaña siguen caros)
-- **Subtotal: ~$520-720** (~$130-180/día)
+### Notas por ciudad (dónde está el gasto real)
 
-### Austria (5 noches en borrador: Viena 23-28 sept; Innsbruck 0, puede +1–2)
-- Alojamiento: $240-410
-- Comida: $170-230
-- Actividades: $85-140
-- **Subtotal: ~$495-780** (~$99-156/día)
-
-### Chequia (5 noches: 28 sept - 3 oct)
-- Alojamiento: $130-170
-- Comida: $85-130
-- Actividades: $55-90
-- **Subtotal: ~$270-390** (~$54-78/día)
-
-### Polonia (4 noches: 3-7 oct)
-- Alojamiento: $68-100
-- Comida: $68-104
-- Actividades: $60-100
-- **Subtotal: ~$196-304** (~$49-76/día)
-
-### Hungría (4 noches: 7-11 oct)
-- Alojamiento: $76-112
-- Comida: $68-104
-- Actividades: $70-115
-- **Subtotal: ~$214-331** (~$54-83/día)
-
-### Eslovenia (4 noches: 11-15 oct, base Liubliana)
-- Alojamiento: $120-168
-- Comida: $80-120
-- Actividades: $60-100
-- **Subtotal: ~$260-388** (~$65-97/día)
-
-### Italia (24 noches: 15 oct - 8 nov)
-- Alojamiento: $912-1,200
-- Comida: $672-960
-- Actividades: $300-480
-- **Subtotal: ~$1,884-2,640** (~$79-110/día)
-
-> **Nota Sur de Italia:** El presupuesto de las **10 noches** tentativas del bloque “Sur de Italia” varía según la ruta:
-> - **Costa Amalfitana:** $$-$$$ — ~$40-55pp/día todo incluido.
-> - **Puglia / Sicilia:** $ — ~$30-45pp/día.
-> - **Calabria:** $ — ~$25-40pp/día. Sumar auto €25-40/día si aplica.
->
-> Elegir Puglia/Calabria/Sicilia vs Amalfi puede ahorrar $100-250pp en esas 10 noches.
-
-### España (10 noches: 8-18 nov)
-- Alojamiento: $330-450
-- Comida: $280-400
-- Actividades: $140-210
-- **Subtotal: ~$750-1,060** (~$75-106/día)
+- **Londres:** los museos top (British ✅, National Gallery, Tate, V&A, Natural History) son **gratis**. El gasto se concentra en Harry Potter Studio **£58.50** ✅, Torre de Londres **£37**, Churchill War Rooms **£34** y Westminster **£31**. London Pass **no conviene** (ver tabla de passes).
+- **York:** todo a pie → transporte **$0**. Solo dos entradas pesan: Minster **£26** y Jorvik **£17.50**.
+- **Edimburgo:** contactless con **tope £5.70/día** y ciudad muy caminable. Castillo **£21.50 online** (vs £24 en puerta) y Mary King's Close **£35** ✅ ya pago.
+- **Highlands:** el alquiler ($171 ✅) está en la sección Transporte; acá va **nafta £100-150 ÷2 + parkings £5-7/día**. Con auto propio se puede cargar el supermercado para varios días — es el tramo donde el patrón de cocina es más fácil de sostener (y donde hay menos alternativa: los restaurantes rurales son caros).
+- **Ámsterdam:** OVpay tope **€10.50/día**, pero con **bici (€12-17/día)** o a pie el gasto real es menor. Museos caros y sí o sí con hora reservada: Van Gogh €25, Rijksmuseum €22.50 (Ana Frank €16.50 ✅ ya pago).
+- **París:** **Navigo Semaine €32.40** (+€5 tarjeta) cubre la semana entera y es lo más barato. **Paris Museum Pass 4d ≈ €85** conviene si hacen Louvre + Orsay + Sainte-Chapelle + Versailles.
+- **Lisboa / Porto:** los más baratos del tramo occidental. Ojo con las entradas de Belém (Jerónimos €18 + Torre €15) y las bodegas de Porto (Sandeman €23, Graham's desde €30).
+- **Interlaken:** **el gran swing del viaje**. Jungfraujoch cuesta **CHF 234.80** tarifa plena; con descuento de pase baja a **CHF ~148-177** (May-Oct: CHF 177.20) → **$165-200 solo esa excursión**. Alternativas mucho más baratas con vistas similares: Harder Kulm **CHF 40**, First **CHF 72** (o subir a pie, CHF 0), Schilthorn con Eurail **CHF 45.70**, Trümmelbach **CHF 16**. **Acá cocinar no es opcional:** un plato en restaurante cuesta CHF 25-40; sin el patrón de cocina, la comida de esas 4 noches se dispara a ~$75/día.
+- **Viena:** Vienna Pass **no conviene** a 5 días. Schönbrunn Imperial **€22** (Grand €28), Belvedere **€19.50 online**. La ópera en **standing room €10-15** es el mejor costo/beneficio de la ciudad.
+- **Praga:** ciudad barata; Prague Card **no conviene**. Lo caro es el **Barrio Judío (700 CZK ≈ €28)** — es casi el 50% del presupuesto de actividades.
+- **Cracovia:** el techo de actividades lo marcan **Auschwitz con guía (~150 PLN ≈ €35)** y **Wieliczka (143 PLN ≈ €33)**. Ambos son excursiones de medio día.
+- **Budapest:** **Budapest Card 72h** conviene (termas + transporte + museos). Parlamento no-UE **14,000 HUF ≈ €35** y Széchenyi **~€33** entre semana (más caro vie-sáb).
+- **Eslovenia:** rango de transporte muy amplio según **auto sí/no**. Entradas fuertes: Postojna **€33.50**, combo Postojna+Predjama **€46-48**, Bled Castle **€19**, Vintgar **€15** (slot online obligatorio).
+- **Florencia:** el billete urbano subió a **€2.00 el 1-ago-2026** (antes €1.70), pero es todo a pie. **Firenze Card €85 solo si exprimen 3+ museos grandes**; si no, sueltos: Brunelleschi Pass €30 + Uffizi €25 + Accademia €20 ya son €75.
+- **Roma:** **Roma Pass 72h conviene** (Coliseo skip-the-line + transporte + 1 museo). Coliseo **€18**, Vaticano **€20 oficial / €25 con gestión online**. Tap&Go tiene **tope €8.50/día**. Nueva tasa Fontana di Trevi **€2**.
+- **Nápoles:** el más barato de Italia en comida. Pompeya (**€18** + Circumvesuviana €3.30 i/v) es el gasto grande de esas 2 noches.
+- **Sur de Italia (10n, sin definir):** el rango depende de la ruta —
+  - **Costa Amalfitana:** ~$40-55/día · el más caro (Positano cerrado en nov; Minori/Maiori/Atrani son la opción barata).
+  - **Puglia / Sicilia:** ~$30-45/día.
+  - **Calabria:** ~$25-40/día · el más barato.
+  - Elegir Puglia/Calabria/Sicilia en vez de Amalfi ahorra **$100-250 pp** en el bloque. Sumar **auto €25-45/día** si se elige Puglia interior o Sicilia.
+- **Barcelona:** **T-casual €13 = €1.30/viaje y es compartible entre los dos**. Sagrada Familia **€26** (+torres €36) y Park Güell **€18** son lo caro; Articket €38 si hacen 3+ museos.
+- **Madrid:** el más barato de Europa Occidental. **Prado gratis las últimas 2h**, **Reina Sofía gratis** en franja — si aprovechan los horarios gratuitos, las actividades caen al piso del rango.
 
 ---
 
@@ -242,29 +291,40 @@ Sin gastos de comida cargados aún (viaje no empezó). Se mantiene estimación; 
 
 | Categoría | Rango |
 |-----------|-------|
-| Alojamiento | $4,147-4,898 |
-| Alimentación | $3,213-4,516 |
-| Transporte (incl. Portugal) | $2,476-3,014 |
-| Otros (incl. Amazon $118) | $2,091-3,491 |
-| **TOTAL Bruno** | **~$11,930-15,920** |
+| Alojamiento | $3,952-4,713 |
+| Alimentación (patrón 5/7 picnic + 5/7 cocinar) | $2,188-3,420 |
+| Transporte interciudad (incl. Portugal) | $1,933-2,143 |
+| Transporte local (suma por ciudad) | $431-1,022 |
+| Actividades / museos (suma por ciudad) | $1,605-3,082 |
+| Otros (seguro, eSIM, lavandería, ETA, Amazon $118) | $603-703 |
+| **TOTAL Bruno** | **~$10,712-15,083** |
 
 ### Katia (108 noches: viaje completo + Pititas Ámsterdam 3n / París 5n)
 
 | Categoría | Rango |
 |-----------|-------|
-| Alojamiento (shared sin Portugal + Pititas $611) | $4,494-5,244 |
-| Alimentación | $3,301-4,596 |
-| Transporte (incl. Pititas) | $2,345-2,885 |
-| Otros | $1,973-3,373 |
-| **TOTAL Katia** | **~$12,115-16,100** |
+| Alojamiento (shared sin Portugal + Pititas $611) | $4,299-5,060 |
+| Alimentación (patrón 5/7 picnic + 5/7 cocinar) | $2,239-3,503 |
+| Transporte interciudad (incl. Pititas) | $1,793-2,005 |
+| Transporte local (suma por ciudad) | $441-1,047 |
+| Actividades / museos (suma por ciudad) | $1,640-3,152 |
+| Otros (seguro, eSIM, lavandería, ETA, ETIAS) | $493-593 |
+| **TOTAL Katia** | **~$10,905-15,360** |
 
 ### Gran Total (ambos)
 
 | Concepto | Rango |
 |----------|-------|
-| Bruno | **~$11,930-15,920** |
-| Katia | **~$12,115-16,100** |
-| **TOTAL VIAJE** | **~$24,045-32,020** |
+| Bruno | **~$10,712-15,083** |
+| Katia | **~$10,905-15,360** |
+| **TOTAL VIAJE** | **~$21,620-30,445** |
+
+> **Qué cambió vs la versión anterior ($24,045-32,020):**
+> 1. **Alimentación reconstruida** con el patrón real de comidas (5/7 almuerzo picnic/calle, 2/7 sentado barato · 5/7 cena cocinada, 2/7 afuera): **−$960-1,030 pp**. Es el cambio más grande.
+> 2. **Alojamiento de Italia y España** ajustado a precios reales de temporada baja: **−$195-185 pp**.
+> 3. **Transporte local y actividades** ahora se presupuestan ciudad por ciudad en vez de dos números globales — eso **sube el techo** ~$400, porque los globales subestimaban Londres, París, Roma y el Sur de Italia.
+>
+> Neto: **~$2,425 menos en el piso y ~$1,575 menos en el techo** para el viaje completo. Y ahora todo es rastreable por ciudad.
 
 ---
 
@@ -315,19 +375,21 @@ Montos **gross** del hogar (o personales si `payer_only`). Incluye cuotas pendie
 
 ### Presupuesto promedio r/solotravel Europa:
 - Viaje económico: €50-70/día pp (~$55-77)
-- Nuestro estimado: ~$95-130/día pp (alojamiento + comida + transporte local)
+- Nuestro estimado **en destino** (alojamiento + comida + transporte local + actividades, sin vuelos ni Eurail): **~$76-113/día pp**
 
 ### Comparación:
 
-| Concepto | Reddit Average | Nuestro Estimado |
+| Concepto | Reddit Average | Nuestro Estimado (promedio 108 días) |
 |----------|---------------|------------------|
-| Alojamiento pp/día | €20-25 | $38-48 (confirmados UK→CH ~$37-61) |
-| Comida pp/día | €15-20 | $30-42 |
-| Transporte local pp/día | €5-10 | ~$5-8 |
-| Actividades pp/día | €10-15 | ~$14-26 |
-| **TOTAL pp/día** | **€50-70** | **~$90-125** |
+| Alojamiento pp/día | €20-25 | $37-44 (confirmados UK→CH: $34-61) |
+| Comida pp/día | €15-20 | **$20-32** (con patrón 5/7 picnic + 5/7 cocinar) |
+| Transporte local pp/día | €5-10 | $4-9 |
+| Actividades pp/día | €10-15 | $15-29 |
+| **TOTAL pp/día** | **€50-70 (~$55-77)** | **~$76-113** |
 
-El ritmo real de alojamiento hasta Interlaken está en la banda **media-hostel**, no en el techo. Europa del Este debería bajar el promedio; Suiza/actividades de montaña lo empujan para arriba.
+Con el patrón de comidas definido, **la comida ya está dentro del rango de referencia de Reddit** (€15-20/día ≈ $17-22 vs nuestro piso de $20). Lo que nos deja por encima del "viaje económico" es el **alojamiento** (van de a dos en habitaciones más cómodas que dorm de 12) y las **actividades** ($15-29/día vs €10-15).
+
+El ritmo real de alojamiento hasta Interlaken está en la banda **media-hostel**, no en el techo. Europa Central (Praga/Cracovia/Budapest, $53-88/día) baja el promedio; Ámsterdam e Interlaken ($101-166/día) lo empujan para arriba. **La diferencia entre estar en el piso y el techo del rango es ~$4,370 pp** — se juega casi toda en **actividades opcionales** (Jungfraujoch, Jacobite, Firenze Card, bodegas de Porto) y en **respetar o no el patrón de cocina**.
 
 ---
 
@@ -351,9 +413,9 @@ Resumen rápido de cuáles convienen (verificar precios actuales antes de compra
 
 ## Tips para Ahorrar
 
-**Alojamiento:** Reservar con anticipación, buscar con cocina, hostales privados en ciudades caras
+**Alojamiento:** Reservar con anticipación, **filtrar sí o sí por cocina disponible** (todo el presupuesto de comida depende de eso), hostales privados en ciudades caras
 **Transporte:** Eurail optimizado, trenes nocturnos, vuelos low-cost anticipados, BlaBlaCar
-**Comida:** Mercados locales, menú del día (España/Francia), cocinar en hostel, supermercados en Suiza
+**Comida:** Sostener el patrón **5/7 picnic + 5/7 cocina**. Guardar los 2 almuerzos sentados para el **menú del día** (España, Francia, Italia — es la comida más barata del día) y las 2 cenas afuera para donde valga la pena (Nápoles, Lisboa, Cracovia: comer afuera cuesta casi lo mismo que cocinar)
 **Actividades:** Free walking tours, días gratuitos en museos, city cards cuando convengan
 
 ---
@@ -380,12 +442,25 @@ Resumen rápido de cuáles convienen (verificar precios actuales antes de compra
 - Coliseo (tarifas oficiales): `https://parcocolosseo.it/visita/orari-e-biglietti/`
 - Cappella Sansevero (tarifas): `http://www.museosansevero.it/it/informazioni/orari-e-tariffe`
 - MANN Nápoles (tarifas): `https://museoarcheologiconapoli.it/en/timetables-and-fares/`
+- Jungfraujoch (tarifas y descuentos de pase): `https://www.jungfrau.ch/en-gb/jungfraujoch-top-of-europe/`
+- Sagrada Familia (tickets): `https://sagradafamilia.org/en/tickets`
+- Museo del Prado (tarifas y horario gratuito): `https://www.museodelprado.es/en/visit-the-museum/prices`
+- Postojna + Predjama (combos): `https://www.postojnska-jama.eu/en/tickets/`
 
 ---
 
 ## Checklist Financiero
 
+- [ ] **Fijar el tipo de cambio real** al empezar el viaje y revisar la tabla por ciudad (hoy: €1 ≈ $1.10 · £1 ≈ $1.28 · CHF 1 ≈ $1.12).
+- [ ] **Decidir Jungfraujoch sí/no** antes del 19-sept — es el único ítem que mueve **$165-200 pp** de una sola vez.
+- [ ] **Decidir Sur de Italia** antes de reservar el vuelo a Barcelona — Amalfi vs Puglia/Sicilia/Calabria cambia **$100-250 pp**.
+- [ ] **Decidir auto en Eslovenia** (bus $15 vs auto $120 pp por el bloque).
+- [ ] Comprar **Budapest Card 72h** y evaluar **Roma Pass 72h** al llegar.
+- [ ] Aprovechar horarios gratuitos: **Prado (últimas 2h)** y **Reina Sofía** en Madrid.
+- [ ] **Al reservar las 12 ciudades pendientes: filtrar por alojamiento CON COCINA.** Todo el presupuesto de comida ($2,188-3,420) depende del patrón 5/7 cocinar; sin cocina se va ~$960-1,030 pp arriba.
+- [ ] Cargar en Spitwise los gastos diarios por ciudad para poder comparar **real vs estimado** contra esta tabla. Chequear en la primera semana (Londres) si el patrón de comidas se sostiene en la práctica.
+- [ ] Revisar el rango a mitad de viaje (~Viena, fin de septiembre) y reasignar las **3 noches de margen** según el ranking de $/día.
 
 ---
 
-**Última actualización:** 23 julio 2026 — Katia alineada a **108 noches**. Pititas = **Ámsterdam 3n + París 5n** (hospedaje **$611** ya pago; comida/transporte/actividades estimados). Totales Katia ~$12,115-16,100. Confirmados Spitwise $9,233.42.
+**Última actualización:** 3 agosto 2026 — El resumen pasó de **por país a por ciudad** (28 filas, 108 noches), con transporte local y actividades presupuestados ciudad por ciudad y precios 2026 verificados. La **alimentación se reconstruyó desde un patrón semanal de comidas** (almuerzo 5/7 picnic + 2/7 sentado barato · cena 5/7 cocinada + 2/7 afuera) con precios unitarios por ciudad, en vez de un "$X/día" estimado. Totales recalculados: **Bruno ~$10,712-15,083 · Katia ~$10,905-15,360 · viaje ~$21,620-30,445**. Confirmados Spitwise **$9,233.42** (sin cambios).
